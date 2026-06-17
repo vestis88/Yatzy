@@ -3,82 +3,177 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Yatzy" />
+  <meta name="theme-color" content="#1c1917" />
   <title>Yatzy</title>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
-          }
-        }
-      }
-    }
-  </script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzFjMTkxNyIvPgogIDx0ZXh0IHg9IjI1NiIgeT0iMjAwIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIxODAiIGZpbGw9IiNmYmJmMjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPlk8L3RleHQ+CiAgPHJlY3QgeD0iOTYiIHk9IjI4MCIgd2lkdGg9IjMyMCIgaGVpZ2h0PSIxOCIgcng9IjkiIGZpbGw9IiNkYzI2MjYiLz4KICA8Y2lyY2xlIGN4PSIxNTYiIGN5PSIzNzAiIHI9IjI4IiBmaWxsPSIjZjVmNWY0Ii8+CiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMzcwIiByPSIyOCIgZmlsbD0iI2Y1ZjVmNCIvPgogIDxjaXJjbGUgY3g9IjM1NiIgY3k9IjM3MCIgcj0iMjgiIGZpbGw9IiNmNWY1ZjQiLz4KICA8Y2lyY2xlIGN4PSIyMDYiIGN5PSI0MjAiIHI9IjI4IiBmaWxsPSIjZjVmNWY0Ii8+CiAgPGNpcmNsZSBjeD0iMzA2IiBjeT0iNDIwIiByPSIyOCIgZmlsbD0iI2Y1ZjVmNCIvPgo8L3N2Zz4=" />
+  <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <style>
-    * { -webkit-tap-highlight-color: transparent; }
-    body { margin: 0; overscroll-behavior: none; }
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    body { margin: 0; overscroll-behavior: none; background: #1c1917; }
+    #root { min-height: 100dvh; }
   </style>
+  <script>
+(function() {
+  var c = document.createElement('canvas');
+  c.width = c.height = 180;
+  var ctx = c.getContext('2d');
+  // Background
+  ctx.fillStyle = '#1c1917';
+  ctx.beginPath();
+  var r = 36;
+  ctx.moveTo(r, 0); ctx.lineTo(180-r, 0);
+  ctx.quadraticCurveTo(180, 0, 180, r);
+  ctx.lineTo(180, 180-r); ctx.quadraticCurveTo(180, 180, 180-r, 180);
+  ctx.lineTo(r, 180); ctx.quadraticCurveTo(0, 180, 0, 180-r);
+  ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath(); ctx.fill();
+  // Y letter
+  ctx.fillStyle = '#fbbf24';
+  ctx.font = 'bold 110px Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Y', 90, 72);
+  // Red bar
+  ctx.fillStyle = '#dc2626';
+  ctx.fillRect(28, 118, 124, 10);
+  // Dice dots
+  ctx.fillStyle = '#f5f5f4';
+  var dots = [[52,150],[90,150],[128,150],[71,172],[109,172]];
+  dots.forEach(function(d) {
+    ctx.beginPath(); ctx.arc(d[0], d[1], 10, 0, Math.PI*2); ctx.fill();
+  });
+  var link = document.createElement('link');
+  link.rel = 'apple-touch-icon';
+  link.href = c.toDataURL('image/png');
+  document.head.appendChild(link);
+})();
+</script>
 </head>
 <body>
   <div id="root"></div>
-  <script type="text/babel">
-    const { useState, useRef, useEffect } = React;
+  <script>
+const {
+  useState,
+  useRef,
+  useEffect
+} = React;
 
-
-// ---------- Inline SVG icons (replaces lucide-react) ----------
-function Trophy({ className = '' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-      <path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-      <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-      <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-    </svg>
-  );
+// ---------- Inline SVG icons ----------
+function Trophy({
+  className = ''
+}) {
+  return /*#__PURE__*/React.createElement("svg", {
+    className: className,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M6 9H4.5a2.5 2.5 0 0 1 0-5H6"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M18 9h1.5a2.5 2.5 0 0 0 0-5H18"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M4 22h16"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M18 2H6v7a6 6 0 0 0 12 0V2Z"
+  }));
 }
-function Undo2({ className = '' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/>
-    </svg>
-  );
+function Undo2({
+  className = ''
+}) {
+  return /*#__PURE__*/React.createElement("svg", {
+    className: className,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M9 14 4 9l5-5"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"
+  }));
 }
-function Volume2({ className = '' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-    </svg>
-  );
+function Volume2({
+  className = ''
+}) {
+  return /*#__PURE__*/React.createElement("svg", {
+    className: className,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M15.54 8.46a5 5 0 0 1 0 7.07"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M19.07 4.93a10 10 0 0 1 0 14.14"
+  }));
 }
-function VolumeX({ className = '' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-      <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
-    </svg>
-  );
+function VolumeX({
+  className = ''
+}) {
+  return /*#__PURE__*/React.createElement("svg", {
+    className: className,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5"
+  }), /*#__PURE__*/React.createElement("line", {
+    x1: "23",
+    y1: "9",
+    x2: "17",
+    y2: "15"
+  }), /*#__PURE__*/React.createElement("line", {
+    x1: "17",
+    y1: "9",
+    x2: "23",
+    y2: "15"
+  }));
 }
-function Pencil({ className = '' }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>
-    </svg>
-  );
+function Pencil({
+  className = ''
+}) {
+  return /*#__PURE__*/React.createElement("svg", {
+    className: className,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "m15 5 4 4"
+  }));
 }
-
 
 // Personal storage keys
 const STORAGE_KEY = 'yatzy-game-state-v2';
 const STATS_KEY = 'yatzy-stats';
-
 const FONT_STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap');
   .font-display { font-family: 'Space Grotesk', system-ui, sans-serif; }
@@ -112,8 +207,13 @@ function getAudioContext() {
   if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
   return audioCtx;
 }
-
-function tone(ctx, { freq = 440, duration = 0.1, type = 'sine', gain = 0.15, time = 0 }) {
+function tone(ctx, {
+  freq = 440,
+  duration = 0.1,
+  type = 'sine',
+  gain = 0.15,
+  time = 0
+}) {
   const osc = ctx.createOscillator();
   const g = ctx.createGain();
   osc.type = type;
@@ -128,7 +228,14 @@ function tone(ctx, { freq = 440, duration = 0.1, type = 'sine', gain = 0.15, tim
 }
 
 // A short burst of filtered noise — used for percussive "clicks" and "thuds"
-function noiseBurst(ctx, { time = 0, duration = 0.03, filterType = 'highpass', filterFreq = 2000, gain = 0.3, q = 0.7 }) {
+function noiseBurst(ctx, {
+  time = 0,
+  duration = 0.03,
+  filterType = 'highpass',
+  filterFreq = 2000,
+  gain = 0.3,
+  q = 0.7
+}) {
   const frames = Math.max(1, Math.floor(ctx.sampleRate * duration));
   const buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
   const data = buffer.getChannelData(0);
@@ -154,11 +261,10 @@ function seededRandom(seed) {
   let s = seed % 2147483647;
   if (s <= 0) s += 2147483646;
   return () => {
-    s = (s * 16807) % 2147483647;
+    s = s * 16807 % 2147483647;
     return (s - 1) / 2147483646;
   };
 }
-
 const ROLL_SOUND_VARIANTS = 15;
 
 // Dice-clatter sound: a handful of short, filtered "tap" clicks with a bit of low body,
@@ -166,7 +272,7 @@ const ROLL_SOUND_VARIANTS = 15;
 function playRollSound(variant = 0) {
   const ctx = getAudioContext();
   if (!ctx) return;
-  const rand = seededRandom((((variant % ROLL_SOUND_VARIANTS) + ROLL_SOUND_VARIANTS) % ROLL_SOUND_VARIANTS) * 977 + 41);
+  const rand = seededRandom((variant % ROLL_SOUND_VARIANTS + ROLL_SOUND_VARIANTS) % ROLL_SOUND_VARIANTS * 977 + 41);
   const clickCount = 6 + Math.floor(rand() * 4); // 6-9 clicks
   for (let i = 0; i < clickCount; i++) {
     const progress = i / clickCount;
@@ -175,18 +281,41 @@ function playRollSound(variant = 0) {
     const filterFreq = 1400 + rand() * 3200;
     // Clicks get gentler and closer together as the dice "settle"
     const gain = (0.22 - progress * 0.12) * (0.8 + rand() * 0.4);
-    noiseBurst(ctx, { time, duration, filterType: 'bandpass', filterFreq, gain, q: 1.2 });
+    noiseBurst(ctx, {
+      time,
+      duration,
+      filterType: 'bandpass',
+      filterFreq,
+      gain,
+      q: 1.2
+    });
     if (rand() > 0.55) {
-      tone(ctx, { freq: 70 + rand() * 90, duration: 0.05, type: 'sine', gain: 0.04, time });
+      tone(ctx, {
+        freq: 70 + rand() * 90,
+        duration: 0.05,
+        type: 'sine',
+        gain: 0.04,
+        time
+      });
     }
   }
 }
-
 function playHoldSound() {
   const ctx = getAudioContext();
   if (!ctx) return;
-  noiseBurst(ctx, { duration: 0.02, filterType: 'bandpass', filterFreq: 2600, gain: 0.18, q: 1.5 });
-  tone(ctx, { freq: 640, duration: 0.03, type: 'square', gain: 0.04 });
+  noiseBurst(ctx, {
+    duration: 0.02,
+    filterType: 'bandpass',
+    filterFreq: 2600,
+    gain: 0.18,
+    q: 1.5
+  });
+  tone(ctx, {
+    freq: 640,
+    duration: 0.03,
+    type: 'square',
+    gain: 0.04
+  });
 }
 
 // A reassuring low "thud" for locking in a score, with slight pitch/timing variation each time
@@ -194,22 +323,47 @@ function playConfirmSound() {
   const ctx = getAudioContext();
   if (!ctx) return;
   const wobble = 1 + (Math.random() - 0.5) * 0.08; // ±4%
-  tone(ctx, { freq: 92 * wobble, duration: 0.26, type: 'sine', gain: 0.32 });
-  tone(ctx, { freq: 55 * wobble, duration: 0.32, type: 'sine', gain: 0.2, time: 0.015 });
-  noiseBurst(ctx, { duration: 0.07, filterType: 'lowpass', filterFreq: 220, gain: 0.16 });
+  tone(ctx, {
+    freq: 92 * wobble,
+    duration: 0.26,
+    type: 'sine',
+    gain: 0.32
+  });
+  tone(ctx, {
+    freq: 55 * wobble,
+    duration: 0.32,
+    type: 'sine',
+    gain: 0.2,
+    time: 0.015
+  });
+  noiseBurst(ctx, {
+    duration: 0.07,
+    filterType: 'lowpass',
+    filterFreq: 220,
+    gain: 0.16
+  });
 }
-
 function playStrokeSound() {
   const ctx = getAudioContext();
   if (!ctx) return;
-  tone(ctx, { freq: 160, duration: 0.14, type: 'sawtooth', gain: 0.1 });
+  tone(ctx, {
+    freq: 160,
+    duration: 0.14,
+    type: 'sawtooth',
+    gain: 0.1
+  });
 }
-
 function playYatzySound() {
   const ctx = getAudioContext();
   if (!ctx) return;
   [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
-    tone(ctx, { freq, duration: 0.22, type: 'triangle', gain: 0.18, time: i * 0.1 });
+    tone(ctx, {
+      freq,
+      duration: 0.22,
+      type: 'triangle',
+      gain: 0.18,
+      time: i * 0.1
+    });
   });
 }
 
@@ -219,25 +373,29 @@ function playBonusSound() {
   const ctx = getAudioContext();
   if (!ctx) return;
   [392.0, 493.88, 587.33, 783.99].forEach((freq, i) => {
-    tone(ctx, { freq, duration: 0.18, type: 'sine', gain: 0.2, time: i * 0.08 });
+    tone(ctx, {
+      freq,
+      duration: 0.18,
+      type: 'sine',
+      gain: 0.2,
+      time: i * 0.08
+    });
   });
 }
-
 function vibrate(pattern) {
   if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(pattern);
 }
 
 // Torn-paper edge: flat top, jagged bottom
-const TORN_EDGE =
-  'polygon(0% 0%, 100% 0%, 100% 40%, 96% 100%, 92% 40%, 88% 100%, 84% 40%, 80% 100%, 76% 40%, 72% 100%, 68% 40%, 64% 100%, 60% 40%, 56% 100%, 52% 40%, 48% 100%, 44% 40%, 40% 100%, 36% 40%, 32% 100%, 28% 40%, 24% 100%, 20% 40%, 16% 100%, 12% 40%, 8% 100%, 4% 40%, 0% 100%)';
+const TORN_EDGE = 'polygon(0% 0%, 100% 0%, 100% 40%, 96% 100%, 92% 40%, 88% 100%, 84% 40%, 80% 100%, 76% 40%, 72% 100%, 68% 40%, 64% 100%, 60% 40%, 56% 100%, 52% 40%, 48% 100%, 44% 40%, 40% 100%, 36% 40%, 32% 100%, 28% 40%, 24% 100%, 20% 40%, 16% 100%, 12% 40%, 8% 100%, 4% 40%, 0% 100%)';
 
 // ---------- Scoring (svenska regler) ----------
 function counts(dice) {
   const c = [0, 0, 0, 0, 0, 0, 0];
-  dice.forEach((d) => c[d]++);
+  dice.forEach(d => c[d]++);
   return c;
 }
-const upperScore = (dice, face) => dice.filter((d) => d === face).length * face;
+const upperScore = (dice, face) => dice.filter(d => d === face).length * face;
 function onePair(dice) {
   const c = counts(dice);
   for (let v = 6; v >= 1; v--) if (c[v] >= 2) return v * 2;
@@ -275,44 +433,112 @@ function chance(dice) {
 function yatzyScore(dice) {
   return counts(dice).includes(5) ? 50 : 0;
 }
-
-const CATEGORIES = [
-  { id: 'ones', label: 'Ettor', sub: 'Summan av ettor', section: 'upper', calc: (d) => upperScore(d, 1) },
-  { id: 'twos', label: 'Tvåor', sub: 'Summan av tvåor', section: 'upper', calc: (d) => upperScore(d, 2) },
-  { id: 'threes', label: 'Treor', sub: 'Summan av treor', section: 'upper', calc: (d) => upperScore(d, 3) },
-  { id: 'fours', label: 'Fyror', sub: 'Summan av fyror', section: 'upper', calc: (d) => upperScore(d, 4) },
-  { id: 'fives', label: 'Femmor', sub: 'Summan av femmor', section: 'upper', calc: (d) => upperScore(d, 5) },
-  { id: 'sixes', label: 'Sexor', sub: 'Summan av sexor', section: 'upper', calc: (d) => upperScore(d, 6) },
-  { id: 'pair', label: 'Ett par', sub: '2 × högsta paret', section: 'lower', calc: onePair },
-  { id: 'twopairs', label: 'Två par', sub: '2 × vardera paret', section: 'lower', calc: twoPairs },
-  { id: 'threekind', label: 'Tretal', sub: '3 × tre lika', section: 'lower', calc: threeKind },
-  { id: 'fourkind', label: 'Fyrtal', sub: '4 × fyra lika', section: 'lower', calc: fourKind },
-  { id: 'smallstraight', label: 'Liten stege', sub: '1-2-3-4-5 = 15 p', section: 'lower', calc: smallStraight },
-  { id: 'largestraight', label: 'Stor stege', sub: '2-3-4-5-6 = 20 p', section: 'lower', calc: largeStraight },
-  { id: 'house', label: 'Kåk', sub: 'Tretal + par, alla tärningar', section: 'lower', calc: fullHouse },
-  { id: 'chance', label: 'Chans', sub: 'Summan av alla tärningar', section: 'lower', calc: chance },
-  { id: 'yatzy', label: 'Yatzy', sub: 'Fem lika = 50 p', section: 'lower', calc: yatzyScore },
-];
+const CATEGORIES = [{
+  id: 'ones',
+  label: 'Ettor',
+  sub: 'Summan av ettor',
+  section: 'upper',
+  calc: d => upperScore(d, 1)
+}, {
+  id: 'twos',
+  label: 'Tvåor',
+  sub: 'Summan av tvåor',
+  section: 'upper',
+  calc: d => upperScore(d, 2)
+}, {
+  id: 'threes',
+  label: 'Treor',
+  sub: 'Summan av treor',
+  section: 'upper',
+  calc: d => upperScore(d, 3)
+}, {
+  id: 'fours',
+  label: 'Fyror',
+  sub: 'Summan av fyror',
+  section: 'upper',
+  calc: d => upperScore(d, 4)
+}, {
+  id: 'fives',
+  label: 'Femmor',
+  sub: 'Summan av femmor',
+  section: 'upper',
+  calc: d => upperScore(d, 5)
+}, {
+  id: 'sixes',
+  label: 'Sexor',
+  sub: 'Summan av sexor',
+  section: 'upper',
+  calc: d => upperScore(d, 6)
+}, {
+  id: 'pair',
+  label: 'Ett par',
+  sub: '2 × högsta paret',
+  section: 'lower',
+  calc: onePair
+}, {
+  id: 'twopairs',
+  label: 'Två par',
+  sub: '2 × vardera paret',
+  section: 'lower',
+  calc: twoPairs
+}, {
+  id: 'threekind',
+  label: 'Tretal',
+  sub: '3 × tre lika',
+  section: 'lower',
+  calc: threeKind
+}, {
+  id: 'fourkind',
+  label: 'Fyrtal',
+  sub: '4 × fyra lika',
+  section: 'lower',
+  calc: fourKind
+}, {
+  id: 'smallstraight',
+  label: 'Liten stege',
+  sub: '1-2-3-4-5 = 15 p',
+  section: 'lower',
+  calc: smallStraight
+}, {
+  id: 'largestraight',
+  label: 'Stor stege',
+  sub: '2-3-4-5-6 = 20 p',
+  section: 'lower',
+  calc: largeStraight
+}, {
+  id: 'house',
+  label: 'Kåk',
+  sub: 'Tretal + par, alla tärningar',
+  section: 'lower',
+  calc: fullHouse
+}, {
+  id: 'chance',
+  label: 'Chans',
+  sub: 'Summan av alla tärningar',
+  section: 'lower',
+  calc: chance
+}, {
+  id: 'yatzy',
+  label: 'Yatzy',
+  sub: 'Fem lika = 50 p',
+  section: 'lower',
+  calc: yatzyScore
+}];
 
 // Every possible 5-dice roll, used to figure out which scores are actually achievable per category
 const ALL_ROLLS = (() => {
   const rolls = [];
-  for (let a = 1; a <= 6; a++)
-    for (let b = 1; b <= 6; b++)
-      for (let c = 1; c <= 6; c++)
-        for (let d = 1; d <= 6; d++)
-          for (let e = 1; e <= 6; e++) rolls.push([a, b, c, d, e]);
+  for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) for (let c = 1; c <= 6; c++) for (let d = 1; d <= 6; d++) for (let e = 1; e <= 6; e++) rolls.push([a, b, c, d, e]);
   return rolls;
 })();
 
 // Set of valid (achievable) scores per category, derived from the scoring rules above
 const VALID_SCORES = CATEGORIES.reduce((acc, cat) => {
   const set = new Set();
-  ALL_ROLLS.forEach((dice) => set.add(cat.calc(dice)));
+  ALL_ROLLS.forEach(dice => set.add(cat.calc(dice)));
   acc[cat.id] = set;
   return acc;
 }, {});
-
 function isValidScore(catId, score) {
   const valid = VALID_SCORES[catId];
   return valid ? valid.has(score) : true;
@@ -321,27 +547,35 @@ function isValidScore(catId, score) {
 // Fixed defaults: Ettor–Sexor use 3-of-a-kind (the bonus baseline), stegar/Yatzy use their fixed value.
 // Every other category defaults to the highest score actually possible there.
 const FIXED_DEFAULTS = {
-  ones: 3, twos: 6, threes: 9, fours: 12, fives: 15, sixes: 18,
+  ones: 3,
+  twos: 6,
+  threes: 9,
+  fours: 12,
+  fives: 15,
+  sixes: 18,
   smallstraight: 15,
   largestraight: 20,
-  yatzy: 50,
+  yatzy: 50
 };
 const DEFAULT_SCORES = CATEGORIES.reduce((acc, cat) => {
   acc[cat.id] = cat.id in FIXED_DEFAULTS ? FIXED_DEFAULTS[cat.id] : Math.max(...VALID_SCORES[cat.id]);
   return acc;
 }, {});
-
 function getDefaultScore(catId) {
   return catId in DEFAULT_SCORES ? DEFAULT_SCORES[catId] : null;
 }
-
 function calcTotals(scores) {
-  const upperIds = CATEGORIES.filter((c) => c.section === 'upper').map((c) => c.id);
-  const lowerIds = CATEGORIES.filter((c) => c.section === 'lower').map((c) => c.id);
+  const upperIds = CATEGORIES.filter(c => c.section === 'upper').map(c => c.id);
+  const lowerIds = CATEGORIES.filter(c => c.section === 'lower').map(c => c.id);
   const upperSum = upperIds.reduce((a, id) => a + (scores[id] ?? 0), 0);
   const bonus = upperSum >= 63 ? 50 : 0;
   const lowerSum = lowerIds.reduce((a, id) => a + (scores[id] ?? 0), 0);
-  return { upperSum, bonus, lowerSum, total: upperSum + bonus + lowerSum };
+  return {
+    upperSum,
+    bonus,
+    lowerSum,
+    total: upperSum + bonus + lowerSum
+  };
 }
 
 // ---------- Dice ----------
@@ -351,7 +585,7 @@ const PIPS = {
   3: [[1, 1], [2, 2], [3, 3]],
   4: [[1, 1], [1, 3], [3, 1], [3, 3]],
   5: [[1, 1], [1, 3], [2, 2], [3, 1], [3, 3]],
-  6: [[1, 1], [1, 3], [2, 1], [2, 3], [3, 1], [3, 3]],
+  6: [[1, 1], [1, 3], [2, 1], [2, 3], [3, 1], [3, 3]]
 };
 
 // A normal die roll. A "lucky" player gets the better of two rolls; an "unlucky"
@@ -369,16 +603,44 @@ function rollDie(lucky, unlucky) {
 function parseNameInput(raw, fallback) {
   const lucky = typeof raw === 'string' && raw.endsWith(' ') && raw.trim().length > 0;
   const trimmed = (raw || '').trim();
-  return { name: trimmed || fallback, lucky };
+  return {
+    name: trimmed || fallback,
+    lucky
+  };
 }
 
 // ---------- AI opponent ----------
 const AI_DIFFICULTIES = {
-  svinlatt: { label: 'Svinlätt', errorRate: 0.55, lucky: false, unlucky: true },
-  latt: { label: 'Lätt', errorRate: 0.45, lucky: false, unlucky: false },
-  mellan: { label: 'Mellan', errorRate: 0.12, lucky: false, unlucky: false },
-  svar: { label: 'Svår', errorRate: 0, lucky: false, unlucky: false },
-  skitsvar: { label: 'Skitsvår', errorRate: 0, lucky: true, unlucky: false },
+  svinlatt: {
+    label: 'Svinlätt',
+    errorRate: 0.55,
+    lucky: false,
+    unlucky: true
+  },
+  latt: {
+    label: 'Lätt',
+    errorRate: 0.45,
+    lucky: false,
+    unlucky: false
+  },
+  mellan: {
+    label: 'Mellan',
+    errorRate: 0.12,
+    lucky: false,
+    unlucky: false
+  },
+  svar: {
+    label: 'Svår',
+    errorRate: 0,
+    lucky: false,
+    unlucky: false
+  },
+  skitsvar: {
+    label: 'Skitsvår',
+    errorRate: 0,
+    lucky: true,
+    unlucky: false
+  }
 };
 const AI_DIFFICULTY_ORDER = ['svinlatt', 'latt', 'mellan', 'svar', 'skitsvar'];
 
@@ -398,15 +660,15 @@ function aiChooseHolds(dice, errorRate) {
     }
   }
   if (bestCount >= 3) {
-    return dice.map((d) => d === bestFace);
+    return dice.map(d => d === bestFace);
   }
   // Chasing a straight: hold one of each value in a 4-in-a-row run, if present
   const present = new Set(dice);
   for (const start of [1, 2, 3]) {
     const run = [start, start + 1, start + 2, start + 3];
-    if (run.every((v) => present.has(v))) {
+    if (run.every(v => present.has(v))) {
       const used = new Set();
-      return dice.map((d) => {
+      return dice.map(d => {
         if (run.includes(d) && !used.has(d)) {
           used.add(d);
           return true;
@@ -416,133 +678,132 @@ function aiChooseHolds(dice, errorRate) {
     }
   }
   // Otherwise keep high dice (good for Chans/upper section), plus a pair if there is one
-  return dice.map((d) => d >= 4 || (bestCount === 2 && d === bestFace));
+  return dice.map(d => d >= 4 || bestCount === 2 && d === bestFace);
 }
 
 // Categories to sacrifice (score 0) first when nothing scores above 0
-const AI_SACRIFICE_ORDER = [
-  'yatzy', 'largestraight', 'smallstraight', 'house', 'fourkind', 'threekind',
-  'twopairs', 'pair', 'sixes', 'fives', 'fours', 'threes', 'twos', 'ones',
-];
+const AI_SACRIFICE_ORDER = ['yatzy', 'largestraight', 'smallstraight', 'house', 'fourkind', 'threekind', 'twopairs', 'pair', 'sixes', 'fives', 'fours', 'threes', 'twos', 'ones'];
 
 // Decide which category to lock in for the final dice. With probability
 // `errorRate`, picks a random unfilled category instead of a sensible one.
 function aiChooseCategory(scores, dice, errorRate) {
-  const unfilled = CATEGORIES.filter((c) => scores[c.id] === undefined);
+  const unfilled = CATEGORIES.filter(c => scores[c.id] === undefined);
   if (Math.random() < errorRate) {
     return unfilled[Math.floor(Math.random() * unfilled.length)].id;
   }
-  const options = unfilled.map((c) => ({ id: c.id, score: c.calc(dice) }));
-  if (options.some((o) => o.id === 'yatzy' && o.score === 50)) return 'yatzy';
-  const positive = options.filter((o) => o.score > 0).sort((a, b) => b.score - a.score);
+  const options = unfilled.map(c => ({
+    id: c.id,
+    score: c.calc(dice)
+  }));
+  if (options.some(o => o.id === 'yatzy' && o.score === 50)) return 'yatzy';
+  const positive = options.filter(o => o.score > 0).sort((a, b) => b.score - a.score);
   if (positive.length > 0) return positive[0].id;
   for (const id of AI_SACRIFICE_ORDER) {
-    if (unfilled.some((c) => c.id === id)) return id;
+    if (unfilled.some(c => c.id === id)) return id;
   }
   return unfilled[0].id;
 }
-
-function Die({ value, held, onClick, disabled, rolling }) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={`Tärning visar ${value}${held ? ', sparad' : ''}`}
-      className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl border-[3px] grid grid-cols-3 grid-rows-3 gap-0.5 p-2 transition-transform duration-150
+function Die({
+  value,
+  held,
+  onClick,
+  disabled,
+  rolling
+}) {
+  return /*#__PURE__*/React.createElement("button", {
+    onClick: onClick,
+    disabled: disabled,
+    "aria-label": `Tärning visar ${value}${held ? ', sparad' : ''}`,
+    className: `relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl border-[3px] grid grid-cols-3 grid-rows-3 gap-0.5 p-2 transition-transform duration-150
         ${held ? 'bg-amber-400 border-stone-900 -rotate-3' : 'bg-stone-50 border-stone-900'}
         ${rolling && !held ? 'animate-bounce' : ''}
-        ${disabled ? 'opacity-70' : 'active:scale-95'}`}
-    >
-      {(PIPS[value] || []).map(([r, c], i) => (
-        <span
-          key={i}
-          style={{ gridRow: r, gridColumn: c }}
-          className="rounded-full bg-stone-900 w-full h-full self-center justify-self-center max-w-[7px] max-h-[7px] sm:max-w-[8px] sm:max-h-[8px]"
-        />
-      ))}
-      {held && <span className="absolute -top-1.5 -right-1 w-4 h-2 bg-emerald-500 rotate-12 rounded-sm" />}
-    </button>
-  );
+        ${disabled ? 'opacity-70' : 'active:scale-95'}`
+  }, (PIPS[value] || []).map(([r, c], i) => /*#__PURE__*/React.createElement("span", {
+    key: i,
+    style: {
+      gridRow: r,
+      gridColumn: c
+    },
+    className: "rounded-full bg-stone-900 w-full h-full self-center justify-self-center max-w-[7px] max-h-[7px] sm:max-w-[8px] sm:max-h-[8px]"
+  })), held && /*#__PURE__*/React.createElement("span", {
+    className: "absolute -top-1.5 -right-1 w-4 h-2 bg-emerald-500 rotate-12 rounded-sm"
+  }));
 }
 
 // ---------- Score row & totals ----------
-function ScoreRow({ category, players, currentPlayer, dice, rollsLeft, mode, selectedCategory, inputBuffer, onSelect, onSelectCell }) {
-  return (
-    <>
-      <div className="sticky left-0 z-10 bg-stone-50 px-2 py-1.5 border-b border-stone-200">
-        <p className="text-sm font-semibold text-stone-800 leading-tight">{category.label}</p>
-        <p className="text-[10px] text-stone-400 leading-tight">{category.sub}</p>
-      </div>
-      {players.map((p, idx) => {
-        const filled = p.scores[category.id];
-        const isFilled = filled !== undefined;
-        const isCurrent = idx === currentPlayer;
+function ScoreRow({
+  category,
+  players,
+  currentPlayer,
+  dice,
+  rollsLeft,
+  mode,
+  selectedCategory,
+  inputBuffer,
+  onSelect,
+  onSelectCell
+}) {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "sticky left-0 z-10 bg-stone-50 px-2 py-1.5 border-b border-stone-200"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-sm font-semibold text-stone-800 leading-tight"
+  }, category.label), /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] text-stone-400 leading-tight"
+  }, category.sub)), players.map((p, idx) => {
+    const filled = p.scores[category.id];
+    const isFilled = filled !== undefined;
+    const isCurrent = idx === currentPlayer;
+    if (mode === 'manual') {
+      const isActive = isCurrent && selectedCategory === category.id;
+      const canSelect = isCurrent && !isFilled;
+      let bg = 'bg-transparent';
+      let text = 'text-stone-300';
+      let content = '–';
+      if (isFilled) {
+        text = 'text-stone-900 font-bold';
+        if (isCurrent) bg = 'bg-emerald-50';
+        content = filled;
+      } else if (isActive) {
+        bg = 'bg-red-100 ring-2 ring-inset ring-red-600';
+        text = 'text-red-700 font-extrabold';
+      } else if (canSelect) {
+        bg = 'bg-amber-50';
+        text = 'text-amber-600';
+      }
+      return /*#__PURE__*/React.createElement("button", {
+        key: idx,
+        disabled: !canSelect,
+        onClick: () => onSelectCell(category.id),
+        className: `text-center font-mono-score text-sm py-1.5 border-b border-stone-200 ${bg} ${text} ${canSelect ? 'active:scale-95' : ''}`
+      }, content);
+    }
 
-        if (mode === 'manual') {
-          const isActive = isCurrent && selectedCategory === category.id;
-          const canSelect = isCurrent && !isFilled;
-
-          let bg = 'bg-transparent';
-          let text = 'text-stone-300';
-          let content = '–';
-
-          if (isFilled) {
-            text = 'text-stone-900 font-bold';
-            if (isCurrent) bg = 'bg-emerald-50';
-            content = filled;
-          } else if (isActive) {
-            bg = 'bg-red-100 ring-2 ring-inset ring-red-600';
-            text = 'text-red-700 font-extrabold';
-          } else if (canSelect) {
-            bg = 'bg-amber-50';
-            text = 'text-amber-600';
-          }
-
-          return (
-            <button
-              key={idx}
-              disabled={!canSelect}
-              onClick={() => onSelectCell(category.id)}
-              className={`text-center font-mono-score text-sm py-1.5 border-b border-stone-200 ${bg} ${text} ${
-                canSelect ? 'active:scale-95' : ''
-              }`}
-            >
-              {content}
-            </button>
-          );
-        }
-
-        // auto mode (app-rolled dice)
-        const canPick = isCurrent && !isFilled && rollsLeft < 3;
-        const potential = canPick ? category.calc(dice) : null;
-        let bg = 'bg-transparent';
-        let text = 'text-stone-300';
-        if (isFilled) {
-          text = 'text-stone-900 font-bold';
-          if (isCurrent) bg = 'bg-emerald-50';
-        } else if (canPick) {
-          bg = 'bg-amber-100';
-          text = 'text-amber-700 opacity-60';
-        }
-
-        return (
-          <button
-            key={idx}
-            disabled={!canPick}
-            onClick={() => onSelect(category.id)}
-            className={`text-center font-mono-score text-sm py-1.5 border-b border-stone-200 ${bg} ${text} ${
-              canPick ? 'active:scale-95' : ''
-            }`}
-          >
-            {isFilled ? filled : canPick ? potential : '–'}
-          </button>
-        );
-      })}
-    </>
-  );
+    // auto mode (app-rolled dice)
+    const canPick = isCurrent && !isFilled && rollsLeft < 3;
+    const potential = canPick ? category.calc(dice) : null;
+    let bg = 'bg-transparent';
+    let text = 'text-stone-300';
+    if (isFilled) {
+      text = 'text-stone-900 font-bold';
+      if (isCurrent) bg = 'bg-emerald-50';
+    } else if (canPick) {
+      bg = 'bg-amber-100';
+      text = 'text-amber-700 opacity-60';
+    }
+    return /*#__PURE__*/React.createElement("button", {
+      key: idx,
+      disabled: !canPick,
+      onClick: () => onSelect(category.id),
+      className: `text-center font-mono-score text-sm py-1.5 border-b border-stone-200 ${bg} ${text} ${canPick ? 'active:scale-95' : ''}`
+    }, isFilled ? filled : canPick ? potential : '–');
+  }));
 }
-
-function TotalsRow({ label, sub, values, accent }) {
+function TotalsRow({
+  label,
+  sub,
+  values,
+  accent
+}) {
   let rowBg = 'bg-stone-100';
   let textCls = 'text-stone-700';
   let valCls = 'text-stone-800';
@@ -556,305 +817,296 @@ function TotalsRow({ label, sub, values, accent }) {
     textCls = 'text-stone-50';
     valCls = 'text-amber-400';
   }
-  return (
-    <>
-      <div className={`sticky left-0 z-10 ${rowBg} px-2 py-1.5 border-b border-stone-300`}>
-        <p className={`text-sm font-bold ${textCls}`}>{label}</p>
-        {sub && <p className="text-[10px] text-stone-400">{sub}</p>}
-      </div>
-      {values.map((v, i) => (
-        <div key={i} className={`text-center font-mono-score text-sm font-bold py-1.5 border-b border-stone-300 ${rowBg} ${valCls}`}>
-          {v}
-        </div>
-      ))}
-    </>
-  );
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: `sticky left-0 z-10 ${rowBg} px-2 py-1.5 border-b border-stone-300`
+  }, /*#__PURE__*/React.createElement("p", {
+    className: `text-sm font-bold ${textCls}`
+  }, label), sub && /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] text-stone-400"
+  }, sub)), values.map((v, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: `text-center font-mono-score text-sm font-bold py-1.5 border-b border-stone-300 ${rowBg} ${valCls}`
+  }, v)));
 }
 
 // ---------- Celebrations ----------
 const CONFETTI_COLORS = ['#DC2626', '#F59E0B', '#059669', '#3B82F6', '#FBBF24', '#F472B6'];
 const BONUS_CONFETTI_COLORS = ['#2563EB', '#FACC15', '#0EA5E9', '#FBBF24', '#1D4ED8'];
-
 function YatzyCelebration() {
-  const pieces = Array.from({ length: 36 }, (_, i) => i);
-  return (
-    <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden">
-      {pieces.map((i) => {
-        const left = Math.random() * 100;
-        const delay = Math.random() * 0.3;
-        const duration = 1.4 + Math.random() * 1.1;
-        const size = 6 + Math.random() * 7;
-        return (
-          <span
-            key={i}
-            className="confetti-piece rounded-sm"
-            style={{
-              left: `${left}%`,
-              width: `${size}px`,
-              height: `${size * 0.45}px`,
-              backgroundColor: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-              animationDuration: `${duration}s`,
-              animationDelay: `${delay}s`,
-            }}
-          />
-        );
-      })}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          className="bg-stone-900 border-4 border-amber-400 rounded-2xl px-8 py-4 text-center"
-          style={{ animation: 'celebration-pop 0.4s ease-out' }}
-        >
-          <p className="font-display font-extrabold text-3xl text-amber-400 tracking-wide">YATZY!</p>
-          <p className="font-mono-score text-stone-50 text-sm mt-1">+50 poäng</p>
-        </div>
-      </div>
-    </div>
-  );
+  const pieces = Array.from({
+    length: 36
+  }, (_, i) => i);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 z-50 pointer-events-none overflow-hidden"
+  }, pieces.map(i => {
+    const left = Math.random() * 100;
+    const delay = Math.random() * 0.3;
+    const duration = 1.4 + Math.random() * 1.1;
+    const size = 6 + Math.random() * 7;
+    return /*#__PURE__*/React.createElement("span", {
+      key: i,
+      className: "confetti-piece rounded-sm",
+      style: {
+        left: `${left}%`,
+        width: `${size}px`,
+        height: `${size * 0.45}px`,
+        backgroundColor: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+        animationDuration: `${duration}s`,
+        animationDelay: `${delay}s`
+      }
+    });
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "absolute inset-0 flex items-center justify-center"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-stone-900 border-4 border-amber-400 rounded-2xl px-8 py-4 text-center",
+    style: {
+      animation: 'celebration-pop 0.4s ease-out'
+    }
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "font-display font-extrabold text-3xl text-amber-400 tracking-wide"
+  }, "YATZY!"), /*#__PURE__*/React.createElement("p", {
+    className: "font-mono-score text-stone-50 text-sm mt-1"
+  }, "+50 poäng"))));
 }
 
 // Similar to the Yatzy celebration, but a calmer blue/gold palette, fewer
 // pieces, and a shorter on-screen time — recognizable as a "smaller" win.
 function BonusCelebration() {
-  const pieces = Array.from({ length: 22 }, (_, i) => i);
-  return (
-    <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden">
-      {pieces.map((i) => {
-        const left = Math.random() * 100;
-        const delay = Math.random() * 0.25;
-        const duration = 1.1 + Math.random() * 0.8;
-        const size = 5 + Math.random() * 5;
-        return (
-          <span
-            key={i}
-            className="confetti-piece rounded-full"
-            style={{
-              left: `${left}%`,
-              width: `${size}px`,
-              height: `${size}px`,
-              backgroundColor: BONUS_CONFETTI_COLORS[i % BONUS_CONFETTI_COLORS.length],
-              animationDuration: `${duration}s`,
-              animationDelay: `${delay}s`,
-            }}
-          />
-        );
-      })}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          className="bg-stone-900 border-4 border-sky-400 rounded-2xl px-8 py-4 text-center"
-          style={{ animation: 'celebration-pop 0.4s ease-out' }}
-        >
-          <p className="font-display font-extrabold text-3xl text-sky-400 tracking-wide">BONUS!</p>
-          <p className="font-mono-score text-stone-50 text-sm mt-1">+50 poäng</p>
-        </div>
-      </div>
-    </div>
-  );
+  const pieces = Array.from({
+    length: 22
+  }, (_, i) => i);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 z-50 pointer-events-none overflow-hidden"
+  }, pieces.map(i => {
+    const left = Math.random() * 100;
+    const delay = Math.random() * 0.25;
+    const duration = 1.1 + Math.random() * 0.8;
+    const size = 5 + Math.random() * 5;
+    return /*#__PURE__*/React.createElement("span", {
+      key: i,
+      className: "confetti-piece rounded-full",
+      style: {
+        left: `${left}%`,
+        width: `${size}px`,
+        height: `${size}px`,
+        backgroundColor: BONUS_CONFETTI_COLORS[i % BONUS_CONFETTI_COLORS.length],
+        animationDuration: `${duration}s`,
+        animationDelay: `${delay}s`
+      }
+    });
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "absolute inset-0 flex items-center justify-center"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-stone-900 border-4 border-sky-400 rounded-2xl px-8 py-4 text-center",
+    style: {
+      animation: 'celebration-pop 0.4s ease-out'
+    }
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "font-display font-extrabold text-3xl text-sky-400 tracking-wide"
+  }, "BONUS!"), /*#__PURE__*/React.createElement("p", {
+    className: "font-mono-score text-stone-50 text-sm mt-1"
+  }, "+50 poäng"))));
 }
 
 // ---------- Loading screen ----------
 function LoadingScreen() {
-  return (
-    <div className="min-h-screen bg-stone-100 flex flex-col items-center justify-center font-sans">
-      <style>{FONT_STYLES}</style>
-      <h1 className="font-display text-4xl font-extrabold text-stone-900 mb-2 tracking-tight">YATZY</h1>
-      <div className="flex gap-1.5">
-        <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-bounce" style={{ animationDelay: '0ms' }} />
-        <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-        <span className="w-2.5 h-2.5 rounded-full bg-emerald-800 animate-bounce" style={{ animationDelay: '300ms' }} />
-      </div>
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", {
+    className: "min-h-screen bg-stone-100 flex flex-col items-center justify-center font-sans"
+  }, /*#__PURE__*/React.createElement("style", null, FONT_STYLES), /*#__PURE__*/React.createElement("h1", {
+    className: "font-display text-4xl font-extrabold text-stone-900 mb-2 tracking-tight"
+  }, "YATZY"), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-1.5"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "w-2.5 h-2.5 rounded-full bg-red-600 animate-bounce",
+    style: {
+      animationDelay: '0ms'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "w-2.5 h-2.5 rounded-full bg-amber-400 animate-bounce",
+    style: {
+      animationDelay: '150ms'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "w-2.5 h-2.5 rounded-full bg-emerald-800 animate-bounce",
+    style: {
+      animationDelay: '300ms'
+    }
+  })));
 }
 
 // ---------- Stats modal ----------
-function StatsModal({ stats, onClose, onClear }) {
+function StatsModal({
+  stats,
+  onClose,
+  onClear
+}) {
   const entries = Object.entries(stats).sort((a, b) => b[1].wins - a[1].wins || b[1].bestScore - a[1].bestScore);
-  return (
-    <div className="fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-stone-50 rounded-2xl max-w-sm w-full max-h-[80vh] overflow-auto p-5 border-4 border-stone-900" onClick={(e) => e.stopPropagation()}>
-        <h2 className="font-display text-xl font-extrabold text-stone-900 mb-1">Statistik</h2>
-        <p className="text-xs text-stone-400 mb-3">Sparad på den här enheten, per namn</p>
-
-        {entries.length === 0 ? (
-          <p className="text-sm text-stone-500">Inga avslutade matcher än.</p>
-        ) : (
-          <div className="space-y-2">
-            {entries.map(([name, s]) => (
-              <div key={name} className="border-b border-stone-100 pb-2">
-                <div className="flex items-center justify-between">
-                  <p className="font-display font-bold text-stone-800">{name}</p>
-                  <p className="font-mono-score text-sm font-bold text-stone-900">{s.bestScore} p</p>
-                </div>
-                <p className="text-[11px] text-stone-400">
-                  {s.games} {s.games === 1 ? 'match' : 'matcher'} · {s.wins} {s.wins === 1 ? 'vinst' : 'vinster'} · Snitt{' '}
-                  {Math.round(s.totalScore / s.games)} p · Yatzy ×{s.yatzys}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <button onClick={onClose} className="mt-4 w-full py-2.5 rounded-xl bg-stone-900 text-stone-50 font-display font-bold uppercase tracking-wide">
-          Stäng
-        </button>
-        {entries.length > 0 && (
-          <button onClick={onClear} className="mt-2 w-full py-2 text-xs text-stone-400 underline">
-            Rensa statistik
-          </button>
-        )}
-      </div>
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4",
+    onClick: onClose
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-stone-50 rounded-2xl max-w-sm w-full max-h-[80vh] overflow-auto p-5 border-4 border-stone-900",
+    onClick: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "font-display text-xl font-extrabold text-stone-900 mb-1"
+  }, "Statistik"), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-stone-400 mb-3"
+  }, "Sparad på den här enheten, per namn"), entries.length === 0 ? /*#__PURE__*/React.createElement("p", {
+    className: "text-sm text-stone-500"
+  }, "Inga avslutade matcher än.") : /*#__PURE__*/React.createElement("div", {
+    className: "space-y-2"
+  }, entries.map(([name, s]) => /*#__PURE__*/React.createElement("div", {
+    key: name,
+    className: "border-b border-stone-100 pb-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "font-display font-bold text-stone-800"
+  }, name), /*#__PURE__*/React.createElement("p", {
+    className: "font-mono-score text-sm font-bold text-stone-900"
+  }, s.bestScore, " p")), /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] text-stone-400"
+  }, s.games, " ", s.games === 1 ? 'match' : 'matcher', " · ", s.wins, " ", s.wins === 1 ? 'vinst' : 'vinster', " · Snitt", ' ', Math.round(s.totalScore / s.games), " p · Yatzy ×", s.yatzys)))), /*#__PURE__*/React.createElement("button", {
+    onClick: onClose,
+    className: "mt-4 w-full py-2.5 rounded-xl bg-stone-900 text-stone-50 font-display font-bold uppercase tracking-wide"
+  }, "Stäng"), entries.length > 0 && /*#__PURE__*/React.createElement("button", {
+    onClick: onClear,
+    className: "mt-2 w-full py-2 text-xs text-stone-400 underline"
+  }, "Rensa statistik")));
 }
 
 // ---------- Setup screen ----------
-function SetupScreen({ numPlayers, setNumPlayers, names, setNames, aiFlags, setAiFlags, aiDifficulties, setAiDifficulties, onStart, stats, showStats, setShowStats, onClearStats }) {
-  return (
-    <div className="min-h-screen bg-stone-100 flex flex-col items-center justify-center px-6 py-10 font-sans">
-      <style>{FONT_STYLES}</style>
-      <h1 className="font-display text-5xl font-extrabold text-stone-900 mb-1 tracking-tight">YATZY</h1>
-      <p className="text-stone-400 text-xs uppercase tracking-widest mb-8">Svenska poängregler</p>
-
-      <div className="w-full max-w-sm bg-stone-50 border-4 border-stone-900 rounded-2xl p-5">
-        <p className="font-display font-bold text-stone-800 mb-3">Antal spelare</p>
-        <div className="flex items-center justify-center gap-4 mb-5">
-          <button
-            onClick={() => setNumPlayers(Math.max(1, numPlayers - 1))}
-            className="w-10 h-10 rounded-full border-2 border-stone-900 font-display font-bold text-xl text-stone-900 active:scale-95"
-          >
-            −
-          </button>
-          <span className="font-mono-score text-3xl font-bold w-10 text-center text-stone-900">{numPlayers}</span>
-          <button
-            onClick={() => setNumPlayers(Math.min(4, numPlayers + 1))}
-            className="w-10 h-10 rounded-full border-2 border-stone-900 font-display font-bold text-xl text-stone-900 active:scale-95"
-          >
-            +
-          </button>
-        </div>
-
-        <div className="space-y-3 mb-6">
-          {Array.from({ length: numPlayers }).map((_, i) => (
-            <div key={i}>
-              <input
-                value={names[i]}
-                onChange={(e) => {
-                  const n = [...names];
-                  n[i] = e.target.value;
-                  setNames(n);
-                }}
-                placeholder={aiFlags[i] ? `Dator ${i + 1}` : `Spelare ${i + 1}`}
-                className="w-full px-3 py-2 rounded-lg border-2 border-stone-300 focus:border-red-600 focus:outline-none text-stone-800"
-              />
-              <div className="flex items-center gap-3 mt-1.5 pl-1">
-                <label className="flex items-center gap-1.5 text-xs text-stone-500">
-                  <input
-                    type="checkbox"
-                    checked={aiFlags[i]}
-                    onChange={(e) => {
-                      const flags = [...aiFlags];
-                      flags[i] = e.target.checked;
-                      setAiFlags(flags);
-                    }}
-                    className="w-4 h-4 accent-red-600"
-                  />
-                  Dator
-                </label>
-                {aiFlags[i] && (
-                  <select
-                    value={aiDifficulties[i]}
-                    onChange={(e) => {
-                      const diffs = [...aiDifficulties];
-                      diffs[i] = e.target.value;
-                      setAiDifficulties(diffs);
-                    }}
-                    className="text-xs px-2 py-1 rounded-lg border-2 border-stone-300 text-stone-700 bg-stone-50 focus:border-red-600 focus:outline-none"
-                  >
-                    {AI_DIFFICULTY_ORDER.map((id) => (
-                      <option key={id} value={id}>
-                        {AI_DIFFICULTIES[id].label}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <button
-          onClick={onStart}
-          className="w-full py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition"
-        >
-          Starta spelet
-        </button>
-      </div>
-
-      <button onClick={() => setShowStats(true)} className="mt-4 text-sm text-stone-500 underline active:scale-95 transition">
-        Visa statistik
-      </button>
-
-      <p className="text-stone-400 text-xs mt-6 text-center max-w-xs leading-relaxed">
-        15 omgångar per spelare. Tre kast per omgång – tryck på en tärning för att spara den till nästa kast.
-      </p>
-
-      {showStats && <StatsModal stats={stats} onClose={() => setShowStats(false)} onClear={onClearStats} />}
-    </div>
-  );
+function SetupScreen({
+  numPlayers,
+  setNumPlayers,
+  names,
+  setNames,
+  aiFlags,
+  setAiFlags,
+  aiDifficulties,
+  setAiDifficulties,
+  onStart,
+  stats,
+  showStats,
+  setShowStats,
+  onClearStats
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "min-h-screen bg-stone-100 flex flex-col items-center justify-center px-6 py-10 font-sans"
+  }, /*#__PURE__*/React.createElement("style", null, FONT_STYLES), /*#__PURE__*/React.createElement("h1", {
+    className: "font-display text-5xl font-extrabold text-stone-900 mb-1 tracking-tight"
+  }, "YATZY"), /*#__PURE__*/React.createElement("p", {
+    className: "text-stone-400 text-xs uppercase tracking-widest mb-8"
+  }, "Svenska poängregler"), /*#__PURE__*/React.createElement("div", {
+    className: "w-full max-w-sm bg-stone-50 border-4 border-stone-900 rounded-2xl p-5"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "font-display font-bold text-stone-800 mb-3"
+  }, "Antal spelare"), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-center gap-4 mb-5"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setNumPlayers(Math.max(1, numPlayers - 1)),
+    className: "w-10 h-10 rounded-full border-2 border-stone-900 font-display font-bold text-xl text-stone-900 active:scale-95"
+  }, "−"), /*#__PURE__*/React.createElement("span", {
+    className: "font-mono-score text-3xl font-bold w-10 text-center text-stone-900"
+  }, numPlayers), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setNumPlayers(Math.min(4, numPlayers + 1)),
+    className: "w-10 h-10 rounded-full border-2 border-stone-900 font-display font-bold text-xl text-stone-900 active:scale-95"
+  }, "+")), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-3 mb-6"
+  }, Array.from({
+    length: numPlayers
+  }).map((_, i) => /*#__PURE__*/React.createElement("div", {
+    key: i
+  }, /*#__PURE__*/React.createElement("input", {
+    value: names[i],
+    onChange: e => {
+      const n = [...names];
+      n[i] = e.target.value;
+      setNames(n);
+    },
+    placeholder: aiFlags[i] ? `Dator ${i + 1}` : `Spelare ${i + 1}`,
+    className: "w-full px-3 py-2 rounded-lg border-2 border-stone-300 focus:border-red-600 focus:outline-none text-stone-800"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-3 mt-1.5 pl-1"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "flex items-center gap-1.5 text-xs text-stone-500"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: aiFlags[i],
+    onChange: e => {
+      const flags = [...aiFlags];
+      flags[i] = e.target.checked;
+      setAiFlags(flags);
+    },
+    className: "w-4 h-4 accent-red-600"
+  }), "Dator"), aiFlags[i] && /*#__PURE__*/React.createElement("select", {
+    value: aiDifficulties[i],
+    onChange: e => {
+      const diffs = [...aiDifficulties];
+      diffs[i] = e.target.value;
+      setAiDifficulties(diffs);
+    },
+    className: "text-xs px-2 py-1 rounded-lg border-2 border-stone-300 text-stone-700 bg-stone-50 focus:border-red-600 focus:outline-none"
+  }, AI_DIFFICULTY_ORDER.map(id => /*#__PURE__*/React.createElement("option", {
+    key: id,
+    value: id
+  }, AI_DIFFICULTIES[id].label))))))), /*#__PURE__*/React.createElement("button", {
+    onClick: onStart,
+    className: "w-full py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition"
+  }, "Starta spelet")), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowStats(true),
+    className: "mt-4 text-sm text-stone-500 underline active:scale-95 transition"
+  }, "Visa statistik"), /*#__PURE__*/React.createElement("p", {
+    className: "text-stone-400 text-xs mt-6 text-center max-w-xs leading-relaxed"
+  }, "15 omgångar per spelare. Tre kast per omgång – tryck på en tärning för att spara den till nästa kast."), showStats && /*#__PURE__*/React.createElement(StatsModal, {
+    stats: stats,
+    onClose: () => setShowStats(false),
+    onClear: onClearStats
+  }));
 }
 
 // ---------- Finished screen ----------
-function FinishedScreen({ players, onRestart, onUndo, canUndo, stats }) {
-  const results = players.map((p) => ({ ...p, ...calcTotals(p.scores) })).sort((a, b) => b.total - a.total);
-  return (
-    <div className="min-h-screen bg-stone-100 flex flex-col items-center justify-center px-6 py-10 font-sans">
-      <style>{FONT_STYLES}</style>
-      <h1 className="font-display text-4xl font-extrabold text-stone-900 mb-1 tracking-tight">Slutresultat</h1>
-      <p className="text-stone-400 text-xs uppercase tracking-widest mb-6">15 rutor avklarade</p>
-
-      <div className="w-full max-w-sm space-y-2">
-        {results.map((r, i) => (
-          <div
-            key={i}
-            className={`flex items-center justify-between rounded-xl px-4 py-3 border-2 ${
-              i === 0 ? 'bg-amber-100 border-stone-900' : 'bg-stone-50 border-stone-200'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              {i === 0 && <Trophy className="w-5 h-5 text-amber-600 shrink-0" />}
-              <div>
-                <p className="font-display font-bold text-stone-900">{r.name}</p>
-                <p className="text-[11px] text-stone-400">
-                  Övre {r.upperSum}
-                  {r.bonus ? ` (+${r.bonus} bonus)` : ''} · Nedre {r.lowerSum}
-                </p>
-                {stats[r.name] && (
-                  <p className="text-[11px] text-stone-400">
-                    {stats[r.name].games} {stats[r.name].games === 1 ? 'match' : 'matcher'} totalt · {stats[r.name].wins}{' '}
-                    {stats[r.name].wins === 1 ? 'vinst' : 'vinster'} · Bästa {stats[r.name].bestScore} p
-                  </p>
-                )}
-              </div>
-            </div>
-            <span className="font-mono-score text-2xl font-extrabold text-stone-900">{r.total}</span>
-          </div>
-        ))}
-      </div>
-
-      <button
-        onClick={onRestart}
-        className="mt-8 px-8 py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition"
-      >
-        Spela igen
-      </button>
-
-      {canUndo && (
-        <button onClick={onUndo} className="mt-3 text-sm text-stone-400 underline active:scale-95 transition">
-          Ångra senaste registreringen
-        </button>
-      )}
-    </div>
-  );
+function FinishedScreen({
+  players,
+  onRestart,
+  onUndo,
+  canUndo,
+  stats
+}) {
+  const results = players.map(p => ({
+    ...p,
+    ...calcTotals(p.scores)
+  })).sort((a, b) => b.total - a.total);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "min-h-screen bg-stone-100 flex flex-col items-center justify-center px-6 py-10 font-sans"
+  }, /*#__PURE__*/React.createElement("style", null, FONT_STYLES), /*#__PURE__*/React.createElement("h1", {
+    className: "font-display text-4xl font-extrabold text-stone-900 mb-1 tracking-tight"
+  }, "Slutresultat"), /*#__PURE__*/React.createElement("p", {
+    className: "text-stone-400 text-xs uppercase tracking-widest mb-6"
+  }, "15 rutor avklarade"), /*#__PURE__*/React.createElement("div", {
+    className: "w-full max-w-sm space-y-2"
+  }, results.map((r, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: `flex items-center justify-between rounded-xl px-4 py-3 border-2 ${i === 0 ? 'bg-amber-100 border-stone-900' : 'bg-stone-50 border-stone-200'}`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2"
+  }, i === 0 && /*#__PURE__*/React.createElement(Trophy, {
+    className: "w-5 h-5 text-amber-600 shrink-0"
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    className: "font-display font-bold text-stone-900"
+  }, r.name), /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] text-stone-400"
+  }, "Övre ", r.upperSum, r.bonus ? ` (+${r.bonus} bonus)` : '', " · Nedre ", r.lowerSum), stats[r.name] && /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] text-stone-400"
+  }, stats[r.name].games, " ", stats[r.name].games === 1 ? 'match' : 'matcher', " totalt · ", stats[r.name].wins, ' ', stats[r.name].wins === 1 ? 'vinst' : 'vinster', " · Bästa ", stats[r.name].bestScore, " p"))), /*#__PURE__*/React.createElement("span", {
+    className: "font-mono-score text-2xl font-extrabold text-stone-900"
+  }, r.total)))), /*#__PURE__*/React.createElement("button", {
+    onClick: onRestart,
+    className: "mt-8 px-8 py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition"
+  }, "Spela igen"), canUndo && /*#__PURE__*/React.createElement("button", {
+    onClick: onUndo,
+    className: "mt-3 text-sm text-stone-400 underline active:scale-95 transition"
+  }, "Ångra senaste registreringen"));
 }
 
 // ---------- Main app ----------
@@ -864,7 +1116,6 @@ function YatzyApp() {
   const [names, setNames] = useState(['', '', '', '']);
   const [aiFlags, setAiFlags] = useState([false, false, false, false]);
   const [aiDifficulties, setAiDifficulties] = useState(['mellan', 'mellan', 'mellan', 'mellan']);
-
   const [players, setPlayers] = useState([]);
   const [currentPlayer, setCurrentPlayer] = useState(0);
   const [dice, setDice] = useState([1, 2, 3, 4, 5]);
@@ -877,7 +1128,6 @@ function YatzyApp() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [inputBuffer, setInputBuffer] = useState('');
   const [inputError, setInputError] = useState(null);
-
   const [showRules, setShowRules] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -892,7 +1142,6 @@ function YatzyApp() {
   const [statsRecorded, setStatsRecorded] = useState(false); // has this finished game been added to stats?
   const [statsSnapshot, setStatsSnapshot] = useState(null); // pre-update stats, for undo
   const [showStats, setShowStats] = useState(false);
-
   const intervalRef = useRef(null);
   const saveTimeoutRef = useRef(null);
   const celebrationTimeoutRef = useRef(null);
@@ -974,8 +1223,22 @@ function YatzyApp() {
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(() => {
       const state = {
-        phase, numPlayers, names, aiFlags, aiDifficulties, players, currentPlayer, dice, held, rollsLeft, turnsPlayed, history, mode, soundEnabled,
-        statsRecorded, statsSnapshot,
+        phase,
+        numPlayers,
+        names,
+        aiFlags,
+        aiDifficulties,
+        players,
+        currentPlayer,
+        dice,
+        held,
+        rollsLeft,
+        turnsPlayed,
+        history,
+        mode,
+        soundEnabled,
+        statsRecorded,
+        statsSnapshot
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }, 500);
@@ -983,7 +1246,6 @@ function YatzyApp() {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
   }, [loading, phase, numPlayers, names, aiFlags, aiDifficulties, players, currentPlayer, dice, held, rollsLeft, turnsPlayed, history, mode, soundEnabled, statsRecorded, statsSnapshot]);
-
   function persistStats(newStats) {
     setStats(newStats);
     if (typeof window !== 'undefined') {
@@ -994,16 +1256,25 @@ function YatzyApp() {
   // Record this game's results into cross-session stats, once
   useEffect(() => {
     if (loading || !statsLoaded || phase !== 'finished' || statsRecorded) return;
-    const totals = players.map((p) => calcTotals(p.scores).total);
+    const totals = players.map(p => calcTotals(p.scores).total);
     const maxTotal = Math.max(...totals);
-
     const snapshot = {};
-    const newStats = { ...stats };
+    const newStats = {
+      ...stats
+    };
     players.forEach((p, idx) => {
       // Don't let an AI's result pollute a human's history if it shares their name
       if (p.isAI && newStats[p.name] !== undefined) return;
-      snapshot[p.name] = newStats[p.name] ? { ...newStats[p.name] } : null;
-      const prev = newStats[p.name] || { games: 0, wins: 0, totalScore: 0, bestScore: 0, yatzys: 0 };
+      snapshot[p.name] = newStats[p.name] ? {
+        ...newStats[p.name]
+      } : null;
+      const prev = newStats[p.name] || {
+        games: 0,
+        wins: 0,
+        totalScore: 0,
+        bestScore: 0,
+        yatzys: 0
+      };
       const isWinner = numPlayers > 1 && totals[idx] === maxTotal;
       const yatzyCount = p.scores.yatzy === 50 ? 1 : 0;
       newStats[p.name] = {
@@ -1011,25 +1282,43 @@ function YatzyApp() {
         wins: prev.wins + (isWinner ? 1 : 0),
         totalScore: prev.totalScore + totals[idx],
         bestScore: Math.max(prev.bestScore, totals[idx]),
-        yatzys: prev.yatzys + yatzyCount,
+        yatzys: prev.yatzys + yatzyCount
       };
     });
-
     persistStats(newStats);
     setStatsSnapshot(snapshot);
     setStatsRecorded(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, statsLoaded, phase, statsRecorded]);
-
   function startGame() {
-    const initPlayers = Array.from({ length: numPlayers }, (_, i) => {
+    const initPlayers = Array.from({
+      length: numPlayers
+    }, (_, i) => {
       if (aiFlags[i]) {
         const diff = AI_DIFFICULTIES[aiDifficulties[i]] || AI_DIFFICULTIES.mellan;
-        const { name } = parseNameInput(names[i], `Dator ${i + 1}`);
-        return { name, scores: {}, isAI: true, difficulty: aiDifficulties[i], lucky: diff.lucky, unlucky: diff.unlucky };
+        const {
+          name
+        } = parseNameInput(names[i], `Dator ${i + 1}`);
+        return {
+          name,
+          scores: {},
+          isAI: true,
+          difficulty: aiDifficulties[i],
+          lucky: diff.lucky,
+          unlucky: diff.unlucky
+        };
       }
-      const { name, lucky } = parseNameInput(names[i], `Spelare ${i + 1}`);
-      return { name, scores: {}, isAI: false, lucky, unlucky: false };
+      const {
+        name,
+        lucky
+      } = parseNameInput(names[i], `Spelare ${i + 1}`);
+      return {
+        name,
+        scores: {},
+        isAI: false,
+        lucky,
+        unlucky: false
+      };
     });
     setPlayers(initPlayers);
     setCurrentPlayer(0);
@@ -1043,7 +1332,6 @@ function YatzyApp() {
     if (aiFlags.slice(0, numPlayers).some(Boolean)) setMode('auto');
     setPhase('playing');
   }
-
   function resetGame() {
     setPhase('setup');
     setPlayers([]);
@@ -1052,16 +1340,13 @@ function YatzyApp() {
     setStatsSnapshot(null);
     setConfirmReset(false);
   }
-
   function rollDice(forcedHeld) {
     if (rolling || rollsLeft === 0) return;
     const player = players[currentPlayer];
     const lucky = !!player?.lucky;
     const unlucky = !!player?.unlucky;
     // Snapshot the effective held state right now so the interval closure never goes stale
-    const safeForced = Array.isArray(forcedHeld) && forcedHeld.length === 5
-      ? forcedHeld.map(Boolean)
-      : null;
+    const safeForced = Array.isArray(forcedHeld) && forcedHeld.length === 5 ? forcedHeld.map(Boolean) : null;
     const heldSnapshot = safeForced || held.map(Boolean);
     if (safeForced) setHeld(safeForced);
     const variant = rollSoundIndexRef.current;
@@ -1071,49 +1356,47 @@ function YatzyApp() {
     let ticks = 0;
     intervalRef.current = setInterval(() => {
       ticks++;
-      setDice((prev) => prev.map((d, i) => (heldSnapshot[i] ? d : rollDie(lucky, unlucky))));
+      setDice(prev => prev.map((d, i) => heldSnapshot[i] ? d : rollDie(lucky, unlucky)));
       if (ticks >= 8) {
         clearInterval(intervalRef.current);
         setRolling(false);
-        setRollsLeft((r) => r - 1);
+        setRollsLeft(r => r - 1);
       }
     }, 70);
   }
-
   function toggleHold(i) {
     if (rolling || rollsLeft === 3 || rollsLeft === 0) return;
     feedback(playHoldSound, 8);
-    setHeld((h) => {
+    setHeld(h => {
       if (!Array.isArray(h)) return [false, false, false, false, false].map((v, idx) => idx === i);
-      return h.map((v, idx) => (idx === i ? !v : v));
+      return h.map((v, idx) => idx === i ? !v : v);
     });
   }
 
   // Shared logic: record a score for the current player and advance to the next turn
   function recordScore(catId, score) {
-    const cat = CATEGORIES.find((c) => c.id === catId);
+    const cat = CATEGORIES.find(c => c.id === catId);
     const prevUpperSum = calcTotals(players[currentPlayer].scores).upperSum;
-    const updated = players.map((p, idx) =>
-      idx === currentPlayer ? { ...p, scores: { ...p.scores, [catId]: score } } : p
-    );
+    const updated = players.map((p, idx) => idx === currentPlayer ? {
+      ...p,
+      scores: {
+        ...p.scores,
+        [catId]: score
+      }
+    } : p);
     const newUpperSum = calcTotals(updated[currentPlayer].scores).upperSum;
     setPlayers(updated);
-    setHistory((h) => [
-      ...h,
-      {
-        playerIndex: currentPlayer,
-        categoryId: catId,
-        prevDice: [...dice],
-        prevHeld: [...held],
-        prevRollsLeft: rollsLeft,
-      },
-    ]);
+    setHistory(h => [...h, {
+      playerIndex: currentPlayer,
+      categoryId: catId,
+      prevDice: [...dice],
+      prevHeld: [...held],
+      prevRollsLeft: rollsLeft
+    }]);
     setSelectedCategory(null);
     setInputBuffer('');
     setInputError(null);
-
     const justGotBonus = cat.section === 'upper' && prevUpperSum < 63 && newUpperSum >= 63;
-
     if (catId === 'yatzy' && score === 50) {
       feedback(playYatzySound, [60, 50, 60, 50, 60, 50, 120]);
       setCelebration('yatzy');
@@ -1129,10 +1412,8 @@ function YatzyApp() {
     } else {
       feedback(playConfirmSound, 18);
     }
-
     const nextTurn = turnsPlayed + 1;
     setTurnsPlayed(nextTurn);
-
     if (nextTurn === numPlayers * 15) {
       setPhase('finished');
       return;
@@ -1148,16 +1429,19 @@ function YatzyApp() {
   function undo() {
     if (history.length === 0) return;
     const last = history[history.length - 1];
-    setHistory((h) => h.slice(0, -1));
-    setPlayers((prev) =>
-      prev.map((p, idx) => {
-        if (idx !== last.playerIndex) return p;
-        const newScores = { ...p.scores };
-        delete newScores[last.categoryId];
-        return { ...p, scores: newScores };
-      })
-    );
-    setTurnsPlayed((t) => t - 1);
+    setHistory(h => h.slice(0, -1));
+    setPlayers(prev => prev.map((p, idx) => {
+      if (idx !== last.playerIndex) return p;
+      const newScores = {
+        ...p.scores
+      };
+      delete newScores[last.categoryId];
+      return {
+        ...p,
+        scores: newScores
+      };
+    }));
+    setTurnsPlayed(t => t - 1);
     setCurrentPlayer(last.playerIndex);
     setDice(Array.isArray(last.prevDice) ? last.prevDice : [1, 2, 3, 4, 5]);
     setHeld(Array.isArray(last.prevHeld) ? last.prevHeld.map(Boolean) : [false, false, false, false, false]);
@@ -1168,10 +1452,11 @@ function YatzyApp() {
     if (phase === 'finished') {
       setPhase('playing');
       if (statsRecorded && statsSnapshot) {
-        const restored = { ...stats };
+        const restored = {
+          ...stats
+        };
         Object.entries(statsSnapshot).forEach(([name, prevValue]) => {
-          if (prevValue === null) delete restored[name];
-          else restored[name] = prevValue;
+          if (prevValue === null) delete restored[name];else restored[name] = prevValue;
         });
         persistStats(restored);
         setStatsSnapshot(null);
@@ -1187,7 +1472,7 @@ function YatzyApp() {
     if (rolling || rollsLeft === 3) return;
     const current = players[currentPlayer];
     if (current.scores[catId] !== undefined) return;
-    const cat = CATEGORIES.find((c) => c.id === catId);
+    const cat = CATEGORIES.find(c => c.id === catId);
     recordScore(catId, cat.calc(dice));
   }
 
@@ -1199,9 +1484,7 @@ function YatzyApp() {
     if (showRules || confirmReset || editingPlayer !== null || showStats) return;
     const player = players[currentPlayer];
     if (!player?.isAI) return;
-
     const errorRate = AI_DIFFICULTIES[player.difficulty]?.errorRate ?? 0;
-
     aiTimeoutRef.current = setTimeout(() => {
       if (rollsLeft === 3) {
         rollDice();
@@ -1211,7 +1494,6 @@ function YatzyApp() {
         selectCategory(aiChooseCategory(player.scores, dice, errorRate));
       }
     }, 700);
-
     return () => {
       if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current);
     };
@@ -1220,20 +1502,18 @@ function YatzyApp() {
 
   // Manual mode: pick which category to enter a score for
   function onSelectCell(catId) {
-    setSelectedCategory((prev) => (prev === catId ? null : catId));
+    setSelectedCategory(prev => prev === catId ? null : catId);
     setInputBuffer('');
     setInputError(null);
   }
-
   function pressDigit(n) {
     if (!selectedCategory) return;
     setInputError(null);
-    setInputBuffer((b) => (b.length >= 2 ? b : b + String(n)));
+    setInputBuffer(b => b.length >= 2 ? b : b + String(n));
   }
-
   function backspace() {
     setInputError(null);
-    setInputBuffer((b) => b.slice(0, -1));
+    setInputBuffer(b => b.slice(0, -1));
   }
 
   // Manual mode: confirm the typed number, or the suggested default if nothing was typed
@@ -1242,7 +1522,7 @@ function YatzyApp() {
     const score = inputBuffer !== '' ? parseInt(inputBuffer, 10) : getDefaultScore(selectedCategory);
     if (score === null) return;
     if (!isValidScore(selectedCategory, score)) {
-      const label = CATEGORIES.find((c) => c.id === selectedCategory)?.label;
+      const label = CATEGORIES.find(c => c.id === selectedCategory)?.label;
       setInputError(`${score} p går inte att få på ${label}. Kontrollera värdet eller tryck ✕ för att stryka.`);
       return;
     }
@@ -1254,14 +1534,12 @@ function YatzyApp() {
     if (!selectedCategory) return;
     recordScore(selectedCategory, 0);
   }
-
   function switchMode(newMode) {
     setMode(newMode);
     setSelectedCategory(null);
     setInputBuffer('');
     setInputError(null);
   }
-
   function closeKeypad() {
     setSelectedCategory(null);
     setInputBuffer('');
@@ -1275,452 +1553,363 @@ function YatzyApp() {
     setEditingPlayer(idx);
     setEditNameValue(p.lucky ? `${p.name} ` : p.name);
   }
-
   function saveEditName() {
     if (editingPlayer === null) return;
-    const { name, lucky } = parseNameInput(editNameValue, players[editingPlayer].name);
-    setPlayers((prev) => prev.map((p, idx) => (idx === editingPlayer ? { ...p, name, lucky } : p)));
+    const {
+      name,
+      lucky
+    } = parseNameInput(editNameValue, players[editingPlayer].name);
+    setPlayers(prev => prev.map((p, idx) => idx === editingPlayer ? {
+      ...p,
+      name,
+      lucky
+    } : p));
     setEditingPlayer(null);
     setEditNameValue('');
   }
-
   function cancelEditName() {
     setEditingPlayer(null);
     setEditNameValue('');
   }
-
   if (loading) {
-    return <LoadingScreen />;
+    return /*#__PURE__*/React.createElement(LoadingScreen, null);
   }
   if (phase === 'setup') {
-    return (
-      <SetupScreen
-        numPlayers={numPlayers}
-        setNumPlayers={setNumPlayers}
-        names={names}
-        setNames={setNames}
-        aiFlags={aiFlags}
-        setAiFlags={setAiFlags}
-        aiDifficulties={aiDifficulties}
-        setAiDifficulties={setAiDifficulties}
-        onStart={startGame}
-        stats={stats}
-        showStats={showStats}
-        setShowStats={setShowStats}
-        onClearStats={() => persistStats({})}
-      />
-    );
+    return /*#__PURE__*/React.createElement(SetupScreen, {
+      numPlayers: numPlayers,
+      setNumPlayers: setNumPlayers,
+      names: names,
+      setNames: setNames,
+      aiFlags: aiFlags,
+      setAiFlags: setAiFlags,
+      aiDifficulties: aiDifficulties,
+      setAiDifficulties: setAiDifficulties,
+      onStart: startGame,
+      stats: stats,
+      showStats: showStats,
+      setShowStats: setShowStats,
+      onClearStats: () => persistStats({})
+    });
   }
   if (phase === 'finished') {
-    return <FinishedScreen players={players} onRestart={resetGame} onUndo={undo} canUndo={history.length > 0} stats={stats} />;
+    return /*#__PURE__*/React.createElement(FinishedScreen, {
+      players: players,
+      onRestart: resetGame,
+      onUndo: undo,
+      canUndo: history.length > 0,
+      stats: stats
+    });
   }
-
   const gridCols = `116px repeat(${numPlayers}, minmax(56px, 1fr))`;
   const round = Math.floor(turnsPlayed / numPlayers) + 1;
   const diceDisabled = rolling || rollsLeft === 3 || rollsLeft === 0;
   const selDefault = selectedCategory ? getDefaultScore(selectedCategory) : null;
-  const selLabel = selectedCategory ? CATEGORIES.find((c) => c.id === selectedCategory)?.label : null;
+  const selLabel = selectedCategory ? CATEGORIES.find(c => c.id === selectedCategory)?.label : null;
   const canConfirm = !!selectedCategory;
-  const hasAI = players.some((p) => p.isAI);
+  const hasAI = players.some(p => p.isAI);
   const currentIsAI = !!players[currentPlayer]?.isAI;
-
   const currentScores = players[currentPlayer]?.scores ?? {};
   const currentTotals = calcTotals(currentScores);
   const upperSum = currentTotals.upperSum;
-  const upperFilledCount = CATEGORIES.filter((c) => c.section === 'upper' && currentScores[c.id] !== undefined).length;
+  const upperFilledCount = CATEGORIES.filter(c => c.section === 'upper' && currentScores[c.id] !== undefined).length;
   const bonusAchieved = upperSum >= 63;
   const bonusMissed = !bonusAchieved && upperFilledCount === 6;
   const pointsToBonus = Math.max(0, 63 - upperSum);
-  const bonusProgressPct = Math.min(100, (upperSum / 63) * 100);
-  const leaderTotal = Math.max(...players.map((p) => calcTotals(p.scores).total));
+  const bonusProgressPct = Math.min(100, upperSum / 63 * 100);
+  const leaderTotal = Math.max(...players.map(p => calcTotals(p.scores).total));
 
   // Pace toward the bonus: compare actual upper-section sum so far to the
   // "3 of a kind" baseline (FIXED_DEFAULTS) for only the categories already filled.
-  const expectedSoFar = CATEGORIES.filter((c) => c.section === 'upper' && currentScores[c.id] !== undefined).reduce(
-    (sum, c) => sum + FIXED_DEFAULTS[c.id],
-    0
-  );
+  const expectedSoFar = CATEGORIES.filter(c => c.section === 'upper' && currentScores[c.id] !== undefined).reduce((sum, c) => sum + FIXED_DEFAULTS[c.id], 0);
   const paceDiff = upperSum - expectedSoFar;
   const paceText = paceDiff > 0 ? `${paceDiff} p före` : paceDiff < 0 ? `${Math.abs(paceDiff)} p efter` : 'jämnt läge';
-
-  return (
-    <div className="h-screen flex flex-col bg-stone-100 font-sans overflow-hidden">
-      <style>{FONT_STYLES}</style>
-
-      {/* Header */}
-      <header className="px-4 pt-4 pb-2 bg-stone-50 border-b-4 border-stone-900 flex items-center justify-between shrink-0">
-        <div>
-          <h1 className="font-display text-2xl font-extrabold tracking-tight text-stone-900 leading-none">YATZY</h1>
-          <p className="text-[10px] uppercase tracking-widest text-stone-400 mt-0.5">Svenska regler</p>
-        </div>
-        <div className="flex gap-1.5">
-          <button
-            onClick={() => setSoundEnabled((s) => !s)}
-            className="w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center text-stone-900"
-            aria-label={soundEnabled ? 'Stäng av ljud och vibration' : 'Sätt på ljud och vibration'}
-          >
-            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-          </button>
-          <button
-            onClick={undo}
-            disabled={history.length === 0}
-            className="w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center text-stone-900 disabled:opacity-30"
-            aria-label="Ångra senaste registrering"
-          >
-            <Undo2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setShowRules(true)}
-            className="w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center font-display font-bold text-stone-900"
-            aria-label="Visa regler"
-          >
-            ?
-          </button>
-          <button
-            onClick={() => setConfirmReset(true)}
-            className="w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center text-stone-900 text-lg"
-            aria-label="Nytt spel"
-          >
-            ↺
-          </button>
-        </div>
-      </header>
-
-      {/* Celebration overlay */}
-      {celebration === 'yatzy' && <YatzyCelebration />}
-      {celebration === 'bonus' && <BonusCelebration />}
-
-      {/* Turn banner */}
-      <div className="bg-red-600 shrink-0">
-        <div className="px-4 py-2 flex items-center justify-between">
-          <span className="font-display font-bold uppercase tracking-wide text-sm text-stone-50">
-            {players[currentPlayer]?.name}s tur
-          </span>
-          <span className="font-mono-score text-xs text-red-100">Omgång {round} / 15</span>
-        </div>
-        <div className="px-4 pb-2">
-          <div className="flex items-center justify-between mb-1 gap-2">
-            <span className="text-[10px] uppercase tracking-widest font-display font-bold text-red-100 truncate min-w-0">
-              {bonusAchieved
-                ? 'Bonus säkrad — +50'
-                : bonusMissed
-                ? 'Bonus missad'
-                : `${pointsToBonus} p till bonus${upperFilledCount > 0 ? ` · ${paceText}` : ''}`}
-            </span>
-            <span className="text-[10px] font-mono-score text-red-100 shrink-0">{upperSum} / 63</span>
-          </div>
-          <div className="h-1.5 bg-red-800 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-300 ${
-                bonusAchieved ? 'bg-emerald-400' : bonusMissed ? 'bg-stone-400' : 'bg-amber-400'
-              }`}
-              style={{ width: `${bonusProgressPct}%` }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Input mode toggle */}
-      {hasAI ? (
-        <div className="px-4 py-1.5 bg-stone-50 border-b border-stone-200 flex items-center justify-center shrink-0">
-          <p className="text-[11px] text-stone-400 uppercase tracking-widest font-display font-bold">
-            {currentIsAI ? `Datorn (${AI_DIFFICULTIES[players[currentPlayer]?.difficulty]?.label ?? ''}) spelar …` : 'Din tur'}
-          </p>
-        </div>
-      ) : (
-        <div className="px-4 py-1.5 bg-stone-50 border-b border-stone-200 flex flex-col items-center gap-1 shrink-0">
-          <div className="flex items-center justify-center gap-2">
-            <button
-              onClick={() => switchMode('auto')}
-              className={`px-3 py-1 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ${
-                mode === 'auto' ? 'bg-stone-900 text-stone-50' : 'text-stone-400'
-              }`}
-            >
-              Slumpa i appen
-            </button>
-            <button
-              onClick={() => switchMode('manual')}
-              className={`px-3 py-1 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ${
-                mode === 'manual' ? 'bg-stone-900 text-stone-50' : 'text-stone-400'
-              }`}
-            >
-              Egna tärningar
-            </button>
-          </div>
-          {mode === 'manual' && !selectedCategory && (
-            <p className="text-[11px] text-stone-400">Tryck på en gul ruta i tabellen för att registrera poäng</p>
-          )}
-        </div>
-      )}
-
-      {/* Dice tray (auto mode only) */}
-      {mode === 'auto' && (
-        <div className="bg-emerald-800 px-4 py-4 shrink-0">
-          <div className="flex justify-center gap-2 sm:gap-3 mb-3">
-            {dice.map((v, i) => (
-              <Die key={i} value={v} held={held[i]} disabled={diceDisabled} rolling={rolling} onClick={() => toggleHold(i)} />
-            ))}
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <button
-              onClick={rollDice}
-              disabled={rolling || rollsLeft === 0}
-              className="px-6 py-2.5 rounded-full bg-amber-400 border-2 border-stone-900 font-display font-bold text-stone-900 text-sm uppercase tracking-wide disabled:opacity-50 active:scale-95 transition"
-            >
-              {rollsLeft === 3 ? 'Kasta tärningarna' : rollsLeft === 0 ? 'Välj en rad nedan' : `Kasta igen (${rollsLeft} kvar)`}
-            </button>
-            <div className="flex gap-1.5">
-              {[0, 1, 2].map((i) => (
-                <span key={i} className={`w-2.5 h-2.5 rounded-full ${i < rollsLeft ? 'bg-amber-400' : 'bg-emerald-600'}`} />
-              ))}
-            </div>
-            {rollsLeft < 3 && rollsLeft > 0 && (
-              <p className="text-emerald-100 text-[11px] text-center mt-1">Tryck på en tärning för att spara den till nästa kast.</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Torn paper edge (auto mode only) */}
-      {mode === 'auto' && <div className="h-3 bg-stone-50 shrink-0" style={{ clipPath: TORN_EDGE }} />}
-
-      {/* Scorecard */}
-      <div className={`flex-1 min-h-0 overflow-auto bg-stone-50 px-3 ${mode === 'manual' && selectedCategory ? 'pb-80' : 'pb-6'}`}>
-        <div className="grid" style={{ gridTemplateColumns: gridCols }}>
-          <div className="sticky left-0 bg-stone-50 z-20" />
-          {players.map((p, i) => {
-            const total = calcTotals(p.scores).total;
-            const isLeader = numPlayers > 1 && total > 0 && total === leaderTotal;
-            return (
-              <button
-                key={i}
-                onClick={() => openEditName(i)}
-                className={`text-center py-1.5 px-1 rounded-t-lg font-display font-bold text-xs uppercase tracking-wide active:scale-95 transition ${
-                  i === currentPlayer ? 'bg-emerald-600 text-stone-50' : 'bg-stone-200 text-stone-500'
-                }`}
-              >
-                <div className="flex items-center justify-center gap-1 truncate">
-                  {isLeader && <Trophy className="w-3 h-3 text-amber-400 shrink-0" />}
-                  <span className="truncate">{p.name}</span>
-                  <Pencil className={`w-2.5 h-2.5 shrink-0 ${i === currentPlayer ? 'text-emerald-100' : 'text-stone-400'}`} />
-                </div>
-                <div className={`font-mono-score text-[11px] font-bold mt-0.5 ${i === currentPlayer ? 'text-emerald-100' : 'text-stone-400'}`}>
-                  {total} p
-                </div>
-              </button>
-            );
-          })}
-
-          <div
-            className="py-1.5 px-1 mt-2 bg-slate-700 text-stone-50 font-display font-bold text-[11px] uppercase tracking-widest rounded"
-            style={{ gridColumn: '1 / -1' }}
-          >
-            Övre sektion
-          </div>
-
-          {CATEGORIES.filter((c) => c.section === 'upper').map((cat) => (
-            <ScoreRow
-              key={cat.id}
-              category={cat}
-              players={players}
-              currentPlayer={currentPlayer}
-              dice={dice}
-              rollsLeft={rollsLeft}
-              mode={mode}
-              selectedCategory={selectedCategory}
-              inputBuffer={inputBuffer}
-              onSelect={selectCategory}
-              onSelectCell={onSelectCell}
-            />
-          ))}
-
-          <TotalsRow label="Summa" sub="Ettor–Sexor" values={players.map((p) => calcTotals(p.scores).upperSum)} />
-          <TotalsRow label="Bonus" sub="63 p → +50" values={players.map((p) => calcTotals(p.scores).bonus)} accent="amber" />
-
-          <div
-            className="py-1.5 px-1 mt-2 bg-emerald-800 text-stone-50 font-display font-bold text-[11px] uppercase tracking-widest rounded"
-            style={{ gridColumn: '1 / -1' }}
-          >
-            Nedre sektion
-          </div>
-
-          {CATEGORIES.filter((c) => c.section === 'lower').map((cat) => (
-            <ScoreRow
-              key={cat.id}
-              category={cat}
-              players={players}
-              currentPlayer={currentPlayer}
-              dice={dice}
-              rollsLeft={rollsLeft}
-              mode={mode}
-              selectedCategory={selectedCategory}
-              inputBuffer={inputBuffer}
-              onSelect={selectCategory}
-              onSelectCell={onSelectCell}
-            />
-          ))}
-
-          <TotalsRow label="TOTALT" values={players.map((p) => calcTotals(p.scores).total)} accent="dark" />
-        </div>
-      </div>
-
-      {/* Keypad overlay (manual mode, shown only when a cell is selected) */}
-      {mode === 'manual' && selectedCategory && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-emerald-800 border-t-4 border-stone-900 rounded-t-2xl px-4 pt-2 pb-4 shadow-2xl">
-          <div className="w-10 h-1 bg-emerald-600 rounded-full mx-auto mb-2" />
-          <div className="max-w-xs mx-auto">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <p className="font-display font-bold text-stone-50 text-sm uppercase tracking-wide">{selLabel}</p>
-                <p className={`font-mono-score text-3xl font-extrabold leading-none mt-0.5 ${inputError ? 'text-red-400' : 'text-amber-400'}`}>
-                  {inputBuffer !== '' ? inputBuffer : selDefault}
-                </p>
-              </div>
-              <button
-                onClick={closeKeypad}
-                aria-label="Stäng"
-                className="w-8 h-8 rounded-full border-2 border-emerald-600 text-emerald-100 flex items-center justify-center text-sm shrink-0"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-                <button
-                  key={n}
-                  onClick={() => pressDigit(n)}
-                  className="py-3 rounded-xl bg-stone-50 border-2 border-stone-900 font-mono-score text-xl font-bold text-stone-900 active:scale-95 transition"
-                >
-                  {n}
-                </button>
-              ))}
-              <button
-                onClick={backspace}
-                disabled={inputBuffer === ''}
-                className="py-3 rounded-xl bg-stone-200 border-2 border-stone-900 font-display text-base font-bold text-stone-700 disabled:opacity-40 active:scale-95 transition"
-              >
-                ⌫
-              </button>
-              <button
-                onClick={() => pressDigit(0)}
-                className="py-3 rounded-xl bg-stone-50 border-2 border-stone-900 font-mono-score text-xl font-bold text-stone-900 active:scale-95 transition"
-              >
-                0
-              </button>
-              <button
-                onClick={confirmScore}
-                disabled={!canConfirm}
-                className="py-3 rounded-xl bg-amber-400 border-2 border-stone-900 font-display text-xl font-bold text-stone-900 disabled:opacity-40 active:scale-95 transition"
-              >
-                ✓
-              </button>
-            </div>
-
-            <button
-              onClick={crossOut}
-              className="w-full mt-2 py-2.5 rounded-xl bg-red-600 border-2 border-stone-900 font-display font-bold text-stone-50 uppercase tracking-wide text-sm active:scale-95 transition"
-            >
-              ✕ Stryk (0 poäng)
-            </button>
-
-            {inputError ? (
-              <p className="text-red-300 text-[11px] text-center mt-2 leading-relaxed font-semibold">⚠ {inputError}</p>
-            ) : (
-              <p className="text-emerald-200 text-[11px] text-center mt-2 leading-relaxed">
-                {inputBuffer !== ''
-                  ? `Tryck ✓ för att registrera ${inputBuffer} p.`
-                  : selectedCategory in FIXED_DEFAULTS
-                  ? `✓ ger ${selDefault} p direkt – eller skriv ett eget värde.`
-                  : `✓ ger ${selDefault} p (högsta möjliga) – eller skriv ett eget värde.`}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Rules modal */}
-      {showRules && (
-        <div className="fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4" onClick={() => setShowRules(false)}>
-          <div className="bg-stone-50 rounded-2xl max-w-sm w-full max-h-[85vh] overflow-auto p-5 border-4 border-stone-900" onClick={(e) => e.stopPropagation()}>
-            <h2 className="font-display text-xl font-extrabold text-stone-900 mb-1">Poängregler</h2>
-            <p className="text-xs text-stone-400 mb-3">Svensk Yatzy · 15 rutor per spelare</p>
-            <div className="space-y-1.5">
-              {CATEGORIES.map((c) => (
-                <div key={c.id} className="flex justify-between items-baseline border-b border-stone-100 pb-1">
-                  <span className="text-sm font-semibold text-stone-800">{c.label}</span>
-                  <span className="text-xs text-stone-400 text-right">{c.sub}</span>
-                </div>
-              ))}
-            </div>
-            <p className="text-xs text-stone-500 mt-3 leading-relaxed">
-              Bonus: om summan av Ettor–Sexor är minst 63 poäng får du 50 extra poäng.
-            </p>
-            <p className="text-xs text-stone-500 mt-2 leading-relaxed">
-              Spelar ni med egna tärningar? Växla till "Egna tärningar" högst upp. Tryck på en ruta i tabellen, skriv poängen
-              eller tryck bara ✓ för förslaget: 3-i-rad för Ettor–Sexor, 15/20/50 för stegar och Yatzy, och högsta möjliga
-              poäng för övriga rader (t.ex. 30 för Chans, 28 för Kåk). Tryck ✕ för att stryka en ruta (0 poäng). Appen
-              kontrollerar att den inskrivna poängen verkligen går att få i den rutan – annars visas ett felmeddelande.
-            </p>
-            <p className="text-xs text-stone-500 mt-2 leading-relaxed">
-              Spelet sparas automatiskt på den här enheten, så du kan stänga appen och fortsätta partiet senare. Ljud och
-              vibration vid kast, registrering och Yatzy kan stängas av med högtalarikonen högst upp.
-            </p>
-            <button onClick={() => setShowRules(false)} className="mt-4 w-full py-2.5 rounded-xl bg-stone-900 text-stone-50 font-display font-bold uppercase tracking-wide">
-              Stäng
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Reset confirm modal */}
-      {confirmReset && (
-        <div className="fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4" onClick={() => setConfirmReset(false)}>
-          <div className="bg-stone-50 rounded-2xl max-w-xs w-full p-5 border-4 border-stone-900 text-center" onClick={(e) => e.stopPropagation()}>
-            <h2 className="font-display text-lg font-extrabold text-stone-900 mb-2">Avsluta spelet?</h2>
-            <p className="text-sm text-stone-500 mb-4">Pågående poäng går förlorade.</p>
-            <div className="flex gap-2">
-              <button onClick={() => setConfirmReset(false)} className="flex-1 py-2.5 rounded-xl border-2 border-stone-900 font-display font-bold text-stone-900">
-                Avbryt
-              </button>
-              <button onClick={resetGame} className="flex-1 py-2.5 rounded-xl bg-red-600 text-stone-50 font-display font-bold">
-                Avsluta
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit name modal */}
-      {editingPlayer !== null && (
-        <div className="fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4" onClick={cancelEditName}>
-          <div className="bg-stone-50 rounded-2xl max-w-xs w-full p-5 border-4 border-stone-900" onClick={(e) => e.stopPropagation()}>
-            <h2 className="font-display text-lg font-extrabold text-stone-900 mb-3">Redigera namn</h2>
-            <input
-              autoFocus
-              value={editNameValue}
-              onChange={(e) => setEditNameValue(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && saveEditName()}
-              className="w-full px-3 py-2 rounded-lg border-2 border-stone-300 focus:border-red-600 focus:outline-none text-stone-800 mb-4"
-            />
-            <div className="flex gap-2">
-              <button onClick={cancelEditName} className="flex-1 py-2.5 rounded-xl border-2 border-stone-900 font-display font-bold text-stone-900">
-                Avbryt
-              </button>
-              <button onClick={saveEditName} className="flex-1 py-2.5 rounded-xl bg-red-600 text-stone-50 font-display font-bold">
-                Spara
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", {
+    className: "h-screen flex flex-col bg-stone-100 font-sans overflow-hidden"
+  }, /*#__PURE__*/React.createElement("style", null, FONT_STYLES), /*#__PURE__*/React.createElement("header", {
+    className: "px-4 pt-4 pb-2 bg-stone-50 border-b-4 border-stone-900 flex items-center justify-between shrink-0"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    className: "font-display text-2xl font-extrabold tracking-tight text-stone-900 leading-none"
+  }, "YATZY"), /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] uppercase tracking-widest text-stone-400 mt-0.5"
+  }, "Svenska regler")), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-1.5"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setSoundEnabled(s => !s),
+    className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center text-stone-900",
+    "aria-label": soundEnabled ? 'Stäng av ljud och vibration' : 'Sätt på ljud och vibration'
+  }, soundEnabled ? /*#__PURE__*/React.createElement(Volume2, {
+    className: "w-4 h-4"
+  }) : /*#__PURE__*/React.createElement(VolumeX, {
+    className: "w-4 h-4"
+  })), /*#__PURE__*/React.createElement("button", {
+    onClick: undo,
+    disabled: history.length === 0,
+    className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center text-stone-900 disabled:opacity-30",
+    "aria-label": "Ångra senaste registrering"
+  }, /*#__PURE__*/React.createElement(Undo2, {
+    className: "w-4 h-4"
+  })), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowRules(true),
+    className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center font-display font-bold text-stone-900",
+    "aria-label": "Visa regler"
+  }, "?"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setConfirmReset(true),
+    className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center text-stone-900 text-lg",
+    "aria-label": "Nytt spel"
+  }, "↺"))), celebration === 'yatzy' && /*#__PURE__*/React.createElement(YatzyCelebration, null), celebration === 'bonus' && /*#__PURE__*/React.createElement(BonusCelebration, null), /*#__PURE__*/React.createElement("div", {
+    className: "bg-red-600 shrink-0"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "px-4 py-2 flex items-center justify-between"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "font-display font-bold uppercase tracking-wide text-sm text-stone-50"
+  }, players[currentPlayer]?.name, "s tur"), /*#__PURE__*/React.createElement("span", {
+    className: "font-mono-score text-xs text-red-100"
+  }, "Omgång ", round, " / 15")), /*#__PURE__*/React.createElement("div", {
+    className: "px-4 pb-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between mb-1 gap-2"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-[10px] uppercase tracking-widest font-display font-bold text-red-100 truncate min-w-0"
+  }, bonusAchieved ? 'Bonus säkrad — +50' : bonusMissed ? 'Bonus missad' : `${pointsToBonus} p till bonus${upperFilledCount > 0 ? ` · ${paceText}` : ''}`), /*#__PURE__*/React.createElement("span", {
+    className: "text-[10px] font-mono-score text-red-100 shrink-0"
+  }, upperSum, " / 63")), /*#__PURE__*/React.createElement("div", {
+    className: "h-1.5 bg-red-800 rounded-full overflow-hidden"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: `h-full rounded-full transition-all duration-300 ${bonusAchieved ? 'bg-emerald-400' : bonusMissed ? 'bg-stone-400' : 'bg-amber-400'}`,
+    style: {
+      width: `${bonusProgressPct}%`
+    }
+  })))), hasAI ? /*#__PURE__*/React.createElement("div", {
+    className: "px-4 py-1.5 bg-stone-50 border-b border-stone-200 flex items-center justify-center shrink-0"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] text-stone-400 uppercase tracking-widest font-display font-bold"
+  }, currentIsAI ? `Datorn (${AI_DIFFICULTIES[players[currentPlayer]?.difficulty]?.label ?? ''}) spelar …` : 'Din tur')) : /*#__PURE__*/React.createElement("div", {
+    className: "px-4 py-1.5 bg-stone-50 border-b border-stone-200 flex flex-col items-center gap-1 shrink-0"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-center gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => switchMode('auto'),
+    className: `px-3 py-1 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ${mode === 'auto' ? 'bg-stone-900 text-stone-50' : 'text-stone-400'}`
+  }, "Slumpa i appen"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => switchMode('manual'),
+    className: `px-3 py-1 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ${mode === 'manual' ? 'bg-stone-900 text-stone-50' : 'text-stone-400'}`
+  }, "Egna tärningar")), mode === 'manual' && !selectedCategory && /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] text-stone-400"
+  }, "Tryck på en gul ruta i tabellen för att registrera poäng")), mode === 'auto' && /*#__PURE__*/React.createElement("div", {
+    className: "bg-emerald-800 px-4 py-4 shrink-0"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-center gap-2 sm:gap-3 mb-3"
+  }, dice.map((v, i) => /*#__PURE__*/React.createElement(Die, {
+    key: i,
+    value: v,
+    held: held[i],
+    disabled: diceDisabled,
+    rolling: rolling,
+    onClick: () => toggleHold(i)
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col items-center gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: rollDice,
+    disabled: rolling || rollsLeft === 0,
+    className: "px-6 py-2.5 rounded-full bg-amber-400 border-2 border-stone-900 font-display font-bold text-stone-900 text-sm uppercase tracking-wide disabled:opacity-50 active:scale-95 transition"
+  }, rollsLeft === 3 ? 'Kasta tärningarna' : rollsLeft === 0 ? 'Välj en rad nedan' : `Kasta igen (${rollsLeft} kvar)`), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-1.5"
+  }, [0, 1, 2].map(i => /*#__PURE__*/React.createElement("span", {
+    key: i,
+    className: `w-2.5 h-2.5 rounded-full ${i < rollsLeft ? 'bg-amber-400' : 'bg-emerald-600'}`
+  }))), rollsLeft < 3 && rollsLeft > 0 && /*#__PURE__*/React.createElement("p", {
+    className: "text-emerald-100 text-[11px] text-center mt-1"
+  }, "Tryck på en tärning för att spara den till nästa kast."))), mode === 'auto' && /*#__PURE__*/React.createElement("div", {
+    className: "h-3 bg-stone-50 shrink-0",
+    style: {
+      clipPath: TORN_EDGE
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: `flex-1 min-h-0 overflow-auto bg-stone-50 px-3 ${mode === 'manual' && selectedCategory ? 'pb-80' : 'pb-6'}`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grid",
+    style: {
+      gridTemplateColumns: gridCols
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "sticky left-0 bg-stone-50 z-20"
+  }), players.map((p, i) => {
+    const total = calcTotals(p.scores).total;
+    const isLeader = numPlayers > 1 && total > 0 && total === leaderTotal;
+    return /*#__PURE__*/React.createElement("button", {
+      key: i,
+      onClick: () => openEditName(i),
+      className: `text-center py-1.5 px-1 rounded-t-lg font-display font-bold text-xs uppercase tracking-wide active:scale-95 transition ${i === currentPlayer ? 'bg-emerald-600 text-stone-50' : 'bg-stone-200 text-stone-500'}`
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center justify-center gap-1 truncate"
+    }, isLeader && /*#__PURE__*/React.createElement(Trophy, {
+      className: "w-3 h-3 text-amber-400 shrink-0"
+    }), /*#__PURE__*/React.createElement("span", {
+      className: "truncate"
+    }, p.name), /*#__PURE__*/React.createElement(Pencil, {
+      className: `w-2.5 h-2.5 shrink-0 ${i === currentPlayer ? 'text-emerald-100' : 'text-stone-400'}`
+    })), /*#__PURE__*/React.createElement("div", {
+      className: `font-mono-score text-[11px] font-bold mt-0.5 ${i === currentPlayer ? 'text-emerald-100' : 'text-stone-400'}`
+    }, total, " p"));
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "py-1.5 px-1 mt-2 bg-slate-700 text-stone-50 font-display font-bold text-[11px] uppercase tracking-widest rounded",
+    style: {
+      gridColumn: '1 / -1'
+    }
+  }, "Övre sektion"), CATEGORIES.filter(c => c.section === 'upper').map(cat => /*#__PURE__*/React.createElement(ScoreRow, {
+    key: cat.id,
+    category: cat,
+    players: players,
+    currentPlayer: currentPlayer,
+    dice: dice,
+    rollsLeft: rollsLeft,
+    mode: mode,
+    selectedCategory: selectedCategory,
+    inputBuffer: inputBuffer,
+    onSelect: selectCategory,
+    onSelectCell: onSelectCell
+  })), /*#__PURE__*/React.createElement(TotalsRow, {
+    label: "Summa",
+    sub: "Ettor–Sexor",
+    values: players.map(p => calcTotals(p.scores).upperSum)
+  }), /*#__PURE__*/React.createElement(TotalsRow, {
+    label: "Bonus",
+    sub: "63 p → +50",
+    values: players.map(p => calcTotals(p.scores).bonus),
+    accent: "amber"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "py-1.5 px-1 mt-2 bg-emerald-800 text-stone-50 font-display font-bold text-[11px] uppercase tracking-widest rounded",
+    style: {
+      gridColumn: '1 / -1'
+    }
+  }, "Nedre sektion"), CATEGORIES.filter(c => c.section === 'lower').map(cat => /*#__PURE__*/React.createElement(ScoreRow, {
+    key: cat.id,
+    category: cat,
+    players: players,
+    currentPlayer: currentPlayer,
+    dice: dice,
+    rollsLeft: rollsLeft,
+    mode: mode,
+    selectedCategory: selectedCategory,
+    inputBuffer: inputBuffer,
+    onSelect: selectCategory,
+    onSelectCell: onSelectCell
+  })), /*#__PURE__*/React.createElement(TotalsRow, {
+    label: "TOTALT",
+    values: players.map(p => calcTotals(p.scores).total),
+    accent: "dark"
+  }))), mode === 'manual' && selectedCategory && /*#__PURE__*/React.createElement("div", {
+    className: "fixed bottom-0 left-0 right-0 z-40 bg-emerald-800 border-t-4 border-stone-900 rounded-t-2xl px-4 pt-2 pb-4 shadow-2xl"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "w-10 h-1 bg-emerald-600 rounded-full mx-auto mb-2"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "max-w-xs mx-auto"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between mb-2"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    className: "font-display font-bold text-stone-50 text-sm uppercase tracking-wide"
+  }, selLabel), /*#__PURE__*/React.createElement("p", {
+    className: `font-mono-score text-3xl font-extrabold leading-none mt-0.5 ${inputError ? 'text-red-400' : 'text-amber-400'}`
+  }, inputBuffer !== '' ? inputBuffer : selDefault)), /*#__PURE__*/React.createElement("button", {
+    onClick: closeKeypad,
+    "aria-label": "Stäng",
+    className: "w-8 h-8 rounded-full border-2 border-emerald-600 text-emerald-100 flex items-center justify-center text-sm shrink-0"
+  }, "×")), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-3 gap-2"
+  }, [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => /*#__PURE__*/React.createElement("button", {
+    key: n,
+    onClick: () => pressDigit(n),
+    className: "py-3 rounded-xl bg-stone-50 border-2 border-stone-900 font-mono-score text-xl font-bold text-stone-900 active:scale-95 transition"
+  }, n)), /*#__PURE__*/React.createElement("button", {
+    onClick: backspace,
+    disabled: inputBuffer === '',
+    className: "py-3 rounded-xl bg-stone-200 border-2 border-stone-900 font-display text-base font-bold text-stone-700 disabled:opacity-40 active:scale-95 transition"
+  }, "⌫"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => pressDigit(0),
+    className: "py-3 rounded-xl bg-stone-50 border-2 border-stone-900 font-mono-score text-xl font-bold text-stone-900 active:scale-95 transition"
+  }, "0"), /*#__PURE__*/React.createElement("button", {
+    onClick: confirmScore,
+    disabled: !canConfirm,
+    className: "py-3 rounded-xl bg-amber-400 border-2 border-stone-900 font-display text-xl font-bold text-stone-900 disabled:opacity-40 active:scale-95 transition"
+  }, "✓")), /*#__PURE__*/React.createElement("button", {
+    onClick: crossOut,
+    className: "w-full mt-2 py-2.5 rounded-xl bg-red-600 border-2 border-stone-900 font-display font-bold text-stone-50 uppercase tracking-wide text-sm active:scale-95 transition"
+  }, "✕ Stryk (0 poäng)"), inputError ? /*#__PURE__*/React.createElement("p", {
+    className: "text-red-300 text-[11px] text-center mt-2 leading-relaxed font-semibold"
+  }, "⚠ ", inputError) : /*#__PURE__*/React.createElement("p", {
+    className: "text-emerald-200 text-[11px] text-center mt-2 leading-relaxed"
+  }, inputBuffer !== '' ? `Tryck ✓ för att registrera ${inputBuffer} p.` : selectedCategory in FIXED_DEFAULTS ? `✓ ger ${selDefault} p direkt – eller skriv ett eget värde.` : `✓ ger ${selDefault} p (högsta möjliga) – eller skriv ett eget värde.`))), showRules && /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4",
+    onClick: () => setShowRules(false)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-stone-50 rounded-2xl max-w-sm w-full max-h-[85vh] overflow-auto p-5 border-4 border-stone-900",
+    onClick: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "font-display text-xl font-extrabold text-stone-900 mb-1"
+  }, "Poängregler"), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-stone-400 mb-3"
+  }, "Svensk Yatzy · 15 rutor per spelare"), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1.5"
+  }, CATEGORIES.map(c => /*#__PURE__*/React.createElement("div", {
+    key: c.id,
+    className: "flex justify-between items-baseline border-b border-stone-100 pb-1"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-sm font-semibold text-stone-800"
+  }, c.label), /*#__PURE__*/React.createElement("span", {
+    className: "text-xs text-stone-400 text-right"
+  }, c.sub)))), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-stone-500 mt-3 leading-relaxed"
+  }, "Bonus: om summan av Ettor–Sexor är minst 63 poäng får du 50 extra poäng."), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-stone-500 mt-2 leading-relaxed"
+  }, "Spelar ni med egna tärningar? Växla till \"Egna tärningar\" högst upp. Tryck på en ruta i tabellen, skriv poängen eller tryck bara ✓ för förslaget: 3-i-rad för Ettor–Sexor, 15/20/50 för stegar och Yatzy, och högsta möjliga poäng för övriga rader (t.ex. 30 för Chans, 28 för Kåk). Tryck ✕ för att stryka en ruta (0 poäng). Appen kontrollerar att den inskrivna poängen verkligen går att få i den rutan – annars visas ett felmeddelande."), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-stone-500 mt-2 leading-relaxed"
+  }, "Spelet sparas automatiskt på den här enheten, så du kan stänga appen och fortsätta partiet senare. Ljud och vibration vid kast, registrering och Yatzy kan stängas av med högtalarikonen högst upp."), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowRules(false),
+    className: "mt-4 w-full py-2.5 rounded-xl bg-stone-900 text-stone-50 font-display font-bold uppercase tracking-wide"
+  }, "Stäng"))), confirmReset && /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4",
+    onClick: () => setConfirmReset(false)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-stone-50 rounded-2xl max-w-xs w-full p-5 border-4 border-stone-900 text-center",
+    onClick: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "font-display text-lg font-extrabold text-stone-900 mb-2"
+  }, "Avsluta spelet?"), /*#__PURE__*/React.createElement("p", {
+    className: "text-sm text-stone-500 mb-4"
+  }, "Pågående poäng går förlorade."), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setConfirmReset(false),
+    className: "flex-1 py-2.5 rounded-xl border-2 border-stone-900 font-display font-bold text-stone-900"
+  }, "Avbryt"), /*#__PURE__*/React.createElement("button", {
+    onClick: resetGame,
+    className: "flex-1 py-2.5 rounded-xl bg-red-600 text-stone-50 font-display font-bold"
+  }, "Avsluta")))), editingPlayer !== null && /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4",
+    onClick: cancelEditName
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-stone-50 rounded-2xl max-w-xs w-full p-5 border-4 border-stone-900",
+    onClick: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "font-display text-lg font-extrabold text-stone-900 mb-3"
+  }, "Redigera namn"), /*#__PURE__*/React.createElement("input", {
+    autoFocus: true,
+    value: editNameValue,
+    onChange: e => setEditNameValue(e.target.value),
+    onKeyDown: e => e.key === 'Enter' && saveEditName(),
+    className: "w-full px-3 py-2 rounded-lg border-2 border-stone-300 focus:border-red-600 focus:outline-none text-stone-800 mb-4"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: cancelEditName,
+    className: "flex-1 py-2.5 rounded-xl border-2 border-stone-900 font-display font-bold text-stone-900"
+  }, "Avbryt"), /*#__PURE__*/React.createElement("button", {
+    onClick: saveEditName,
+    className: "flex-1 py-2.5 rounded-xl bg-red-600 text-stone-50 font-display font-bold"
+  }, "Spara")))));
 }
+ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(YatzyApp, null));
 
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<YatzyApp />);
   </script>
 </body>
 </html>
