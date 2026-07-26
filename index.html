@@ -2,225 +2,209 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Yatzy" />
   <meta name="theme-color" content="#1c1917" />
   <title>Yatzy</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzFjMTkxNyIvPgogIDx0ZXh0IHg9IjI1NiIgeT0iMjAwIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIxODAiIGZpbGw9IiNmYmJmMjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPlk8L3RleHQ+CiAgPHJlY3QgeD0iOTYiIHk9IjI4MCIgd2lkdGg9IjMyMCIgaGVpZ2h0PSIxOCIgcng9IjkiIGZpbGw9IiNkYzI2MjYiLz4KICA8Y2lyY2xlIGN4PSIxNTYiIGN5PSIzNzAiIHI9IjI4IiBmaWxsPSIjZjVmNWY0Ii8+CiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMzcwIiByPSIyOCIgZmlsbD0iI2Y1ZjVmNCIvPgogIDxjaXJjbGUgY3g9IjM1NiIgY3k9IjM3MCIgcj0iMjgiIGZpbGw9IiNmNWY1ZjQiLz4KICA8Y2lyY2xlIGN4PSIyMDYiIGN5PSI0MjAiIHI9IjI4IiBmaWxsPSIjZjVmNWY0Ii8+CiAgPGNpcmNsZSBjeD0iMzA2IiBjeT0iNDIwIiByPSIyOCIgZmlsbD0iI2Y1ZjVmNCIvPgo8L3N2Zz4=" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="apple-touch-icon" href="icon.png" />
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    body { margin: 0; background: #f5f5f4; }
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-    body { margin: 0; overscroll-behavior: none; background: #1c1917; }
-    #root { min-height: 100dvh; }
   </style>
-  <script>
-(function() {
-  var c = document.createElement('canvas');
-  c.width = c.height = 180;
-  var ctx = c.getContext('2d');
-  // Background
-  ctx.fillStyle = '#1c1917';
-  ctx.beginPath();
-  var r = 36;
-  ctx.moveTo(r, 0); ctx.lineTo(180-r, 0);
-  ctx.quadraticCurveTo(180, 0, 180, r);
-  ctx.lineTo(180, 180-r); ctx.quadraticCurveTo(180, 180, 180-r, 180);
-  ctx.lineTo(r, 180); ctx.quadraticCurveTo(0, 180, 0, 180-r);
-  ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
-  ctx.closePath(); ctx.fill();
-  // Y letter
-  ctx.fillStyle = '#fbbf24';
-  ctx.font = 'bold 110px Georgia, serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('Y', 90, 72);
-  // Red bar
-  ctx.fillStyle = '#dc2626';
-  ctx.fillRect(28, 118, 124, 10);
-  // Dice dots
-  ctx.fillStyle = '#f5f5f4';
-  var dots = [[52,150],[90,150],[128,150],[71,172],[109,172]];
-  dots.forEach(function(d) {
-    ctx.beginPath(); ctx.arc(d[0], d[1], 10, 0, Math.PI*2); ctx.fill();
-  });
-  var link = document.createElement('link');
-  link.rel = 'apple-touch-icon';
-  link.href = c.toDataURL('image/png');
-  document.head.appendChild(link);
-})();
-</script>
 </head>
 <body>
   <div id="root"></div>
   <script>
-const {
-  useState,
-  useRef,
-  useEffect
-} = React;
-
-// ---------- Inline SVG icons ----------
-function Trophy({
-  className = ''
-}) {
-  return /*#__PURE__*/React.createElement("svg", {
-    className: className,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round"
-  }, /*#__PURE__*/React.createElement("path", {
-    d: "M6 9H4.5a2.5 2.5 0 0 1 0-5H6"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M18 9h1.5a2.5 2.5 0 0 0 0-5H18"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M4 22h16"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M18 2H6v7a6 6 0 0 0 12 0V2Z"
-  }));
-}
-function Undo2({
-  className = ''
-}) {
-  return /*#__PURE__*/React.createElement("svg", {
-    className: className,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round"
-  }, /*#__PURE__*/React.createElement("path", {
-    d: "M9 14 4 9l5-5"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"
-  }));
-}
-function Volume2({
-  className = ''
-}) {
-  return /*#__PURE__*/React.createElement("svg", {
-    className: className,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round"
-  }, /*#__PURE__*/React.createElement("polygon", {
-    points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M15.54 8.46a5 5 0 0 1 0 7.07"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M19.07 4.93a10 10 0 0 1 0 14.14"
-  }));
-}
-function VolumeX({
-  className = ''
-}) {
-  return /*#__PURE__*/React.createElement("svg", {
-    className: className,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round"
-  }, /*#__PURE__*/React.createElement("polygon", {
-    points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "23",
-    y1: "9",
-    x2: "17",
-    y2: "15"
-  }), /*#__PURE__*/React.createElement("line", {
-    x1: "17",
-    y1: "9",
-    x2: "23",
-    y2: "15"
-  }));
-}
-function Pencil({
-  className = ''
-}) {
-  return /*#__PURE__*/React.createElement("svg", {
-    className: className,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round"
-  }, /*#__PURE__*/React.createElement("path", {
-    d: "M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "m15 5 4 4"
-  }));
-}
+    // Shim: localStorage-backed window.storage for standalone HTML deployment
+    window.storage = {
+      get: (key) => Promise.resolve((() => { try { const v = localStorage.getItem(key); return v ? { key, value: v } : null; } catch { return null; } })()),
+      set: (key, value) => Promise.resolve((() => { try { localStorage.setItem(key, value); return { key, value }; } catch { return null; } })()),
+      delete: (key) => Promise.resolve((() => { try { localStorage.removeItem(key); return { key, deleted: true }; } catch { return null; } })()),
+      list: (prefix) => Promise.resolve((() => { try { const keys = Object.keys(localStorage).filter(k => !prefix || k.startsWith(prefix)); return { keys }; } catch { return { keys: [] }; } })()),
+    };
+  </script>
+  <script>
+function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */ var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i.return) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
+function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
+function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _createForOfIteratorHelper(r, e) { var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t.return || t.return(); } finally { if (u) throw o; } } }; }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+import React, { useState, useRef, useEffect } from 'react';
+import { Trophy, Undo2, Volume2, VolumeX, Pencil } from 'lucide-react';
 
 // Personal storage keys
-const STORAGE_KEY = 'yatzy-game-state-v2';
-const STATS_KEY = 'yatzy-stats';
-const FONT_STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap');
-  .font-display { font-family: 'Space Grotesk', system-ui, sans-serif; }
-  .font-mono-score { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
-  .confetti-piece {
-    position: absolute;
-    top: -10px;
-    animation-name: confetti-fall;
-    animation-timing-function: ease-in;
-    animation-fill-mode: forwards;
+var STORAGE_KEY = 'yatzy-game-state-v3';
+var STATS_KEY = 'yatzy-stats';
+
+// ─── Player color palettes ────────────────────────────────────────────────────
+// Four distinct themes, one per player slot. Each has Tailwind class strings
+// for the various places the color is used.
+var PLAYER_COLORS = [{
+  id: 'red',
+  emoji: '🔴',
+  header: 'bg-red-600 text-stone-50',
+  headerBorder: 'border-red-700',
+  light: 'bg-red-50',
+  accent: 'text-red-700',
+  badge: 'bg-red-100 text-red-800 border-red-300',
+  dot: 'bg-red-500',
+  finish: 'bg-red-100 border-red-400'
+}, {
+  id: 'blue',
+  emoji: '🔵',
+  header: 'bg-sky-600 text-stone-50',
+  headerBorder: 'border-sky-700',
+  light: 'bg-sky-50',
+  accent: 'text-sky-700',
+  badge: 'bg-sky-100 text-sky-800 border-sky-300',
+  dot: 'bg-sky-500',
+  finish: 'bg-sky-100 border-sky-400'
+}, {
+  id: 'amber',
+  emoji: '🟡',
+  header: 'bg-amber-500 text-stone-900',
+  headerBorder: 'border-amber-600',
+  light: 'bg-amber-50',
+  accent: 'text-amber-700',
+  badge: 'bg-amber-100 text-amber-800 border-amber-300',
+  dot: 'bg-amber-500',
+  finish: 'bg-amber-100 border-amber-400'
+}, {
+  id: 'emerald',
+  emoji: '🟢',
+  header: 'bg-emerald-600 text-stone-50',
+  headerBorder: 'border-emerald-700',
+  light: 'bg-emerald-50',
+  accent: 'text-emerald-700',
+  badge: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+  dot: 'bg-emerald-500',
+  finish: 'bg-emerald-100 border-emerald-400'
+}];
+
+// Emoji avatar options per player (shown on setup and scorecard header)
+var AVATAR_OPTIONS = ['😀', '😎', '🤩', '🥳', '🧠', '👻', '🦊', '🐻', '🐼', '🦄', '🎩'];
+var LEADERBOARD_KEY = 'yatzy-leaderboard';
+var TOURNAMENT_KEY = 'yatzy-tournament';
+// ─── House rules ──────────────────────────────────────────────────────────────
+var DEFAULT_HOUSE_RULES = {
+  joker: false,
+  // Yatzy used as wildcard in lower section if yatzy-slot is filled
+  bonusYatzy: false,
+  // Each Yatzy beyond the first adds +50 bonus points
+  naturalBonus: false,
+  // Yatzy on first roll scores 100 instead of 50
+  strictUpper: false,
+  // Upper section must be completed before lower can be started
+  forcedOrder: false // Categories must be filled top-to-bottom (no free choice)
+};
+
+// Rule-aware scoring — replaces raw cat.calc(dice) calls during gameplay
+// Pass houseRules=null to get the plain calculation (used in scorecard preview)
+function calcScore(catId, dice, houseRules, scores) {
+  var hr = houseRules || DEFAULT_HOUSE_RULES;
+
+  // Generous straights: remove one duplicate then test
+  // Generous straights: 4 of the 5 required values suffice — the 5th die can be
+
+  // Natural bonus: Yatzy on roll 1 (rollsLeft===2 when scored, since one roll was used)
+  // We detect this via the scores context — but we can't know rollsLeft here.
+  // Instead we pass it separately. For simplicity, naturalBonus is handled in recordScore.
+
+  // Joker: if scoring a lower-section category and the player has a Yatzy,
+  // and the yatzy slot is already filled, allow the joker score.
+  // The joker score for lower cats = the natural score of that dice combo.
+  // This is handled by NOT blocking the score — the calc itself is unchanged.
+  // We just need to unlock the category when joker applies.
+
+  var cat = CATEGORIES.find(function (c) {
+    return c.id === catId;
+  });
+  if (!cat) return 0;
+  return cat.calc(dice);
+}
+
+// With joker rule: a Yatzy roll unlocks certain lower categories even if the
+// "natural" score is 0. Returns true if this dice+catId combo is joker-eligible.
+function isJokerEligible(catId, dice, scores, houseRules) {
+  if (!(houseRules !== null && houseRules !== void 0 && houseRules.joker)) return false;
+  if (!counts(dice).includes(5)) return false; // must be a Yatzy roll
+  if (scores['yatzy'] === undefined) return false; // yatzy slot must be filled
+  // Joker applies to lower section categories (except yatzy itself)
+  var cat = CATEGORIES.find(function (c) {
+    return c.id === catId;
+  });
+  return cat && cat.section === 'lower' && catId !== 'yatzy';
+}
+
+// Forced-order: return the catId that must be filled next, or null if free choice
+function forcedOrderCat(scores) {
+  var _iterator = _createForOfIteratorHelper(CATEGORIES),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var cat = _step.value;
+      if (scores[cat.id] === undefined) return cat.id;
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
   }
-  @keyframes confetti-fall {
-    from { transform: translateY(0) rotate(0deg); opacity: 1; }
-    to { transform: translateY(110vh) rotate(540deg); opacity: 0; }
-  }
-  @keyframes celebration-pop {
-    0% { transform: scale(0.6) rotate(-6deg); opacity: 0; }
-    50% { transform: scale(1.08) rotate(2deg); opacity: 1; }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; }
-  }
-`;
+  return null;
+}
+var FONT_STYLES = "\n  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap');\n  .font-display { font-family: 'Space Grotesk', system-ui, sans-serif; }\n  .font-mono-score { font-family: 'IBM Plex Mono', 'Courier New', monospace; }\n  .confetti-piece {\n    position: absolute;\n    top: -10px;\n    animation-name: confetti-fall;\n    animation-timing-function: ease-in;\n    animation-fill-mode: forwards;\n  }\n  @keyframes confetti-fall {\n    from { transform: translateY(0) rotate(0deg); opacity: 1; }\n    to { transform: translateY(110vh) rotate(540deg); opacity: 0; }\n  }\n  @keyframes celebration-pop {\n    0% { transform: scale(0.6) rotate(-6deg); opacity: 0; }\n    50% { transform: scale(1.08) rotate(2deg); opacity: 1; }\n    100% { transform: scale(1) rotate(0deg); opacity: 1; }\n  }\n";
 
 // ---------- Sound & haptic feedback ----------
 // Sounds are synthesized with the Web Audio API (no audio files needed).
-let audioCtx = null;
+var audioCtx = null;
 function getAudioContext() {
   if (typeof window === 'undefined') return null;
-  const AC = window.AudioContext || window.webkitAudioContext;
+  var AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return null;
   if (!audioCtx) audioCtx = new AC();
-  if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+  if (audioCtx.state === 'suspended') audioCtx.resume().catch(function () {});
   return audioCtx;
 }
-function tone(ctx, {
-  freq = 440,
-  duration = 0.1,
-  type = 'sine',
-  gain = 0.15,
-  time = 0
-}) {
-  const osc = ctx.createOscillator();
-  const g = ctx.createGain();
+function tone(ctx, _ref) {
+  var _ref$freq = _ref.freq,
+    freq = _ref$freq === void 0 ? 440 : _ref$freq,
+    _ref$duration = _ref.duration,
+    duration = _ref$duration === void 0 ? 0.1 : _ref$duration,
+    _ref$type = _ref.type,
+    type = _ref$type === void 0 ? 'sine' : _ref$type,
+    _ref$gain = _ref.gain,
+    gain = _ref$gain === void 0 ? 0.15 : _ref$gain,
+    _ref$time = _ref.time,
+    time = _ref$time === void 0 ? 0 : _ref$time;
+  var osc = ctx.createOscillator();
+  var g = ctx.createGain();
   osc.type = type;
   osc.frequency.value = freq;
   osc.connect(g);
   g.connect(ctx.destination);
-  const start = ctx.currentTime + time;
+  var start = ctx.currentTime + time;
   g.gain.setValueAtTime(gain, start);
   g.gain.exponentialRampToValueAtTime(0.0001, start + duration);
   osc.start(start);
@@ -228,27 +212,32 @@ function tone(ctx, {
 }
 
 // A short burst of filtered noise — used for percussive "clicks" and "thuds"
-function noiseBurst(ctx, {
-  time = 0,
-  duration = 0.03,
-  filterType = 'highpass',
-  filterFreq = 2000,
-  gain = 0.3,
-  q = 0.7
-}) {
-  const frames = Math.max(1, Math.floor(ctx.sampleRate * duration));
-  const buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < frames; i++) {
+function noiseBurst(ctx, _ref2) {
+  var _ref2$time = _ref2.time,
+    time = _ref2$time === void 0 ? 0 : _ref2$time,
+    _ref2$duration = _ref2.duration,
+    duration = _ref2$duration === void 0 ? 0.03 : _ref2$duration,
+    _ref2$filterType = _ref2.filterType,
+    filterType = _ref2$filterType === void 0 ? 'highpass' : _ref2$filterType,
+    _ref2$filterFreq = _ref2.filterFreq,
+    filterFreq = _ref2$filterFreq === void 0 ? 2000 : _ref2$filterFreq,
+    _ref2$gain = _ref2.gain,
+    gain = _ref2$gain === void 0 ? 0.3 : _ref2$gain,
+    _ref2$q = _ref2.q,
+    q = _ref2$q === void 0 ? 0.7 : _ref2$q;
+  var frames = Math.max(1, Math.floor(ctx.sampleRate * duration));
+  var buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
+  var data = buffer.getChannelData(0);
+  for (var i = 0; i < frames; i++) {
     data[i] = (Math.random() * 2 - 1) * (1 - i / frames);
   }
-  const source = ctx.createBufferSource();
+  var source = ctx.createBufferSource();
   source.buffer = buffer;
-  const filter = ctx.createBiquadFilter();
+  var filter = ctx.createBiquadFilter();
   filter.type = filterType;
   filter.frequency.value = filterFreq;
   filter.Q.value = q;
-  const g = ctx.createGain();
+  var g = ctx.createGain();
   g.gain.value = gain;
   source.connect(filter);
   filter.connect(g);
@@ -258,35 +247,36 @@ function noiseBurst(ctx, {
 
 // Deterministic pseudo-random generator so each "variant" sounds the same every time it's picked
 function seededRandom(seed) {
-  let s = seed % 2147483647;
+  var s = seed % 2147483647;
   if (s <= 0) s += 2147483646;
-  return () => {
+  return function () {
     s = s * 16807 % 2147483647;
     return (s - 1) / 2147483646;
   };
 }
-const ROLL_SOUND_VARIANTS = 15;
+var ROLL_SOUND_VARIANTS = 15;
 
 // Dice-clatter sound: a handful of short, filtered "tap" clicks with a bit of low body,
 // timed like dice tumbling and settling. 15 fixed variants are cycled through.
-function playRollSound(variant = 0) {
-  const ctx = getAudioContext();
+function playRollSound() {
+  var variant = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var ctx = getAudioContext();
   if (!ctx) return;
-  const rand = seededRandom((variant % ROLL_SOUND_VARIANTS + ROLL_SOUND_VARIANTS) % ROLL_SOUND_VARIANTS * 977 + 41);
-  const clickCount = 6 + Math.floor(rand() * 4); // 6-9 clicks
-  for (let i = 0; i < clickCount; i++) {
-    const progress = i / clickCount;
-    const time = progress * 0.38 + rand() * 0.025;
-    const duration = 0.018 + rand() * 0.02;
-    const filterFreq = 1400 + rand() * 3200;
+  var rand = seededRandom((variant % ROLL_SOUND_VARIANTS + ROLL_SOUND_VARIANTS) % ROLL_SOUND_VARIANTS * 977 + 41);
+  var clickCount = 6 + Math.floor(rand() * 4); // 6-9 clicks
+  for (var i = 0; i < clickCount; i++) {
+    var progress = i / clickCount;
+    var time = progress * 0.38 + rand() * 0.025;
+    var duration = 0.018 + rand() * 0.02;
+    var filterFreq = 1400 + rand() * 3200;
     // Clicks get gentler and closer together as the dice "settle"
-    const gain = (0.22 - progress * 0.12) * (0.8 + rand() * 0.4);
+    var gain = (0.22 - progress * 0.12) * (0.8 + rand() * 0.4);
     noiseBurst(ctx, {
-      time,
-      duration,
+      time: time,
+      duration: duration,
       filterType: 'bandpass',
-      filterFreq,
-      gain,
+      filterFreq: filterFreq,
+      gain: gain,
       q: 1.2
     });
     if (rand() > 0.55) {
@@ -295,13 +285,13 @@ function playRollSound(variant = 0) {
         duration: 0.05,
         type: 'sine',
         gain: 0.04,
-        time
+        time: time
       });
     }
   }
 }
 function playHoldSound() {
-  const ctx = getAudioContext();
+  var ctx = getAudioContext();
   if (!ctx) return;
   noiseBurst(ctx, {
     duration: 0.02,
@@ -320,9 +310,9 @@ function playHoldSound() {
 
 // A reassuring low "thud" for locking in a score, with slight pitch/timing variation each time
 function playConfirmSound() {
-  const ctx = getAudioContext();
+  var ctx = getAudioContext();
   if (!ctx) return;
-  const wobble = 1 + (Math.random() - 0.5) * 0.08; // ±4%
+  var wobble = 1 + (Math.random() - 0.5) * 0.08; // ±4%
   tone(ctx, {
     freq: 92 * wobble,
     duration: 0.26,
@@ -344,7 +334,7 @@ function playConfirmSound() {
   });
 }
 function playStrokeSound() {
-  const ctx = getAudioContext();
+  var ctx = getAudioContext();
   if (!ctx) return;
   tone(ctx, {
     freq: 160,
@@ -354,11 +344,11 @@ function playStrokeSound() {
   });
 }
 function playYatzySound() {
-  const ctx = getAudioContext();
+  var ctx = getAudioContext();
   if (!ctx) return;
-  [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+  [523.25, 659.25, 783.99, 1046.5].forEach(function (freq, i) {
     tone(ctx, {
-      freq,
+      freq: freq,
       duration: 0.22,
       type: 'triangle',
       gain: 0.18,
@@ -370,11 +360,11 @@ function playYatzySound() {
 // A shorter, warmer arpeggio for reaching the upper-section bonus —
 // similar idea to the Yatzy fanfare, but a different chord and timbre
 function playBonusSound() {
-  const ctx = getAudioContext();
+  var ctx = getAudioContext();
   if (!ctx) return;
-  [392.0, 493.88, 587.33, 783.99].forEach((freq, i) => {
+  [392.0, 493.88, 587.33, 783.99].forEach(function (freq, i) {
     tone(ctx, {
-      freq,
+      freq: freq,
       duration: 0.18,
       type: 'sine',
       gain: 0.2,
@@ -387,88 +377,114 @@ function vibrate(pattern) {
 }
 
 // Torn-paper edge: flat top, jagged bottom
-const TORN_EDGE = 'polygon(0% 0%, 100% 0%, 100% 40%, 96% 100%, 92% 40%, 88% 100%, 84% 40%, 80% 100%, 76% 40%, 72% 100%, 68% 40%, 64% 100%, 60% 40%, 56% 100%, 52% 40%, 48% 100%, 44% 40%, 40% 100%, 36% 40%, 32% 100%, 28% 40%, 24% 100%, 20% 40%, 16% 100%, 12% 40%, 8% 100%, 4% 40%, 0% 100%)';
+var TORN_EDGE = 'polygon(0% 0%, 100% 0%, 100% 40%, 96% 100%, 92% 40%, 88% 100%, 84% 40%, 80% 100%, 76% 40%, 72% 100%, 68% 40%, 64% 100%, 60% 40%, 56% 100%, 52% 40%, 48% 100%, 44% 40%, 40% 100%, 36% 40%, 32% 100%, 28% 40%, 24% 100%, 20% 40%, 16% 100%, 12% 40%, 8% 100%, 4% 40%, 0% 100%)';
 
 // ---------- Scoring (svenska regler) ----------
 function counts(dice) {
-  const c = [0, 0, 0, 0, 0, 0, 0];
-  dice.forEach(d => c[d]++);
+  var c = [0, 0, 0, 0, 0, 0, 0];
+  dice.forEach(function (d) {
+    return c[d]++;
+  });
   return c;
 }
-const upperScore = (dice, face) => dice.filter(d => d === face).length * face;
+var upperScore = function upperScore(dice, face) {
+  return dice.filter(function (d) {
+    return d === face;
+  }).length * face;
+};
 function onePair(dice) {
-  const c = counts(dice);
-  for (let v = 6; v >= 1; v--) if (c[v] >= 2) return v * 2;
+  var c = counts(dice);
+  for (var v = 6; v >= 1; v--) if (c[v] >= 2) return v * 2;
   return 0;
 }
 function twoPairs(dice) {
-  const c = counts(dice);
-  const p = [];
-  for (let v = 6; v >= 1; v--) if (c[v] >= 2) p.push(v);
+  var c = counts(dice);
+  var p = [];
+  for (var v = 6; v >= 1; v--) if (c[v] >= 2) p.push(v);
   return p.length >= 2 ? p[0] * 2 + p[1] * 2 : 0;
 }
 function threeKind(dice) {
-  const c = counts(dice);
-  for (let v = 6; v >= 1; v--) if (c[v] >= 3) return v * 3;
+  var c = counts(dice);
+  for (var v = 6; v >= 1; v--) if (c[v] >= 3) return v * 3;
   return 0;
 }
 function fourKind(dice) {
-  const c = counts(dice);
-  for (let v = 6; v >= 1; v--) if (c[v] >= 4) return v * 4;
+  var c = counts(dice);
+  for (var v = 6; v >= 1; v--) if (c[v] >= 4) return v * 4;
   return 0;
 }
 function smallStraight(dice) {
-  return [...dice].sort((a, b) => a - b).join('') === '12345' ? 15 : 0;
+  return _toConsumableArray(dice).sort(function (a, b) {
+    return a - b;
+  }).join('') === '12345' ? 15 : 0;
 }
 function largeStraight(dice) {
-  return [...dice].sort((a, b) => a - b).join('') === '23456' ? 20 : 0;
+  return _toConsumableArray(dice).sort(function (a, b) {
+    return a - b;
+  }).join('') === '23456' ? 20 : 0;
 }
 function fullHouse(dice) {
-  const c = counts(dice);
-  return c.includes(3) && c.includes(2) ? dice.reduce((a, b) => a + b, 0) : 0;
+  var c = counts(dice);
+  return c.includes(3) && c.includes(2) ? dice.reduce(function (a, b) {
+    return a + b;
+  }, 0) : 0;
 }
 function chance(dice) {
-  return dice.reduce((a, b) => a + b, 0);
+  return dice.reduce(function (a, b) {
+    return a + b;
+  }, 0);
 }
 function yatzyScore(dice) {
   return counts(dice).includes(5) ? 50 : 0;
 }
-const CATEGORIES = [{
+var CATEGORIES = [{
   id: 'ones',
   label: 'Ettor',
   sub: 'Summan av ettor',
   section: 'upper',
-  calc: d => upperScore(d, 1)
+  calc: function calc(d) {
+    return upperScore(d, 1);
+  }
 }, {
   id: 'twos',
   label: 'Tvåor',
   sub: 'Summan av tvåor',
   section: 'upper',
-  calc: d => upperScore(d, 2)
+  calc: function calc(d) {
+    return upperScore(d, 2);
+  }
 }, {
   id: 'threes',
   label: 'Treor',
   sub: 'Summan av treor',
   section: 'upper',
-  calc: d => upperScore(d, 3)
+  calc: function calc(d) {
+    return upperScore(d, 3);
+  }
 }, {
   id: 'fours',
   label: 'Fyror',
   sub: 'Summan av fyror',
   section: 'upper',
-  calc: d => upperScore(d, 4)
+  calc: function calc(d) {
+    return upperScore(d, 4);
+  }
 }, {
   id: 'fives',
   label: 'Femmor',
   sub: 'Summan av femmor',
   section: 'upper',
-  calc: d => upperScore(d, 5)
+  calc: function calc(d) {
+    return upperScore(d, 5);
+  }
 }, {
   id: 'sixes',
   label: 'Sexor',
   sub: 'Summan av sexor',
   section: 'upper',
-  calc: d => upperScore(d, 6)
+  calc: function calc(d) {
+    return upperScore(d, 6);
+  }
 }, {
   id: 'pair',
   label: 'Ett par',
@@ -526,27 +542,29 @@ const CATEGORIES = [{
 }];
 
 // Every possible 5-dice roll, used to figure out which scores are actually achievable per category
-const ALL_ROLLS = (() => {
-  const rolls = [];
-  for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) for (let c = 1; c <= 6; c++) for (let d = 1; d <= 6; d++) for (let e = 1; e <= 6; e++) rolls.push([a, b, c, d, e]);
+var ALL_ROLLS = function () {
+  var rolls = [];
+  for (var a = 1; a <= 6; a++) for (var b = 1; b <= 6; b++) for (var c = 1; c <= 6; c++) for (var d = 1; d <= 6; d++) for (var e = 1; e <= 6; e++) rolls.push([a, b, c, d, e]);
   return rolls;
-})();
+}();
 
 // Set of valid (achievable) scores per category, derived from the scoring rules above
-const VALID_SCORES = CATEGORIES.reduce((acc, cat) => {
-  const set = new Set();
-  ALL_ROLLS.forEach(dice => set.add(cat.calc(dice)));
+var VALID_SCORES = CATEGORIES.reduce(function (acc, cat) {
+  var set = new Set();
+  ALL_ROLLS.forEach(function (dice) {
+    return set.add(cat.calc(dice));
+  });
   acc[cat.id] = set;
   return acc;
 }, {});
 function isValidScore(catId, score) {
-  const valid = VALID_SCORES[catId];
+  var valid = VALID_SCORES[catId];
   return valid ? valid.has(score) : true;
 }
 
 // Fixed defaults: Ettor–Sexor use 3-of-a-kind (the bonus baseline), stegar/Yatzy use their fixed value.
 // Every other category defaults to the highest score actually possible there.
-const FIXED_DEFAULTS = {
+var FIXED_DEFAULTS = {
   ones: 3,
   twos: 6,
   threes: 9,
@@ -557,29 +575,43 @@ const FIXED_DEFAULTS = {
   largestraight: 20,
   yatzy: 50
 };
-const DEFAULT_SCORES = CATEGORIES.reduce((acc, cat) => {
-  acc[cat.id] = cat.id in FIXED_DEFAULTS ? FIXED_DEFAULTS[cat.id] : Math.max(...VALID_SCORES[cat.id]);
+var DEFAULT_SCORES = CATEGORIES.reduce(function (acc, cat) {
+  acc[cat.id] = cat.id in FIXED_DEFAULTS ? FIXED_DEFAULTS[cat.id] : Math.max.apply(Math, _toConsumableArray(VALID_SCORES[cat.id]));
   return acc;
 }, {});
 function getDefaultScore(catId) {
   return catId in DEFAULT_SCORES ? DEFAULT_SCORES[catId] : null;
 }
 function calcTotals(scores) {
-  const upperIds = CATEGORIES.filter(c => c.section === 'upper').map(c => c.id);
-  const lowerIds = CATEGORIES.filter(c => c.section === 'lower').map(c => c.id);
-  const upperSum = upperIds.reduce((a, id) => a + (scores[id] ?? 0), 0);
-  const bonus = upperSum >= 63 ? 50 : 0;
-  const lowerSum = lowerIds.reduce((a, id) => a + (scores[id] ?? 0), 0);
+  var upperIds = CATEGORIES.filter(function (c) {
+    return c.section === 'upper';
+  }).map(function (c) {
+    return c.id;
+  });
+  var lowerIds = CATEGORIES.filter(function (c) {
+    return c.section === 'lower';
+  }).map(function (c) {
+    return c.id;
+  });
+  var upperSum = upperIds.reduce(function (a, id) {
+    var _scores$id;
+    return a + ((_scores$id = scores[id]) !== null && _scores$id !== void 0 ? _scores$id : 0);
+  }, 0);
+  var bonus = upperSum >= 63 ? 50 : 0;
+  var lowerSum = lowerIds.reduce(function (a, id) {
+    var _scores$id2;
+    return a + ((_scores$id2 = scores[id]) !== null && _scores$id2 !== void 0 ? _scores$id2 : 0);
+  }, 0);
   return {
-    upperSum,
-    bonus,
-    lowerSum,
+    upperSum: upperSum,
+    bonus: bonus,
+    lowerSum: lowerSum,
     total: upperSum + bonus + lowerSum
   };
 }
 
 // ---------- Dice ----------
-const PIPS = {
+var PIPS = {
   1: [[2, 2]],
   2: [[1, 1], [3, 3]],
   3: [[1, 1], [2, 2], [3, 3]],
@@ -591,7 +623,7 @@ const PIPS = {
 // A normal die roll. A "lucky" player gets the better of two rolls; an "unlucky"
 // player gets the worse of two. Always lands on a valid 1-6 face either way.
 function rollDie(lucky, unlucky) {
-  const a = Math.ceil(Math.random() * 6);
+  var a = Math.ceil(Math.random() * 6);
   if (lucky) return Math.max(a, Math.ceil(Math.random() * 6));
   if (unlucky) return Math.min(a, Math.ceil(Math.random() * 6));
   return a;
@@ -601,16 +633,16 @@ function rollDie(lucky, unlucky) {
 // hidden "lucky" flag — a trailing space toggles it. Trimming first means the
 // same person shows up as one stats entry whether or not the flag is set.
 function parseNameInput(raw, fallback) {
-  const lucky = typeof raw === 'string' && raw.endsWith(' ') && raw.trim().length > 0;
-  const trimmed = (raw || '').trim();
+  var lucky = typeof raw === 'string' && raw.endsWith(' ') && raw.trim().length > 0;
+  var trimmed = (raw || '').trim();
   return {
     name: trimmed || fallback,
-    lucky
+    lucky: lucky
   };
 }
 
 // ---------- AI opponent ----------
-const AI_DIFFICULTIES = {
+var AI_DIFFICULTIES = {
   svinlatt: {
     label: 'Svinlätt',
     errorRate: 0.55,
@@ -642,150 +674,535 @@ const AI_DIFFICULTIES = {
     unlucky: false
   }
 };
-const AI_DIFFICULTY_ORDER = ['svinlatt', 'latt', 'mellan', 'svar', 'skitsvar'];
+var AI_DIFFICULTY_ORDER = ['svinlatt', 'latt', 'mellan', 'svar', 'skitsvar'];
 
-// Decide which dice to hold before the next roll. With probability `errorRate`,
-// makes a clumsy/random choice instead.
-function aiChooseHolds(dice, errorRate) {
-  if (Math.random() < errorRate) {
-    return dice.map(() => Math.random() < 0.5);
+// ─── Hold logic ───────────────────────────────────────────────────────────────
+// Strategy: each turn, pick a TARGET category to aim for and hold dice that
+// advance that target. The target is chosen based on what's most valuable
+// given the game state (upper section bonus is the biggest lever).
+//
+// Upper section needs 63 pts for +50 bonus. Target = 3× each face value.
+// Actively roll for specific upper categories rather than opportunistically.
+function aiChooseTarget(dice, scores) {
+  var c = counts(dice);
+  var open = function open(id) {
+    return scores[id] === undefined;
+  };
+  var faceVal = {
+    ones: 1,
+    twos: 2,
+    threes: 3,
+    fours: 4,
+    fives: 5,
+    sixes: 6
+  };
+
+  // Current upper pace
+  var upperCats = ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes'];
+  var upperSum = upperCats.reduce(function (s, id) {
+    var _scores$id3;
+    return s + ((_scores$id3 = scores[id]) !== null && _scores$id3 !== void 0 ? _scores$id3 : 0);
+  }, 0);
+  var upperFilled = upperCats.filter(function (id) {
+    return scores[id] !== undefined;
+  }).length;
+  var expectedSoFar = upperCats.filter(function (id) {
+    return scores[id] !== undefined;
+  }).reduce(function (s, id) {
+    return s + faceVal[id] * 3;
+  }, 0);
+  var behindOnBonus = upperSum < expectedSoFar;
+  var upperRemaining = upperCats.filter(function (id) {
+    return open(id);
+  });
+
+  // Priority 1: If we already have 3+ of a face that maps to an open upper category, target it
+  for (var _i = 0, _arr = ['sixes', 'fives', 'fours', 'threes', 'twos', 'ones']; _i < _arr.length; _i++) {
+    var id = _arr[_i];
+    if (open(id) && c[faceVal[id]] >= 3) return {
+      type: 'upper',
+      face: faceVal[id],
+      id: id
+    };
   }
-  const c = counts(dice);
-  let bestFace = 0;
-  let bestCount = 0;
-  for (let v = 6; v >= 1; v--) {
-    if (c[v] > bestCount) {
-      bestCount = c[v];
-      bestFace = v;
-    }
+
+  // Priority 2: Yatzy chase — if we have 4 of a kind
+  for (var v = 6; v >= 1; v--) {
+    if (c[v] >= 4 && open('yatzy')) return {
+      type: 'yatzy',
+      face: v
+    };
   }
-  if (bestCount >= 3) {
-    return dice.map(d => d === bestFace);
-  }
-  // Chasing a straight: hold one of each value in a 4-in-a-row run, if present
-  const present = new Set(dice);
-  for (const start of [1, 2, 3]) {
-    const run = [start, start + 1, start + 2, start + 3];
-    if (run.every(v => present.has(v))) {
-      const used = new Set();
-      return dice.map(d => {
-        if (run.includes(d) && !used.has(d)) {
-          used.add(d);
-          return true;
+
+  // Priority 3: Full house if we have 3+2
+  if (open('house')) {
+    for (var _v = 6; _v >= 1; _v--) {
+      if (c[_v] === 3) {
+        for (var p = 6; p >= 1; p--) {
+          if (p !== _v && c[p] >= 2) return {
+            type: 'house',
+            face3: _v,
+            face2: p
+          };
         }
-        return false;
-      });
+      }
     }
   }
-  // Otherwise keep high dice (good for Chans/upper section), plus a pair if there is one
-  return dice.map(d => d >= 4 || bestCount === 2 && d === bestFace);
+
+  // Priority 4: Large straight potential (4 or 5 of the run present)
+  if (open('largestraight')) {
+    var lr = [2, 3, 4, 5, 6];
+    if (lr.filter(function (v) {
+      return new Set(dice).has(v);
+    }).length >= 4) return {
+      type: 'largestraight'
+    };
+  }
+
+  // Priority 5: Small straight potential
+  if (open('smallstraight')) {
+    var sr = [1, 2, 3, 4, 5];
+    if (sr.filter(function (v) {
+      return new Set(dice).has(v);
+    }).length >= 4) return {
+      type: 'smallstraight'
+    };
+  }
+
+  // Priority 6: Behind on bonus AND have 2+ of an open upper face → keep building it
+  if (behindOnBonus || upperFilled < 3) {
+    // Target the highest-value open upper category we have the most dice for
+    for (var _i2 = 0, _arr2 = ['sixes', 'fives', 'fours', 'threes', 'twos', 'ones']; _i2 < _arr2.length; _i2++) {
+      var _id = _arr2[_i2];
+      if (open(_id) && c[faceVal[_id]] >= 2) return {
+        type: 'upper',
+        face: faceVal[_id],
+        id: _id
+      };
+    }
+    // Even a single high die is worth targeting if we're behind
+    for (var _i3 = 0, _arr3 = ['sixes', 'fives']; _i3 < _arr3.length; _i3++) {
+      var _id2 = _arr3[_i3];
+      if (open(_id2) && c[faceVal[_id2]] >= 1) return {
+        type: 'upper',
+        face: faceVal[_id2],
+        id: _id2
+      };
+    }
+  }
+
+  // Priority 7: High pairs / combos for lower section
+  var pairs = [];
+  for (var _v2 = 6; _v2 >= 1; _v2--) if (c[_v2] >= 2) pairs.push(_v2);
+  if (pairs.length >= 2 && open('twopairs') && pairs[0] >= 4) return {
+    type: 'twopairs',
+    pairs: pairs
+  };
+  if (pairs.length >= 1 && pairs[0] >= 4) return {
+    type: 'pair',
+    face: pairs[0]
+  };
+  if (pairs.length >= 1 && pairs[0] === 3 && open('threes')) return {
+    type: 'upper',
+    face: 3,
+    id: 'threes'
+  };
+  if (pairs.length >= 1 && pairs[0] >= 3) return {
+    type: 'pair',
+    face: pairs[0]
+  };
+
+  // Priority 8: Target the highest open upper category with at least one matching die
+  for (var _i4 = 0, _arr4 = ['sixes', 'fives', 'fours', 'threes']; _i4 < _arr4.length; _i4++) {
+    var _id3 = _arr4[_i4];
+    if (open(_id3) && c[faceVal[_id3]] >= 1) return {
+      type: 'upper',
+      face: faceVal[_id3],
+      id: _id3
+    };
+  }
+
+  // Fallback: target sixes (always worth rolling for)
+  return {
+    type: 'high'
+  };
+}
+function aiChooseHolds(dice, scores, errorRate, rollsLeft) {
+  if (Math.random() < errorRate) return dice.map(function () {
+    return Math.random() < 0.5;
+  });
+  var c = counts(dice);
+  var has = function has(id) {
+    return scores[id] === undefined;
+  };
+  var earlyGame = rollsLeft >= 2;
+  var present = new Set(dice);
+  var holdRun = function holdRun(run) {
+    var used = new Set();
+    return dice.map(function (d) {
+      if (run.includes(d) && !used.has(d)) {
+        used.add(d);
+        return true;
+      }
+      return false;
+    });
+  };
+
+  // Always hold 5-of-a-kind or 4-of-a-kind regardless of target
+  for (var v = 6; v >= 1; v--) if (c[v] >= 5) return dice.map(function () {
+    return true;
+  });
+  var _loop = function _loop(_v3) {
+      if (c[_v3] >= 4) return {
+        v: dice.map(function (d) {
+          return d === _v3;
+        })
+      };
+    },
+    _ret;
+  for (var _v3 = 6; _v3 >= 1; _v3--) {
+    _ret = _loop(_v3);
+    if (_ret) return _ret.v;
+  }
+
+  // Completed full house — always keep
+  var dv = Object.keys(c).filter(function (v) {
+    return c[v] > 0;
+  }).map(Number);
+  if (dv.length === 2 && has('house')) {
+    var _dv = _slicedToArray(dv, 2),
+      a = _dv[0],
+      b = _dv[1];
+    if (c[a] === 3 && c[b] === 2 || c[a] === 2 && c[b] === 3) return dice.map(function () {
+      return true;
+    });
+  }
+  var target = aiChooseTarget(dice, scores);
+  if (target.type === 'upper') {
+    // Hold all dice matching this face
+    return dice.map(function (d) {
+      return d === target.face;
+    });
+  }
+  if (target.type === 'yatzy') {
+    return dice.map(function (d) {
+      return d === target.face;
+    });
+  }
+  if (target.type === 'house') {
+    return dice.map(function (d) {
+      return d === target.face3 || d === target.face2;
+    });
+  }
+  if (target.type === 'largestraight') {
+    var lr = [2, 3, 4, 5, 6];
+    if (lr.filter(function (v) {
+      return present.has(v);
+    }).length >= 4) return holdRun(lr);
+    // Chase 3-in-a-row on first roll
+    if (earlyGame) {
+      var have = lr.filter(function (v) {
+        return present.has(v);
+      });
+      if (have.length >= 3) {
+        var indices = have.map(function (v) {
+          return lr.indexOf(v);
+        }).sort(function (a, b) {
+          return a - b;
+        });
+        var best3 = [];
+        for (var i = 0; i <= indices.length - 3; i++) {
+          if (indices[i + 2] - indices[i] === 2) {
+            best3.push.apply(best3, _toConsumableArray(indices.slice(i, i + 3)));
+            break;
+          }
+        }
+        if (best3.length) return holdRun(lr);
+      }
+    }
+    return holdRun([2, 3, 4, 5, 6].filter(function (v) {
+      return present.has(v);
+    }));
+  }
+  if (target.type === 'smallstraight') {
+    var sr = [1, 2, 3, 4, 5];
+    if (sr.filter(function (v) {
+      return present.has(v);
+    }).length >= 4) return holdRun(sr);
+    if (earlyGame) {
+      var _have = sr.filter(function (v) {
+        return present.has(v);
+      });
+      if (_have.length >= 3) return holdRun(sr.filter(function (v) {
+        return present.has(v);
+      }));
+    }
+    return holdRun([1, 2, 3, 4, 5].filter(function (v) {
+      return present.has(v);
+    }));
+  }
+  if (target.type === 'twopairs') {
+    var pairs = target.pairs || [];
+    if (pairs.length >= 2) return dice.map(function (d) {
+      return pairs.slice(0, 2).includes(d);
+    });
+  }
+  if (target.type === 'pair') {
+    return dice.map(function (d) {
+      return d === target.face;
+    });
+  }
+
+  // Fallback 'high': keep 5s and 6s
+  var highKeeps = dice.map(function (d) {
+    return d >= 5;
+  });
+  if (highKeeps.some(Boolean)) return highKeeps;
+  var midKeeps = dice.map(function (d) {
+    return d >= 4;
+  });
+  if (midKeeps.some(Boolean)) return midKeeps;
+  return dice.map(function () {
+    return false;
+  });
 }
 
-// Categories to sacrifice (score 0) first when nothing scores above 0
-const AI_SACRIFICE_ORDER = ['yatzy', 'largestraight', 'smallstraight', 'house', 'fourkind', 'threekind', 'twopairs', 'pair', 'sixes', 'fives', 'fours', 'threes', 'twos', 'ones'];
-
-// Decide which category to lock in for the final dice. With probability
-// `errorRate`, picks a random unfilled category instead of a sensible one.
+// ─── Category selection ───────────────────────────────────────────────────────
+// Core principles (validated by simulation):
+// 1. Chance avg 19.6 pts — use it for mediocre rolls rather than burning a category slot
+// 2. NEVER score an upper category below its 3× baseline if a competitive lower option exists
+// 3. Baseline trap fix: ones=3 beats twopairs=14 if Tier 4 fires naively — compare absolute values
+// 4. Low faces (ones=5max, twos=10max) have low ceilings — sacrifice them early when forced to zero
 function aiChooseCategory(scores, dice, errorRate) {
-  const unfilled = CATEGORIES.filter(c => scores[c.id] === undefined);
+  var unfilled = CATEGORIES.filter(function (cat) {
+    return scores[cat.id] === undefined;
+  });
   if (Math.random() < errorRate) {
     return unfilled[Math.floor(Math.random() * unfilled.length)].id;
   }
-  const options = unfilled.map(c => ({
-    id: c.id,
-    score: c.calc(dice)
-  }));
-  if (options.some(o => o.id === 'yatzy' && o.score === 50)) return 'yatzy';
-  const positive = options.filter(o => o.score > 0).sort((a, b) => b.score - a.score);
-  if (positive.length > 0) return positive[0].id;
-  for (const id of AI_SACRIFICE_ORDER) {
-    if (unfilled.some(c => c.id === id)) return id;
+  var catScore = function catScore(id) {
+    var cat = CATEGORIES.find(function (c) {
+      return c.id === id;
+    });
+    return cat && scores[id] === undefined ? cat.calc(dice) : -1;
+  };
+  var open = function open(id) {
+    return scores[id] === undefined;
+  };
+  var faceMap = {
+    ones: 1,
+    twos: 2,
+    threes: 3,
+    fours: 4,
+    fives: 5,
+    sixes: 6
+  };
+  var upperBaseline = function upperBaseline(id) {
+    var _faceMap$id;
+    return ((_faceMap$id = faceMap[id]) !== null && _faceMap$id !== void 0 ? _faceMap$id : 0) * 3;
+  };
+  var upperExcellent = function upperExcellent(id) {
+    var _faceMap$id2;
+    return ((_faceMap$id2 = faceMap[id]) !== null && _faceMap$id2 !== void 0 ? _faceMap$id2 : 0) * 4;
+  };
+  var chanceScore = catScore('chance');
+
+  // Best lower-section score currently available (excluding Chance which we handle separately)
+  var bestLowerNow = Math.max(catScore('pair'), catScore('twopairs'), catScore('threekind'), catScore('fourkind'), catScore('smallstraight'), catScore('largestraight'), catScore('house'), catScore('yatzy'));
+
+  // ── Tier 1: Unmissable ────────────────────────────────────────────────────
+  if (open('yatzy') && catScore('yatzy') === 50) return 'yatzy';
+  if (open('largestraight') && catScore('largestraight') === 20) return 'largestraight';
+  if (open('smallstraight') && catScore('smallstraight') === 15) return 'smallstraight';
+  if (open('house') && catScore('house') > 0) return 'house';
+
+  // ── Tier 2: 4+ of a face (excellent upper + bonus buffer) ─────────────────
+  for (var _i5 = 0, _arr5 = ['sixes', 'fives', 'fours', 'threes', 'twos', 'ones']; _i5 < _arr5.length; _i5++) {
+    var id = _arr5[_i5];
+    if (open(id) && catScore(id) >= upperExcellent(id)) return id;
+  }
+
+  // ── Tier 3: 4-of-a-kind lower (≥ 20) ────────────────────────────────────
+  if (open('fourkind') && catScore('fourkind') >= 20) return 'fourkind';
+
+  // ── Tier 4: Upper at 3× baseline — BUT only if competitive with lower options
+  // Key bug fix: ones=3 passes the baseline test but twopairs=14 is far better.
+  // Require: upper score > bestLowerNow OR upper score is the clearly dominant play.
+  for (var _i6 = 0, _arr6 = ['sixes', 'fives', 'fours', 'threes', 'twos', 'ones']; _i6 < _arr6.length; _i6++) {
+    var _id4 = _arr6[_i6];
+    if (open(_id4) && catScore(_id4) >= upperBaseline(_id4)) {
+      // Only take baseline upper if it's competitive with available lower scores
+      // Exception: sixes/fives at baseline (18/15) are always worth taking
+      var face = faceMap[_id4];
+      var sc = catScore(_id4);
+      if (face >= 5) return _id4; // always take sixes/fives at baseline
+      if (sc >= bestLowerNow) return _id4; // upper beats lower — take it
+      if (sc >= 12 && bestLowerNow <= 14) return _id4; // close enough
+      // Otherwise defer to lower section this turn
+    }
+  }
+
+  // ── Tier 5: High three-of-a-kind lower (≥ 15) ────────────────────────────
+  if (open('threekind') && catScore('threekind') >= 15) return 'threekind';
+
+  // ── Tier 6: Chance when excellent (≥ 22) ─────────────────────────────────
+  if (open('chance') && chanceScore >= 22) return 'chance';
+
+  // ── Tier 7: Two pairs ────────────────────────────────────────────────────
+  if (open('twopairs') && catScore('twopairs') > 0) return 'twopairs';
+
+  // ── Tier 8: Strong pair (≥ 10) ───────────────────────────────────────────
+  if (open('pair') && catScore('pair') >= 10) return 'pair';
+
+  // ── Tier 9: Chance when good (≥ 17) ─────────────────────────────────────
+  if (open('chance') && chanceScore >= 17) return 'chance';
+
+  // ── Tier 10: Any four/three of a kind ────────────────────────────────────
+  if (open('fourkind') && catScore('fourkind') > 0) return 'fourkind';
+  if (open('threekind') && catScore('threekind') > 0) return 'threekind';
+
+  // ── Tier 11: Weaker pair (≥ 6) ───────────────────────────────────────────
+  if (open('pair') && catScore('pair') >= 6) return 'pair';
+
+  // ── Tier 12: Below-baseline upper — only low faces, min 2 dice ───────────
+  for (var _i7 = 0, _arr7 = ['fours', 'threes', 'twos', 'ones']; _i7 < _arr7.length; _i7++) {
+    var _id5 = _arr7[_i7];
+    if (open(_id5) && catScore(_id5) >= faceMap[_id5] * 2) return _id5;
+  }
+
+  // ── Tier 13: Chance safety net ───────────────────────────────────────────
+  if (open('chance') && chanceScore > 0) return 'chance';
+
+  // ── Tier 14: Any positive score ──────────────────────────────────────────
+  for (var _i8 = 0, _arr8 = ['fours', 'threes', 'twos', 'ones']; _i8 < _arr8.length; _i8++) {
+    var _id6 = _arr8[_i8];
+    if (open(_id6) && catScore(_id6) > 0) return _id6;
+  }
+  for (var _i9 = 0, _arr9 = ['fives', 'sixes']; _i9 < _arr9.length; _i9++) {
+    var _id7 = _arr9[_i9];
+    if (open(_id7) && catScore(_id7) >= faceMap[_id7] * 2) return _id7;
+  }
+  if (open('pair') && catScore('pair') > 0) return 'pair';
+
+  // ── Tier 15: Sacrifice — least valuable first ─────────────────────────────
+  var sacrificeOrder = ['yatzy', 'ones', 'twos', 'largestraight', 'smallstraight', 'house', 'fourkind', 'threekind', 'threes', 'twopairs', 'pair', 'fours', 'fives', 'sixes', 'chance'];
+  for (var _i0 = 0, _sacrificeOrder = sacrificeOrder; _i0 < _sacrificeOrder.length; _i0++) {
+    var _id8 = _sacrificeOrder[_i0];
+    if (open(_id8)) return _id8;
   }
   return unfilled[0].id;
 }
-function Die({
-  value,
-  held,
-  onClick,
-  disabled,
-  rolling
-}) {
+function Die(_ref3) {
+  var value = _ref3.value,
+    held = _ref3.held,
+    onClick = _ref3.onClick,
+    disabled = _ref3.disabled,
+    rolling = _ref3.rolling;
   return /*#__PURE__*/React.createElement("button", {
     onClick: onClick,
     disabled: disabled,
-    "aria-label": `Tärning visar ${value}${held ? ', sparad' : ''}`,
-    className: `relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl border-[3px] grid grid-cols-3 grid-rows-3 gap-0.5 p-2 transition-transform duration-150
-        ${held ? 'bg-amber-400 border-stone-900 -rotate-3' : 'bg-stone-50 border-stone-900'}
-        ${rolling && !held ? 'animate-bounce' : ''}
-        ${disabled ? 'opacity-70' : 'active:scale-95'}`
-  }, (PIPS[value] || []).map(([r, c], i) => /*#__PURE__*/React.createElement("span", {
-    key: i,
-    style: {
-      gridRow: r,
-      gridColumn: c
-    },
-    className: "rounded-full bg-stone-900 w-full h-full self-center justify-self-center max-w-[7px] max-h-[7px] sm:max-w-[8px] sm:max-h-[8px]"
-  })), held && /*#__PURE__*/React.createElement("span", {
+    "aria-label": "T\xE4rning visar ".concat(value).concat(held ? ', sparad' : ''),
+    className: "relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl border-[3px] grid grid-cols-3 grid-rows-3 gap-0.5 p-2 transition-transform duration-150\n        ".concat(held ? 'bg-amber-400 border-stone-900 -rotate-3' : 'bg-stone-50 border-stone-900', "\n        ").concat(rolling && !held ? 'animate-bounce' : '', "\n        ").concat(disabled ? 'opacity-70' : 'active:scale-95')
+  }, (PIPS[value] || []).map(function (_ref4, i) {
+    var _ref5 = _slicedToArray(_ref4, 2),
+      r = _ref5[0],
+      c = _ref5[1];
+    return /*#__PURE__*/React.createElement("span", {
+      key: i,
+      style: {
+        gridRow: r,
+        gridColumn: c
+      },
+      className: "rounded-full bg-stone-900 w-full h-full self-center justify-self-center max-w-[7px] max-h-[7px] sm:max-w-[8px] sm:max-h-[8px]"
+    });
+  }), held && /*#__PURE__*/React.createElement("span", {
     className: "absolute -top-1.5 -right-1 w-4 h-2 bg-emerald-500 rotate-12 rounded-sm"
   }));
 }
 
 // ---------- Score row & totals ----------
-function ScoreRow({
-  category,
-  players,
-  currentPlayer,
-  dice,
-  rollsLeft,
-  mode,
-  selectedCategory,
-  inputBuffer,
-  onSelect,
-  onSelectCell
-}) {
+function ScoreRow(_ref6) {
+  var category = _ref6.category,
+    players = _ref6.players,
+    currentPlayer = _ref6.currentPlayer,
+    dice = _ref6.dice,
+    rollsLeft = _ref6.rollsLeft,
+    mode = _ref6.mode,
+    selectedCategory = _ref6.selectedCategory,
+    inputBuffer = _ref6.inputBuffer,
+    onSelect = _ref6.onSelect,
+    onSelectCell = _ref6.onSelectCell,
+    lastAiAction = _ref6.lastAiAction,
+    houseRules = _ref6.houseRules,
+    forcedCat = _ref6.forcedCat;
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "sticky left-0 z-10 bg-stone-50 px-2 py-1.5 border-b border-stone-200"
   }, /*#__PURE__*/React.createElement("p", {
     className: "text-sm font-semibold text-stone-800 leading-tight"
   }, category.label), /*#__PURE__*/React.createElement("p", {
     className: "text-[10px] text-stone-400 leading-tight"
-  }, category.sub)), players.map((p, idx) => {
-    const filled = p.scores[category.id];
-    const isFilled = filled !== undefined;
-    const isCurrent = idx === currentPlayer;
+  }, category.sub)), players.map(function (p, idx) {
+    var _players$idx$scores, _players$idx2, _players$idx$scores3, _players$idx4;
+    var filled = p.scores[category.id];
+    var isFilled = filled !== undefined;
+    var isCurrent = idx === currentPlayer;
     if (mode === 'manual') {
-      const isActive = isCurrent && selectedCategory === category.id;
-      const canSelect = isCurrent && !isFilled;
-      let bg = 'bg-transparent';
-      let text = 'text-stone-300';
-      let content = '–';
+      var isActive = isCurrent && selectedCategory === category.id;
+      var canSelect = isCurrent && !isFilled;
+      var _bg = 'bg-transparent';
+      var _text = 'text-stone-300';
+      var content = '–';
       if (isFilled) {
-        text = 'text-stone-900 font-bold';
-        if (isCurrent) bg = 'bg-emerald-50';
+        var _PLAYER_COLORS$light, _PLAYER_COLORS, _players$idx$colorInd, _players$idx;
+        _text = 'text-stone-900 font-bold';
+        if (isCurrent) _bg = (_PLAYER_COLORS$light = (_PLAYER_COLORS = PLAYER_COLORS[(_players$idx$colorInd = (_players$idx = players[idx]) === null || _players$idx === void 0 ? void 0 : _players$idx.colorIndex) !== null && _players$idx$colorInd !== void 0 ? _players$idx$colorInd : idx % 4]) === null || _PLAYER_COLORS === void 0 ? void 0 : _PLAYER_COLORS.light) !== null && _PLAYER_COLORS$light !== void 0 ? _PLAYER_COLORS$light : 'bg-emerald-50';
         content = filled;
       } else if (isActive) {
-        bg = 'bg-red-100 ring-2 ring-inset ring-red-600';
-        text = 'text-red-700 font-extrabold';
+        _bg = 'bg-red-100 ring-2 ring-inset ring-red-600';
+        _text = 'text-red-700 font-extrabold';
       } else if (canSelect) {
-        bg = 'bg-amber-50';
-        text = 'text-amber-600';
+        _bg = 'bg-amber-50';
+        _text = 'text-amber-600';
       }
       return /*#__PURE__*/React.createElement("button", {
         key: idx,
         disabled: !canSelect,
-        onClick: () => onSelectCell(category.id),
-        className: `text-center font-mono-score text-sm py-1.5 border-b border-stone-200 ${bg} ${text} ${canSelect ? 'active:scale-95' : ''}`
+        onClick: function onClick() {
+          return onSelectCell(category.id);
+        },
+        className: "text-center font-mono-score text-sm py-1.5 border-b border-stone-200 ".concat(_bg, " ").concat(_text, " ").concat(canSelect ? 'active:scale-95' : '')
       }, content);
     }
 
     // auto mode (app-rolled dice)
-    const canPick = isCurrent && !isFilled && rollsLeft < 3;
-    const potential = canPick ? category.calc(dice) : null;
-    let bg = 'bg-transparent';
-    let text = 'text-stone-300';
-    if (isFilled) {
+    // With joker rule: a filled slot can still be scored if joker applies
+    var jokerApplies = isFilled && isJokerEligible(category.id, dice, (_players$idx$scores = (_players$idx2 = players[idx]) === null || _players$idx2 === void 0 ? void 0 : _players$idx2.scores) !== null && _players$idx$scores !== void 0 ? _players$idx$scores : {}, houseRules);
+    var hr = houseRules || DEFAULT_HOUSE_RULES;
+    // Forced order: only the required cat is pickable
+    var forcedBlocked = hr.forcedOrder && isCurrent && forcedCat && category.id !== forcedCat;
+    // Strict upper: lower blocked until upper done
+    var strictBlocked = hr.strictUpper && isCurrent && category.section === 'lower' && function (_players$idx$scores2, _players$idx3) {
+      var sc = (_players$idx$scores2 = (_players$idx3 = players[idx]) === null || _players$idx3 === void 0 ? void 0 : _players$idx3.scores) !== null && _players$idx$scores2 !== void 0 ? _players$idx$scores2 : {};
+      return !CATEGORIES.filter(function (c) {
+        return c.section === 'upper';
+      }).every(function (c) {
+        return sc[c.id] !== undefined;
+      });
+    }();
+    var canPick = isCurrent && (!isFilled || jokerApplies) && rollsLeft < 3 && !forcedBlocked && !strictBlocked;
+    var potential = canPick ? calcScore(category.id, dice, houseRules, (_players$idx$scores3 = (_players$idx4 = players[idx]) === null || _players$idx4 === void 0 ? void 0 : _players$idx4.scores) !== null && _players$idx$scores3 !== void 0 ? _players$idx$scores3 : {}) : null;
+    var isLastAiCell = lastAiAction && lastAiAction.playerIndex === idx && lastAiAction.categoryId === category.id;
+    var bg = 'bg-transparent';
+    var text = 'text-stone-300';
+    if (forcedBlocked || strictBlocked) {
+      bg = 'bg-stone-100';
+      text = 'text-stone-300';
+    } else if (isFilled) {
+      var _PLAYER_COLORS$light2, _PLAYER_COLORS2, _players$idx$colorInd2, _players$idx5;
       text = 'text-stone-900 font-bold';
-      if (isCurrent) bg = 'bg-emerald-50';
+      if (isCurrent) bg = (_PLAYER_COLORS$light2 = (_PLAYER_COLORS2 = PLAYER_COLORS[(_players$idx$colorInd2 = (_players$idx5 = players[idx]) === null || _players$idx5 === void 0 ? void 0 : _players$idx5.colorIndex) !== null && _players$idx$colorInd2 !== void 0 ? _players$idx$colorInd2 : idx % 4]) === null || _PLAYER_COLORS2 === void 0 ? void 0 : _PLAYER_COLORS2.light) !== null && _PLAYER_COLORS$light2 !== void 0 ? _PLAYER_COLORS$light2 : 'bg-emerald-50';
+      // Briefly highlight the AI's just-scored cell in a distinct amber-orange
+      if (isLastAiCell) bg = 'bg-orange-200';
     } else if (canPick) {
       bg = 'bg-amber-100';
       text = 'text-amber-700 opacity-60';
@@ -793,20 +1210,21 @@ function ScoreRow({
     return /*#__PURE__*/React.createElement("button", {
       key: idx,
       disabled: !canPick,
-      onClick: () => onSelect(category.id),
-      className: `text-center font-mono-score text-sm py-1.5 border-b border-stone-200 ${bg} ${text} ${canPick ? 'active:scale-95' : ''}`
+      onClick: function onClick() {
+        return onSelect(category.id);
+      },
+      className: "text-center font-mono-score text-sm py-1.5 border-b border-stone-200 ".concat(bg, " ").concat(text, " ").concat(canPick ? 'active:scale-95' : '')
     }, isFilled ? filled : canPick ? potential : '–');
   }));
 }
-function TotalsRow({
-  label,
-  sub,
-  values,
-  accent
-}) {
-  let rowBg = 'bg-stone-100';
-  let textCls = 'text-stone-700';
-  let valCls = 'text-stone-800';
+function TotalsRow(_ref7) {
+  var label = _ref7.label,
+    sub = _ref7.sub,
+    values = _ref7.values,
+    accent = _ref7.accent;
+  var rowBg = 'bg-stone-100';
+  var textCls = 'text-stone-700';
+  var valCls = 'text-stone-800';
   if (accent === 'amber') {
     rowBg = 'bg-amber-100';
     textCls = 'text-amber-700';
@@ -818,41 +1236,45 @@ function TotalsRow({
     valCls = 'text-amber-400';
   }
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    className: `sticky left-0 z-10 ${rowBg} px-2 py-1.5 border-b border-stone-300`
+    className: "sticky left-0 z-10 ".concat(rowBg, " px-2 py-1.5 border-b border-stone-300")
   }, /*#__PURE__*/React.createElement("p", {
-    className: `text-sm font-bold ${textCls}`
+    className: "text-sm font-bold ".concat(textCls)
   }, label), sub && /*#__PURE__*/React.createElement("p", {
     className: "text-[10px] text-stone-400"
-  }, sub)), values.map((v, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    className: `text-center font-mono-score text-sm font-bold py-1.5 border-b border-stone-300 ${rowBg} ${valCls}`
-  }, v)));
+  }, sub)), values.map(function (v, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "text-center font-mono-score text-sm font-bold py-1.5 border-b border-stone-300 ".concat(rowBg, " ").concat(valCls)
+    }, v);
+  }));
 }
 
 // ---------- Celebrations ----------
-const CONFETTI_COLORS = ['#DC2626', '#F59E0B', '#059669', '#3B82F6', '#FBBF24', '#F472B6'];
-const BONUS_CONFETTI_COLORS = ['#2563EB', '#FACC15', '#0EA5E9', '#FBBF24', '#1D4ED8'];
+var CONFETTI_COLORS = ['#DC2626', '#F59E0B', '#059669', '#3B82F6', '#FBBF24', '#F472B6'];
+var BONUS_CONFETTI_COLORS = ['#2563EB', '#FACC15', '#0EA5E9', '#FBBF24', '#1D4ED8'];
 function YatzyCelebration() {
-  const pieces = Array.from({
+  var pieces = Array.from({
     length: 36
-  }, (_, i) => i);
+  }, function (_, i) {
+    return i;
+  });
   return /*#__PURE__*/React.createElement("div", {
     className: "fixed inset-0 z-50 pointer-events-none overflow-hidden"
-  }, pieces.map(i => {
-    const left = Math.random() * 100;
-    const delay = Math.random() * 0.3;
-    const duration = 1.4 + Math.random() * 1.1;
-    const size = 6 + Math.random() * 7;
+  }, pieces.map(function (i) {
+    var left = Math.random() * 100;
+    var delay = Math.random() * 0.3;
+    var duration = 1.4 + Math.random() * 1.1;
+    var size = 6 + Math.random() * 7;
     return /*#__PURE__*/React.createElement("span", {
       key: i,
       className: "confetti-piece rounded-sm",
       style: {
-        left: `${left}%`,
-        width: `${size}px`,
-        height: `${size * 0.45}px`,
+        left: "".concat(left, "%"),
+        width: "".concat(size, "px"),
+        height: "".concat(size * 0.45, "px"),
         backgroundColor: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-        animationDuration: `${duration}s`,
-        animationDelay: `${delay}s`
+        animationDuration: "".concat(duration, "s"),
+        animationDelay: "".concat(delay, "s")
       }
     });
   }), /*#__PURE__*/React.createElement("div", {
@@ -866,32 +1288,34 @@ function YatzyCelebration() {
     className: "font-display font-extrabold text-3xl text-amber-400 tracking-wide"
   }, "YATZY!"), /*#__PURE__*/React.createElement("p", {
     className: "font-mono-score text-stone-50 text-sm mt-1"
-  }, "+50 poäng"))));
+  }, "+50 po\xE4ng"))));
 }
 
 // Similar to the Yatzy celebration, but a calmer blue/gold palette, fewer
 // pieces, and a shorter on-screen time — recognizable as a "smaller" win.
 function BonusCelebration() {
-  const pieces = Array.from({
+  var pieces = Array.from({
     length: 22
-  }, (_, i) => i);
+  }, function (_, i) {
+    return i;
+  });
   return /*#__PURE__*/React.createElement("div", {
     className: "fixed inset-0 z-50 pointer-events-none overflow-hidden"
-  }, pieces.map(i => {
-    const left = Math.random() * 100;
-    const delay = Math.random() * 0.25;
-    const duration = 1.1 + Math.random() * 0.8;
-    const size = 5 + Math.random() * 5;
+  }, pieces.map(function (i) {
+    var left = Math.random() * 100;
+    var delay = Math.random() * 0.25;
+    var duration = 1.1 + Math.random() * 0.8;
+    var size = 5 + Math.random() * 5;
     return /*#__PURE__*/React.createElement("span", {
       key: i,
       className: "confetti-piece rounded-full",
       style: {
-        left: `${left}%`,
-        width: `${size}px`,
-        height: `${size}px`,
+        left: "".concat(left, "%"),
+        width: "".concat(size, "px"),
+        height: "".concat(size, "px"),
         backgroundColor: BONUS_CONFETTI_COLORS[i % BONUS_CONFETTI_COLORS.length],
-        animationDuration: `${duration}s`,
-        animationDelay: `${delay}s`
+        animationDuration: "".concat(duration, "s"),
+        animationDelay: "".concat(delay, "s")
       }
     });
   }), /*#__PURE__*/React.createElement("div", {
@@ -905,10 +1329,156 @@ function BonusCelebration() {
     className: "font-display font-extrabold text-3xl text-sky-400 tracking-wide"
   }, "BONUS!"), /*#__PURE__*/React.createElement("p", {
     className: "font-mono-score text-stone-50 text-sm mt-1"
-  }, "+50 poäng"))));
+  }, "+50 po\xE4ng"))));
 }
 
 // ---------- Loading screen ----------
+function BonusYatzyCelebration() {
+  var pieces = Array.from({
+    length: 18
+  }, function (_, i) {
+    return {
+      left: "".concat(8 + Math.random() * 84, "%"),
+      delay: "".concat(Math.random() * 0.4, "s"),
+      size: 7 + Math.random() * 8,
+      color: ['#f59e0b', '#10b981', '#f59e0b', '#10b981', '#fbbf24', '#34d399'][i % 6],
+      rotate: "".concat(Math.random() * 360, "deg")
+    };
+  });
+  return /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 pointer-events-none z-40 flex items-center justify-center"
+  }, pieces.map(function (p, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "absolute top-0",
+      style: {
+        left: p.left,
+        animation: "confetti-fall 1.4s ".concat(p.delay, " ease-in forwards"),
+        width: p.size,
+        height: p.size,
+        backgroundColor: p.color,
+        borderRadius: '2px',
+        transform: "rotate(".concat(p.rotate, ")")
+      }
+    });
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "bg-emerald-600 border-4 border-stone-900 rounded-2xl px-6 py-4 text-center shadow-2xl",
+    style: {
+      animation: 'celebration-pop 0.4s ease-out'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-3xl mb-1"
+  }, "\uD83C\uDFB2"), /*#__PURE__*/React.createElement("p", {
+    className: "font-display font-extrabold text-stone-50 text-xl tracking-tight"
+  }, "BONUS YATZY!"), /*#__PURE__*/React.createElement("p", {
+    className: "font-mono-score text-emerald-200 text-sm font-bold mt-0.5"
+  }, "+50 extrapo\xE4ng")));
+}
+function NaturalYatzyCelebration() {
+  var pieces = Array.from({
+    length: 22
+  }, function (_, i) {
+    return {
+      left: "".concat(5 + Math.random() * 90, "%"),
+      delay: "".concat(Math.random() * 0.3, "s"),
+      size: 8 + Math.random() * 10,
+      color: ['#fbbf24', '#f59e0b', '#ef4444', '#fbbf24', '#f97316', '#fbbf24'][i % 6],
+      rotate: "".concat(Math.random() * 360, "deg")
+    };
+  });
+  return /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 pointer-events-none z-40 flex items-center justify-center"
+  }, pieces.map(function (p, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "absolute top-0",
+      style: {
+        left: p.left,
+        animation: "confetti-fall 1.6s ".concat(p.delay, " ease-in forwards"),
+        width: p.size,
+        height: p.size,
+        backgroundColor: p.color,
+        borderRadius: '2px',
+        transform: "rotate(".concat(p.rotate, ")")
+      }
+    });
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "bg-amber-500 border-4 border-stone-900 rounded-2xl px-6 py-4 text-center shadow-2xl",
+    style: {
+      animation: 'celebration-pop 0.4s ease-out'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-3xl mb-1"
+  }, "\uD83C\uDFAF"), /*#__PURE__*/React.createElement("p", {
+    className: "font-display font-extrabold text-stone-900 text-xl tracking-tight"
+  }, "NATURLIG YATZY!"), /*#__PURE__*/React.createElement("p", {
+    className: "font-mono-score text-stone-700 text-sm font-bold mt-0.5"
+  }, "F\xF6rsta kastet \xB7 100 po\xE4ng!")));
+}
+
+// ─── Tournament standings screen ──────────────────────────────────────────────
+function TournamentStandingsScreen(_ref8) {
+  var tournament = _ref8.tournament,
+    onNextRound = _ref8.onNextRound,
+    onAbort = _ref8.onAbort;
+  var standings = tournament.standings,
+    currentRound = tournament.currentRound,
+    rounds = tournament.rounds;
+  var sorted = _toConsumableArray(standings).sort(function (a, b) {
+    return b.wins !== a.wins ? b.wins - a.wins : b.totalScore - a.totalScore;
+  });
+  var isLastRound = currentRound >= rounds;
+  var leader = sorted[0];
+  return /*#__PURE__*/React.createElement("div", {
+    className: "min-h-screen bg-stone-100 flex flex-col items-center justify-center px-6 py-10 font-sans"
+  }, /*#__PURE__*/React.createElement("style", null, FONT_STYLES), isLastRound ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "text-5xl mb-3"
+  }, "\uD83C\uDFC6"), /*#__PURE__*/React.createElement("h1", {
+    className: "font-display text-4xl font-extrabold text-stone-900 mb-1 tracking-tight"
+  }, "Turnering klar!"), /*#__PURE__*/React.createElement("p", {
+    className: "text-stone-400 text-xs uppercase tracking-widest mb-6"
+  }, rounds, " ", rounds === 1 ? 'omgång' : 'omgångar', " spelade")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h1", {
+    className: "font-display text-3xl font-extrabold text-stone-900 mb-1 tracking-tight"
+  }, "Omg\xE5ng ", currentRound, " av ", rounds, " klar"), /*#__PURE__*/React.createElement("p", {
+    className: "text-stone-400 text-xs uppercase tracking-widest mb-6"
+  }, "St\xE4llning")), /*#__PURE__*/React.createElement("div", {
+    className: "w-full max-w-sm space-y-2 mb-8"
+  }, sorted.map(function (p, i) {
+    var _p$colorIndex, _p$colorIndex2;
+    var pal = PLAYER_COLORS[(_p$colorIndex = p.colorIndex) !== null && _p$colorIndex !== void 0 ? _p$colorIndex : i % 4];
+    var medals = ['🥇', '🥈', '🥉'];
+    var isLeader = i === 0;
+    return /*#__PURE__*/React.createElement("div", {
+      key: p.name,
+      className: "flex items-center gap-3 rounded-xl px-4 py-3 border-2 ".concat(isLeader ? "".concat(pal.finish) : 'bg-stone-50 border-stone-200')
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "text-2xl w-8 text-center shrink-0"
+    }, medals[i] || "".concat(i + 1, ".")), /*#__PURE__*/React.createElement("span", {
+      className: "text-xl shrink-0"
+    }, p.avatar || AVATAR_OPTIONS[(_p$colorIndex2 = p.colorIndex) !== null && _p$colorIndex2 !== void 0 ? _p$colorIndex2 : i]), /*#__PURE__*/React.createElement("div", {
+      className: "flex-1 min-w-0"
+    }, /*#__PURE__*/React.createElement("p", {
+      className: "font-display font-bold text-stone-900 truncate"
+    }, p.name), /*#__PURE__*/React.createElement("p", {
+      className: "text-[11px] text-stone-400"
+    }, p.wins === Math.floor(p.wins) ? p.wins : p.wins.toFixed(1), " ", p.wins === 1 ? 'vinst' : 'vinster', " \xB7 Totalt ", p.totalScore, " p")), /*#__PURE__*/React.createElement("div", {
+      className: "text-right shrink-0"
+    }, /*#__PURE__*/React.createElement("p", {
+      className: "font-mono-score text-xl font-extrabold text-stone-900"
+    }, p.wins % 1 === 0 ? p.wins : p.wins.toFixed(1)), /*#__PURE__*/React.createElement("p", {
+      className: "text-[10px] text-stone-400"
+    }, "po\xE4ng")));
+  })), !isLastRound && /*#__PURE__*/React.createElement("button", {
+    onClick: onNextRound,
+    className: "w-full max-w-sm py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition mb-3"
+  }, "Omg\xE5ng ", currentRound + 1, " \u2192"), isLastRound && /*#__PURE__*/React.createElement("button", {
+    onClick: onAbort,
+    className: "w-full max-w-sm py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition mb-3"
+  }, "Ny turnering"), /*#__PURE__*/React.createElement("button", {
+    onClick: onAbort,
+    className: "text-sm text-stone-400 underline active:scale-95 transition"
+  }, isLastRound ? 'Ny turnering' : 'Avbryt turnering'));
+}
 function LoadingScreen() {
   return /*#__PURE__*/React.createElement("div", {
     className: "min-h-screen bg-stone-100 flex flex-col items-center justify-center font-sans"
@@ -935,148 +1505,468 @@ function LoadingScreen() {
 }
 
 // ---------- Stats modal ----------
-function StatsModal({
-  stats,
-  onClose,
-  onClear
-}) {
-  const entries = Object.entries(stats).sort((a, b) => b[1].wins - a[1].wins || b[1].bestScore - a[1].bestScore);
+
+// ─── House rules modal ────────────────────────────────────────────────────────
+var HOUSE_RULE_DEFS = [{
+  id: 'joker',
+  label: 'Joker',
+  desc: 'Yatzy som joker — om Yatzy-rutan är fylld kan ett Yatzy-kast räknas som ett par, kåk, etc.',
+  emoji: '🃏'
+}, {
+  id: 'bonusYatzy',
+  label: 'Bonus-Yatzy',
+  desc: 'Varje extra Yatzy ger +50 på toppen av den ruta du väljer att fylla i. Du måste fortfarande fylla en öppen ruta — bonusen är ett tillägg, inte en gratistur.',
+  emoji: '✨'
+}, {
+  id: 'naturalBonus',
+  label: 'Naturlig Yatzy',
+  desc: 'Yatzy på första kastet ger 100 poäng istället för 50.',
+  emoji: '🎯'
+}, {
+  id: 'strictUpper',
+  label: 'Övre sektion först',
+  desc: 'Övre sektionen (ettor–sexor) måste fyllas i innan nedre sektionen kan användas.',
+  emoji: '🔒'
+}, {
+  id: 'forcedOrder',
+  label: 'Tvingad ordning',
+  desc: 'Rutorna måste fyllas uppifrån och ner — ingen valfrihet. Snabbspel för yngre.',
+  emoji: '⬇️'
+}];
+function HouseRulesModal(_ref9) {
+  var rules = _ref9.rules,
+    _onChange = _ref9.onChange,
+    onClose = _ref9.onClose;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-stone-900/60 flex items-end justify-center z-50 px-4 pb-6"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-stone-50 border-4 border-stone-900 rounded-2xl w-full max-w-sm",
+    style: {
+      maxHeight: '88vh',
+      display: 'flex',
+      flexDirection: 'column'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "p-5 pb-3",
+    style: {
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between mb-1"
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "font-display font-extrabold text-xl text-stone-900"
+  }, "\u2699\uFE0F Husregler"), /*#__PURE__*/React.createElement("button", {
+    onClick: onClose,
+    className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center font-bold text-stone-900"
+  }, "\u2715")), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-stone-400"
+  }, "Aktiva husregler g\xE4ller hela spelet. Kan inte \xE4ndras efter start.")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      overflowY: 'auto',
+      WebkitOverflowScrolling: 'touch',
+      padding: '0 20px 8px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "space-y-3"
+  }, HOUSE_RULE_DEFS.map(function (def) {
+    return /*#__PURE__*/React.createElement("label", {
+      key: def.id,
+      className: "flex items-start gap-3 rounded-xl border-2 p-3 cursor-pointer transition ".concat(rules[def.id] ? 'bg-amber-50 border-amber-400' : 'bg-white border-stone-200')
+    }, /*#__PURE__*/React.createElement("input", {
+      type: "checkbox",
+      checked: !!rules[def.id],
+      onChange: function onChange(e) {
+        return _onChange(_objectSpread(_objectSpread({}, rules), {}, _defineProperty({}, def.id, e.target.checked)));
+      },
+      className: "w-5 h-5 mt-0.5 accent-red-600 shrink-0"
+    }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+      className: "font-display font-bold text-stone-900 text-sm"
+    }, def.emoji, " ", def.label), /*#__PURE__*/React.createElement("p", {
+      className: "text-xs text-stone-500 mt-0.5 leading-relaxed"
+    }, def.desc)));
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "p-5 pt-3",
+    style: {
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: onClose,
+    className: "w-full py-2.5 rounded-xl bg-stone-900 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition text-sm"
+  }, "Spara & st\xE4ng"))));
+}
+
+// ─── Leaderboard modal ────────────────────────────────────────────────────────
+function LeaderboardModal(_ref0) {
+  var leaderboard = _ref0.leaderboard,
+    onClose = _ref0.onClose,
+    onClear = _ref0.onClear;
+  var entries = Object.entries(leaderboard).map(function (_ref1) {
+    var _ref10 = _slicedToArray(_ref1, 2),
+      name = _ref10[0],
+      d = _ref10[1];
+    return _objectSpread(_objectSpread({
+      name: name
+    }, d), {}, {
+      avgScore: d.games > 0 ? Math.round(d.totalScore / d.games) : 0
+    });
+  }).sort(function (a, b) {
+    return b.wins - a.wins || b.bestScore - a.bestScore;
+  });
+  return /*#__PURE__*/React.createElement("div", {
+    className: "fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 px-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-stone-50 border-4 border-stone-900 rounded-2xl w-full max-w-sm p-5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between mb-4"
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "font-display font-extrabold text-xl text-stone-900"
+  }, "\uD83C\uDFC6 Topplista"), /*#__PURE__*/React.createElement("button", {
+    onClick: onClose,
+    className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center font-bold text-stone-900"
+  }, "\u2715")), entries.length === 0 ? /*#__PURE__*/React.createElement("p", {
+    className: "text-stone-400 text-sm text-center py-4"
+  }, "Inga resultat \xE4nnu.") : /*#__PURE__*/React.createElement("div", {
+    className: "space-y-2 max-h-72 overflow-y-auto"
+  }, entries.map(function (e, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: e.name,
+      className: "rounded-xl border-2 px-3 py-2 flex items-center gap-3 ".concat(i === 0 ? 'bg-amber-50 border-amber-400' : 'bg-white border-stone-200')
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "font-mono-score text-lg font-bold text-stone-400 w-5 text-center"
+    }, i + 1), /*#__PURE__*/React.createElement("div", {
+      className: "flex-1 min-w-0"
+    }, /*#__PURE__*/React.createElement("p", {
+      className: "font-display font-bold text-stone-900 truncate"
+    }, e.name), /*#__PURE__*/React.createElement("p", {
+      className: "text-[11px] text-stone-400"
+    }, e.games, " ", e.games === 1 ? 'match' : 'matcher', " \xB7 Snitt ", e.avgScore, " p \xB7 B\xE4st ", e.bestScore, " p")), /*#__PURE__*/React.createElement("div", {
+      className: "text-right shrink-0"
+    }, /*#__PURE__*/React.createElement("p", {
+      className: "font-mono-score font-extrabold text-stone-900"
+    }, e.wins), /*#__PURE__*/React.createElement("p", {
+      className: "text-[10px] text-stone-400"
+    }, e.wins === 1 ? 'vinst' : 'vinster')));
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2 mt-4"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: onClose,
+    className: "flex-1 py-2.5 rounded-xl bg-stone-900 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition text-sm"
+  }, "St\xE4ng"), entries.length > 0 && /*#__PURE__*/React.createElement("button", {
+    onClick: onClear,
+    className: "px-4 py-2.5 rounded-xl border-2 border-stone-300 text-stone-500 font-display font-bold uppercase tracking-wide active:scale-95 transition text-sm"
+  }, "Rensa"))));
+}
+function StatsModal(_ref11) {
+  var stats = _ref11.stats,
+    onClose = _ref11.onClose,
+    onClear = _ref11.onClear;
+  var entries = Object.entries(stats).sort(function (a, b) {
+    return b[1].wins - a[1].wins || b[1].bestScore - a[1].bestScore;
+  });
   return /*#__PURE__*/React.createElement("div", {
     className: "fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4",
     onClick: onClose
   }, /*#__PURE__*/React.createElement("div", {
     className: "bg-stone-50 rounded-2xl max-w-sm w-full max-h-[80vh] overflow-auto p-5 border-4 border-stone-900",
-    onClick: e => e.stopPropagation()
+    onClick: function onClick(e) {
+      return e.stopPropagation();
+    }
   }, /*#__PURE__*/React.createElement("h2", {
     className: "font-display text-xl font-extrabold text-stone-900 mb-1"
   }, "Statistik"), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-stone-400 mb-3"
-  }, "Sparad på den här enheten, per namn"), entries.length === 0 ? /*#__PURE__*/React.createElement("p", {
+  }, "Sparad p\xE5 den h\xE4r enheten, per namn"), entries.length === 0 ? /*#__PURE__*/React.createElement("p", {
     className: "text-sm text-stone-500"
-  }, "Inga avslutade matcher än.") : /*#__PURE__*/React.createElement("div", {
+  }, "Inga avslutade matcher \xE4n.") : /*#__PURE__*/React.createElement("div", {
     className: "space-y-2"
-  }, entries.map(([name, s]) => /*#__PURE__*/React.createElement("div", {
-    key: name,
-    className: "border-b border-stone-100 pb-2"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center justify-between"
-  }, /*#__PURE__*/React.createElement("p", {
-    className: "font-display font-bold text-stone-800"
-  }, name), /*#__PURE__*/React.createElement("p", {
-    className: "font-mono-score text-sm font-bold text-stone-900"
-  }, s.bestScore, " p")), /*#__PURE__*/React.createElement("p", {
-    className: "text-[11px] text-stone-400"
-  }, s.games, " ", s.games === 1 ? 'match' : 'matcher', " · ", s.wins, " ", s.wins === 1 ? 'vinst' : 'vinster', " · Snitt", ' ', Math.round(s.totalScore / s.games), " p · Yatzy ×", s.yatzys)))), /*#__PURE__*/React.createElement("button", {
+  }, entries.map(function (_ref12) {
+    var _ref13 = _slicedToArray(_ref12, 2),
+      name = _ref13[0],
+      s = _ref13[1];
+    return /*#__PURE__*/React.createElement("div", {
+      key: name,
+      className: "border-b border-stone-100 pb-2"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center justify-between"
+    }, /*#__PURE__*/React.createElement("p", {
+      className: "font-display font-bold text-stone-800"
+    }, name), /*#__PURE__*/React.createElement("p", {
+      className: "font-mono-score text-sm font-bold text-stone-900"
+    }, s.bestScore, " p")), /*#__PURE__*/React.createElement("p", {
+      className: "text-[11px] text-stone-400"
+    }, s.games, " ", s.games === 1 ? 'match' : 'matcher', " \xB7 ", s.wins, " ", s.wins === 1 ? 'vinst' : 'vinster', " \xB7 Snitt", ' ', Math.round(s.totalScore / s.games), " p \xB7 Yatzy \xD7", s.yatzys));
+  })), /*#__PURE__*/React.createElement("button", {
     onClick: onClose,
     className: "mt-4 w-full py-2.5 rounded-xl bg-stone-900 text-stone-50 font-display font-bold uppercase tracking-wide"
-  }, "Stäng"), entries.length > 0 && /*#__PURE__*/React.createElement("button", {
+  }, "St\xE4ng"), entries.length > 0 && /*#__PURE__*/React.createElement("button", {
     onClick: onClear,
     className: "mt-2 w-full py-2 text-xs text-stone-400 underline"
   }, "Rensa statistik")));
 }
 
 // ---------- Setup screen ----------
-function SetupScreen({
-  numPlayers,
-  setNumPlayers,
-  names,
-  setNames,
-  aiFlags,
-  setAiFlags,
-  aiDifficulties,
-  setAiDifficulties,
-  onStart,
-  stats,
-  showStats,
-  setShowStats,
-  onClearStats
-}) {
+function SetupScreen(_ref14) {
+  var numPlayers = _ref14.numPlayers,
+    setNumPlayers = _ref14.setNumPlayers,
+    names = _ref14.names,
+    setNames = _ref14.setNames,
+    avatars = _ref14.avatars,
+    setAvatars = _ref14.setAvatars,
+    aiFlags = _ref14.aiFlags,
+    setAiFlags = _ref14.setAiFlags,
+    aiDifficulties = _ref14.aiDifficulties,
+    setAiDifficulties = _ref14.setAiDifficulties,
+    onStart = _ref14.onStart,
+    stats = _ref14.stats,
+    showStats = _ref14.showStats,
+    setShowStats = _ref14.setShowStats,
+    onClearStats = _ref14.onClearStats,
+    leaderboard = _ref14.leaderboard,
+    showLeaderboard = _ref14.showLeaderboard,
+    setShowLeaderboard = _ref14.setShowLeaderboard,
+    onClearLeaderboard = _ref14.onClearLeaderboard,
+    rules = _ref14.rules,
+    onRulesChange = _ref14.onRulesChange,
+    tournamentMode = _ref14.tournamentMode,
+    setTournamentMode = _ref14.setTournamentMode,
+    tournamentRounds = _ref14.tournamentRounds,
+    setTournamentRounds = _ref14.setTournamentRounds;
+  var _React$useState = React.useState(false),
+    _React$useState2 = _slicedToArray(_React$useState, 2),
+    shuffleFlash = _React$useState2[0],
+    setShuffleFlash = _React$useState2[1];
+  var _React$useState3 = React.useState(false),
+    _React$useState4 = _slicedToArray(_React$useState3, 2),
+    showHouseRules = _React$useState4[0],
+    setShowHouseRules = _React$useState4[1];
+  function shufflePlayers() {
+    // Shuffle all player slots together (name + avatar + ai flag + difficulty)
+    var slots = Array.from({
+      length: numPlayers
+    }, function (_, i) {
+      return {
+        name: names[i],
+        avatar: avatars[i],
+        ai: aiFlags[i],
+        diff: aiDifficulties[i]
+      };
+    });
+    for (var i = slots.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var _ref15 = [slots[j], slots[i]];
+      slots[i] = _ref15[0];
+      slots[j] = _ref15[1];
+    }
+    var n = _toConsumableArray(names);
+    var av = _toConsumableArray(avatars);
+    var fl = _toConsumableArray(aiFlags);
+    var di = _toConsumableArray(aiDifficulties);
+    slots.forEach(function (s, i) {
+      n[i] = s.name;
+      av[i] = s.avatar;
+      fl[i] = s.ai;
+      di[i] = s.diff;
+    });
+    setNames(n);
+    setAvatars(av);
+    setAiFlags(fl);
+    setAiDifficulties(di);
+    setShuffleFlash(true);
+    setTimeout(function () {
+      return setShuffleFlash(false);
+    }, 500);
+  }
   return /*#__PURE__*/React.createElement("div", {
     className: "min-h-screen bg-stone-100 flex flex-col items-center justify-center px-6 py-10 font-sans"
   }, /*#__PURE__*/React.createElement("style", null, FONT_STYLES), /*#__PURE__*/React.createElement("h1", {
     className: "font-display text-5xl font-extrabold text-stone-900 mb-1 tracking-tight"
   }, "YATZY"), /*#__PURE__*/React.createElement("p", {
     className: "text-stone-400 text-xs uppercase tracking-widest mb-8"
-  }, "Svenska poängregler"), /*#__PURE__*/React.createElement("div", {
+  }, "Svenska po\xE4ngregler"), /*#__PURE__*/React.createElement("div", {
     className: "w-full max-w-sm bg-stone-50 border-4 border-stone-900 rounded-2xl p-5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between mb-4"
   }, /*#__PURE__*/React.createElement("p", {
-    className: "font-display font-bold text-stone-800 mb-3"
-  }, "Antal spelare"), /*#__PURE__*/React.createElement("div", {
+    className: "font-display font-bold text-stone-800"
+  }, "Antal spelare"), numPlayers > 1 && /*#__PURE__*/React.createElement("button", {
+    onClick: shufflePlayers,
+    className: "text-xs px-3 py-1 rounded-full border-2 border-stone-300 text-stone-500 font-display font-bold active:scale-95 transition ".concat(shuffleFlash ? 'bg-amber-100 border-amber-400 text-amber-700' : '')
+  }, "\uD83D\uDD00 Blanda")), /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-center gap-4 mb-5"
   }, /*#__PURE__*/React.createElement("button", {
-    onClick: () => setNumPlayers(Math.max(1, numPlayers - 1)),
+    onClick: function onClick() {
+      return setNumPlayers(Math.max(1, numPlayers - 1));
+    },
     className: "w-10 h-10 rounded-full border-2 border-stone-900 font-display font-bold text-xl text-stone-900 active:scale-95"
-  }, "−"), /*#__PURE__*/React.createElement("span", {
+  }, "\u2212"), /*#__PURE__*/React.createElement("span", {
     className: "font-mono-score text-3xl font-bold w-10 text-center text-stone-900"
   }, numPlayers), /*#__PURE__*/React.createElement("button", {
-    onClick: () => setNumPlayers(Math.min(4, numPlayers + 1)),
+    onClick: function onClick() {
+      return setNumPlayers(Math.min(4, numPlayers + 1));
+    },
     className: "w-10 h-10 rounded-full border-2 border-stone-900 font-display font-bold text-xl text-stone-900 active:scale-95"
   }, "+")), /*#__PURE__*/React.createElement("div", {
-    className: "space-y-3 mb-6"
+    className: "space-y-4 mb-6"
   }, Array.from({
     length: numPlayers
-  }).map((_, i) => /*#__PURE__*/React.createElement("div", {
-    key: i
-  }, /*#__PURE__*/React.createElement("input", {
-    value: names[i],
-    onChange: e => {
-      const n = [...names];
-      n[i] = e.target.value;
-      setNames(n);
-    },
-    placeholder: aiFlags[i] ? `Dator ${i + 1}` : `Spelare ${i + 1}`,
-    className: "w-full px-3 py-2 rounded-lg border-2 border-stone-300 focus:border-red-600 focus:outline-none text-stone-800"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center gap-3 mt-1.5 pl-1"
+  }).map(function (_, i) {
+    var pal = PLAYER_COLORS[i];
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "rounded-xl border-2 p-3 ".concat(pal.light, " border-stone-200")
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex flex-wrap gap-1 mb-2"
+    }, AVATAR_OPTIONS.map(function (em) {
+      return /*#__PURE__*/React.createElement("button", {
+        key: em,
+        onClick: function onClick() {
+          var a = _toConsumableArray(avatars);
+          a[i] = em;
+          setAvatars(a);
+        },
+        className: "text-lg rounded-lg p-0.5 transition leading-none ".concat(avatars[i] === em ? 'ring-2 ring-stone-900 bg-white/80' : 'opacity-50 active:opacity-100')
+      }, em);
+    })), /*#__PURE__*/React.createElement("input", {
+      value: names[i],
+      onChange: function onChange(e) {
+        var n = _toConsumableArray(names);
+        n[i] = e.target.value;
+        setNames(n);
+      },
+      placeholder: aiFlags[i] ? "Dator ".concat(i + 1) : "Spelare ".concat(i + 1),
+      className: "w-full px-3 py-2 rounded-lg border-2 border-stone-300 focus:outline-none text-stone-800 bg-white focus:border-stone-600"
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-3 mt-1.5 pl-1"
+    }, /*#__PURE__*/React.createElement("label", {
+      className: "flex items-center gap-1.5 text-xs text-stone-500"
+    }, /*#__PURE__*/React.createElement("input", {
+      type: "checkbox",
+      checked: aiFlags[i],
+      onChange: function onChange(e) {
+        var flags = _toConsumableArray(aiFlags);
+        flags[i] = e.target.checked;
+        setAiFlags(flags);
+      },
+      className: "w-4 h-4 accent-red-600"
+    }), "Dator"), aiFlags[i] && /*#__PURE__*/React.createElement("select", {
+      value: aiDifficulties[i],
+      onChange: function onChange(e) {
+        var diffs = _toConsumableArray(aiDifficulties);
+        diffs[i] = e.target.value;
+        setAiDifficulties(diffs);
+      },
+      className: "text-xs px-2 py-1 rounded-lg border-2 border-stone-300 text-stone-700 bg-stone-50 focus:border-red-600 focus:outline-none"
+    }, AI_DIFFICULTY_ORDER.map(function (id) {
+      return /*#__PURE__*/React.createElement("option", {
+        key: id,
+        value: id
+      }, AI_DIFFICULTIES[id].label);
+    }))));
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "rounded-xl border-2 p-3 mb-4 transition ".concat(tournamentMode ? 'bg-amber-50 border-amber-400' : 'bg-white border-stone-200')
   }, /*#__PURE__*/React.createElement("label", {
-    className: "flex items-center gap-1.5 text-xs text-stone-500"
+    className: "flex items-center gap-3 cursor-pointer"
   }, /*#__PURE__*/React.createElement("input", {
     type: "checkbox",
-    checked: aiFlags[i],
-    onChange: e => {
-      const flags = [...aiFlags];
-      flags[i] = e.target.checked;
-      setAiFlags(flags);
+    checked: tournamentMode,
+    onChange: function onChange(e) {
+      return setTournamentMode(e.target.checked);
     },
-    className: "w-4 h-4 accent-red-600"
-  }), "Dator"), aiFlags[i] && /*#__PURE__*/React.createElement("select", {
-    value: aiDifficulties[i],
-    onChange: e => {
-      const diffs = [...aiDifficulties];
-      diffs[i] = e.target.value;
-      setAiDifficulties(diffs);
+    className: "w-5 h-5 accent-red-600 shrink-0"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "flex-1"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "font-display font-bold text-stone-900 text-sm"
+  }, "\uD83C\uDFC6 Turnering"), /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-stone-500 mt-0.5"
+  }, "Spela flera omg\xE5ngar med po\xE4ngst\xE4llning"))), tournamentMode && /*#__PURE__*/React.createElement("div", {
+    className: "mt-3 flex items-center gap-3 pl-8"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-xs text-stone-600 font-display font-bold"
+  }, "Omg\xE5ngar:"), [1, 2, 3, 5].map(function (n) {
+    return /*#__PURE__*/React.createElement("button", {
+      key: n,
+      onClick: function onClick() {
+        return setTournamentRounds(n);
+      },
+      className: "w-9 h-9 rounded-full font-display font-bold text-sm transition active:scale-95 ".concat(tournamentRounds === n ? 'bg-red-600 text-stone-50' : 'border-2 border-stone-300 text-stone-600')
+    }, n);
+  }))), Object.values(rules).some(Boolean) && /*#__PURE__*/React.createElement("div", {
+    className: "mb-3 flex flex-wrap gap-1"
+  }, HOUSE_RULE_DEFS.filter(function (d) {
+    return rules[d.id];
+  }).map(function (d) {
+    return /*#__PURE__*/React.createElement("span", {
+      key: d.id,
+      className: "text-xs bg-amber-100 border border-amber-400 text-amber-800 rounded-full px-2 py-0.5 font-display font-bold"
+    }, d.emoji, " ", d.label);
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return setShowHouseRules(true);
     },
-    className: "text-xs px-2 py-1 rounded-lg border-2 border-stone-300 text-stone-700 bg-stone-50 focus:border-red-600 focus:outline-none"
-  }, AI_DIFFICULTY_ORDER.map(id => /*#__PURE__*/React.createElement("option", {
-    key: id,
-    value: id
-  }, AI_DIFFICULTIES[id].label))))))), /*#__PURE__*/React.createElement("button", {
+    className: "flex-1 py-3 rounded-xl border-2 border-stone-300 text-stone-600 font-display font-bold uppercase tracking-wide active:scale-95 transition text-sm"
+  }, "\u2699\uFE0F Husregler"), /*#__PURE__*/React.createElement("button", {
     onClick: onStart,
-    className: "w-full py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition"
-  }, "Starta spelet")), /*#__PURE__*/React.createElement("button", {
-    onClick: () => setShowStats(true),
-    className: "mt-4 text-sm text-stone-500 underline active:scale-95 transition"
-  }, "Visa statistik"), /*#__PURE__*/React.createElement("p", {
+    className: "flex-1 py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition text-sm"
+  }, "Starta spelet"))), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-4 mt-4"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return setShowStats(true);
+    },
+    className: "text-sm text-stone-500 underline active:scale-95 transition"
+  }, "Visa statistik"), /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return setShowLeaderboard(true);
+    },
+    className: "text-sm text-stone-500 underline active:scale-95 transition"
+  }, "\uD83C\uDFC6 Topplista")), /*#__PURE__*/React.createElement("p", {
     className: "text-stone-400 text-xs mt-6 text-center max-w-xs leading-relaxed"
-  }, "15 omgångar per spelare. Tre kast per omgång – tryck på en tärning för att spara den till nästa kast."), showStats && /*#__PURE__*/React.createElement(StatsModal, {
+  }, "15 omg\xE5ngar per spelare. Tre kast per omg\xE5ng \u2013 tryck p\xE5 en t\xE4rning f\xF6r att spara den till n\xE4sta kast."), showStats && /*#__PURE__*/React.createElement(StatsModal, {
     stats: stats,
-    onClose: () => setShowStats(false),
+    onClose: function onClose() {
+      return setShowStats(false);
+    },
     onClear: onClearStats
+  }), showLeaderboard && /*#__PURE__*/React.createElement(LeaderboardModal, {
+    leaderboard: leaderboard,
+    onClose: function onClose() {
+      return setShowLeaderboard(false);
+    },
+    onClear: onClearLeaderboard
+  }), showHouseRules && /*#__PURE__*/React.createElement(HouseRulesModal, {
+    rules: rules,
+    onChange: onRulesChange,
+    onClose: function onClose() {
+      return setShowHouseRules(false);
+    }
   }));
 }
 
 // ---------- Finished screen ----------
-function FinishedScreen({
-  players,
-  onRestart,
-  onUndo,
-  canUndo,
-  stats
-}) {
-  const results = players.map(p => ({
-    ...p,
-    ...calcTotals(p.scores)
-  })).sort((a, b) => b.total - a.total);
+function FinishedScreen(_ref16) {
+  var players = _ref16.players,
+    onRestart = _ref16.onRestart,
+    onUndo = _ref16.onUndo,
+    canUndo = _ref16.canUndo,
+    stats = _ref16.stats,
+    leaderboard = _ref16.leaderboard,
+    onClearLeaderboard = _ref16.onClearLeaderboard,
+    tournament = _ref16.tournament,
+    onNextRound = _ref16.onNextRound,
+    onEndTournament = _ref16.onEndTournament;
+  var results = players.map(function (p) {
+    return _objectSpread(_objectSpread({}, p), calcTotals(p.scores));
+  }).sort(function (a, b) {
+    return b.total - a.total;
+  });
+  var _React$useState5 = React.useState(false),
+    _React$useState6 = _slicedToArray(_React$useState5, 2),
+    showLeaderboard = _React$useState6[0],
+    setShowLeaderboard = _React$useState6[1];
   return /*#__PURE__*/React.createElement("div", {
     className: "min-h-screen bg-stone-100 flex flex-col items-center justify-center px-6 py-10 font-sans"
   }, /*#__PURE__*/React.createElement("style", null, FONT_STYLES), /*#__PURE__*/React.createElement("h1", {
@@ -1085,71 +1975,248 @@ function FinishedScreen({
     className: "text-stone-400 text-xs uppercase tracking-widest mb-6"
   }, "15 rutor avklarade"), /*#__PURE__*/React.createElement("div", {
     className: "w-full max-w-sm space-y-2"
-  }, results.map((r, i) => /*#__PURE__*/React.createElement("div", {
-    key: i,
-    className: `flex items-center justify-between rounded-xl px-4 py-3 border-2 ${i === 0 ? 'bg-amber-100 border-stone-900' : 'bg-stone-50 border-stone-200'}`
+  }, results.map(function (r, i) {
+    var _r$colorIndex, _r$colorIndex2;
+    var pal = PLAYER_COLORS[(_r$colorIndex = r.colorIndex) !== null && _r$colorIndex !== void 0 ? _r$colorIndex : i % 4];
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "flex items-center justify-between rounded-xl px-4 py-3 border-2 ".concat(i === 0 ? "".concat(pal.finish) : 'bg-stone-50 border-stone-200')
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-2"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "text-2xl"
+    }, r.avatar || AVATAR_OPTIONS[(_r$colorIndex2 = r.colorIndex) !== null && _r$colorIndex2 !== void 0 ? _r$colorIndex2 : i]), i === 0 && /*#__PURE__*/React.createElement(Trophy, {
+      className: "w-5 h-5 text-amber-600 shrink-0"
+    }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+      className: "font-display font-bold text-stone-900"
+    }, r.name), /*#__PURE__*/React.createElement("p", {
+      className: "text-[11px] text-stone-400"
+    }, "\xD6vre ", r.upperSum, r.bonus ? " (+".concat(r.bonus, " bonus)") : '', " \xB7 Nedre ", r.lowerSum), stats[r.name] && /*#__PURE__*/React.createElement("p", {
+      className: "text-[11px] text-stone-400"
+    }, stats[r.name].games, " ", stats[r.name].games === 1 ? 'match' : 'matcher', " totalt \xB7 ", stats[r.name].wins, ' ', stats[r.name].wins === 1 ? 'vinst' : 'vinster', " \xB7 B\xE4sta ", stats[r.name].bestScore, " p"))), /*#__PURE__*/React.createElement("span", {
+      className: "font-mono-score text-2xl font-extrabold text-stone-900"
+    }, r.total));
+  })), tournament ? /*#__PURE__*/React.createElement("div", {
+    className: "mt-8 w-full max-w-sm space-y-3"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center gap-2"
-  }, i === 0 && /*#__PURE__*/React.createElement(Trophy, {
-    className: "w-5 h-5 text-amber-600 shrink-0"
-  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
-    className: "font-display font-bold text-stone-900"
-  }, r.name), /*#__PURE__*/React.createElement("p", {
-    className: "text-[11px] text-stone-400"
-  }, "Övre ", r.upperSum, r.bonus ? ` (+${r.bonus} bonus)` : '', " · Nedre ", r.lowerSum), stats[r.name] && /*#__PURE__*/React.createElement("p", {
-    className: "text-[11px] text-stone-400"
-  }, stats[r.name].games, " ", stats[r.name].games === 1 ? 'match' : 'matcher', " totalt · ", stats[r.name].wins, ' ', stats[r.name].wins === 1 ? 'vinst' : 'vinster', " · Bästa ", stats[r.name].bestScore, " p"))), /*#__PURE__*/React.createElement("span", {
-    className: "font-mono-score text-2xl font-extrabold text-stone-900"
-  }, r.total)))), /*#__PURE__*/React.createElement("button", {
+    className: "rounded-xl bg-stone-800 text-stone-50 px-4 py-2 text-center text-xs font-display font-bold uppercase tracking-widest"
+  }, "Omg\xE5ng ", tournament.currentRound, " av ", tournament.rounds), tournament.currentRound < tournament.rounds ? /*#__PURE__*/React.createElement("button", {
+    onClick: onNextRound,
+    className: "w-full py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition"
+  }, "Omg\xE5ng ", tournament.currentRound + 1, " \u2192") : /*#__PURE__*/React.createElement("button", {
+    onClick: onEndTournament,
+    className: "w-full py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition"
+  }, "\uD83C\uDFC6 Visa resultat"), /*#__PURE__*/React.createElement("button", {
+    onClick: onRestart,
+    className: "w-full text-sm text-stone-400 underline active:scale-95 transition text-center"
+  }, "Avbryt turnering")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
     onClick: onRestart,
     className: "mt-8 px-8 py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition"
-  }, "Spela igen"), canUndo && /*#__PURE__*/React.createElement("button", {
+  }, "Spela igen"), /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return setShowLeaderboard(true);
+    },
+    className: "mt-3 text-sm text-stone-500 underline active:scale-95 transition"
+  }, "\uD83C\uDFC6 Topplista")), canUndo && !tournament && /*#__PURE__*/React.createElement("button", {
     onClick: onUndo,
     className: "mt-3 text-sm text-stone-400 underline active:scale-95 transition"
-  }, "Ångra senaste registreringen"));
+  }, "\xC5ngra senaste registreringen"), showLeaderboard && /*#__PURE__*/React.createElement(LeaderboardModal, {
+    leaderboard: leaderboard,
+    onClose: function onClose() {
+      return setShowLeaderboard(false);
+    },
+    onClear: onClearLeaderboard
+  }));
 }
 
 // ---------- Main app ----------
-function YatzyApp() {
-  const [phase, setPhase] = useState('setup'); // setup | playing | finished
-  const [numPlayers, setNumPlayers] = useState(1);
-  const [names, setNames] = useState(['', '', '', '']);
-  const [aiFlags, setAiFlags] = useState([false, false, false, false]);
-  const [aiDifficulties, setAiDifficulties] = useState(['mellan', 'mellan', 'mellan', 'mellan']);
-  const [players, setPlayers] = useState([]);
-  const [currentPlayer, setCurrentPlayer] = useState(0);
-  const [dice, setDice] = useState([1, 2, 3, 4, 5]);
-  const [held, setHeld] = useState([false, false, false, false, false]);
-  const [rollsLeft, setRollsLeft] = useState(3);
-  const [rolling, setRolling] = useState(false);
-  const [turnsPlayed, setTurnsPlayed] = useState(0);
-  const [history, setHistory] = useState([]); // stack of {playerIndex, categoryId} for undo
-  const [mode, setMode] = useState('auto'); // 'auto' = app rolls, 'manual' = type in scores yourself
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [inputBuffer, setInputBuffer] = useState('');
-  const [inputError, setInputError] = useState(null);
-  const [showRules, setShowRules] = useState(false);
-  const [confirmReset, setConfirmReset] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [celebration, setCelebration] = useState(null); // null | 'yatzy' | 'bonus'
-  const [editingPlayer, setEditingPlayer] = useState(null); // player index being renamed, or null
-  const [editNameValue, setEditNameValue] = useState('');
+export default function YatzyApp() {
+  var _CATEGORIES$find3, _players$currentPlaye3, _players$currentPlaye4, _players$currentPlaye5, _players$currentPlaye6, _AI_DIFFICULTIES$play3, _AI_DIFFICULTIES$play4, _players$currentPlaye7;
+  var _useState = useState('setup'),
+    _useState2 = _slicedToArray(_useState, 2),
+    phase = _useState2[0],
+    setPhase = _useState2[1]; // setup | playing | finished
+  var _useState3 = useState(1),
+    _useState4 = _slicedToArray(_useState3, 2),
+    numPlayers = _useState4[0],
+    setNumPlayers = _useState4[1];
+  var _useState5 = useState(['', '', '', '']),
+    _useState6 = _slicedToArray(_useState5, 2),
+    names = _useState6[0],
+    setNames = _useState6[1];
+  var _useState7 = useState([false, false, false, false]),
+    _useState8 = _slicedToArray(_useState7, 2),
+    aiFlags = _useState8[0],
+    setAiFlags = _useState8[1];
+  var _useState9 = useState(['mellan', 'mellan', 'mellan', 'mellan']),
+    _useState0 = _slicedToArray(_useState9, 2),
+    aiDifficulties = _useState0[0],
+    setAiDifficulties = _useState0[1];
+  var _useState1 = useState([null, null, null, null]),
+    _useState10 = _slicedToArray(_useState1, 2),
+    avatars = _useState10[0],
+    setAvatars = _useState10[1];
+  var _useState11 = useState({}),
+    _useState12 = _slicedToArray(_useState11, 2),
+    leaderboard = _useState12[0],
+    setLeaderboard = _useState12[1];
+  var _useState13 = useState(_objectSpread({}, DEFAULT_HOUSE_RULES)),
+    _useState14 = _slicedToArray(_useState13, 2),
+    houseRules = _useState14[0],
+    setHouseRules = _useState14[1];
+
+  // Tournament state
+  var _useState15 = useState(false),
+    _useState16 = _slicedToArray(_useState15, 2),
+    tournamentMode = _useState16[0],
+    setTournamentMode = _useState16[1];
+  var _useState17 = useState(3),
+    _useState18 = _slicedToArray(_useState17, 2),
+    tournamentRounds = _useState18[0],
+    setTournamentRounds = _useState18[1];
+  // tournament: null | { rounds, currentRound, standings: [{name,avatar,colorIndex,wins,totalScore,gamesPlayed}] }
+  var _useState19 = useState(null),
+    _useState20 = _slicedToArray(_useState19, 2),
+    tournament = _useState20[0],
+    setTournament = _useState20[1];
+  var _useState21 = useState(false),
+    _useState22 = _slicedToArray(_useState21, 2),
+    leaderboardLoaded = _useState22[0],
+    setLeaderboardLoaded = _useState22[1];
+  var _useState23 = useState(false),
+    _useState24 = _slicedToArray(_useState23, 2),
+    showLeaderboard = _useState24[0],
+    setShowLeaderboard = _useState24[1];
+  var _useState25 = useState([]),
+    _useState26 = _slicedToArray(_useState25, 2),
+    players = _useState26[0],
+    setPlayers = _useState26[1];
+  var _useState27 = useState(0),
+    _useState28 = _slicedToArray(_useState27, 2),
+    currentPlayer = _useState28[0],
+    setCurrentPlayer = _useState28[1];
+  var _useState29 = useState([1, 2, 3, 4, 5]),
+    _useState30 = _slicedToArray(_useState29, 2),
+    dice = _useState30[0],
+    setDice = _useState30[1];
+  var _useState31 = useState([false, false, false, false, false]),
+    _useState32 = _slicedToArray(_useState31, 2),
+    held = _useState32[0],
+    setHeld = _useState32[1];
+  var _useState33 = useState(3),
+    _useState34 = _slicedToArray(_useState33, 2),
+    rollsLeft = _useState34[0],
+    setRollsLeft = _useState34[1];
+  var _useState35 = useState(false),
+    _useState36 = _slicedToArray(_useState35, 2),
+    rolling = _useState36[0],
+    setRolling = _useState36[1];
+  var _useState37 = useState(0),
+    _useState38 = _slicedToArray(_useState37, 2),
+    turnsPlayed = _useState38[0],
+    setTurnsPlayed = _useState38[1];
+  var _useState39 = useState([]),
+    _useState40 = _slicedToArray(_useState39, 2),
+    history = _useState40[0],
+    setHistory = _useState40[1]; // stack of {playerIndex, categoryId} for undo
+  var _useState41 = useState('auto'),
+    _useState42 = _slicedToArray(_useState41, 2),
+    mode = _useState42[0],
+    setMode = _useState42[1]; // 'auto' = app rolls, 'manual' = type in scores yourself
+  var _useState43 = useState(null),
+    _useState44 = _slicedToArray(_useState43, 2),
+    selectedCategory = _useState44[0],
+    setSelectedCategory = _useState44[1];
+  var _useState45 = useState(''),
+    _useState46 = _slicedToArray(_useState45, 2),
+    inputBuffer = _useState46[0],
+    setInputBuffer = _useState46[1];
+  var _useState47 = useState(null),
+    _useState48 = _slicedToArray(_useState47, 2),
+    inputError = _useState48[0],
+    setInputError = _useState48[1];
+  var _useState49 = useState(false),
+    _useState50 = _slicedToArray(_useState49, 2),
+    showRules = _useState50[0],
+    setShowRules = _useState50[1];
+  var _useState51 = useState(false),
+    _useState52 = _slicedToArray(_useState51, 2),
+    confirmReset = _useState52[0],
+    setConfirmReset = _useState52[1];
+  var _useState53 = useState(true),
+    _useState54 = _slicedToArray(_useState53, 2),
+    loading = _useState54[0],
+    setLoading = _useState54[1];
+  var _useState55 = useState(true),
+    _useState56 = _slicedToArray(_useState55, 2),
+    soundEnabled = _useState56[0],
+    setSoundEnabled = _useState56[1];
+  var _useState57 = useState(null),
+    _useState58 = _slicedToArray(_useState57, 2),
+    celebration = _useState58[0],
+    setCelebration = _useState58[1]; // null | 'yatzy' | 'bonus'
+  var _useState59 = useState(null),
+    _useState60 = _slicedToArray(_useState59, 2),
+    editingPlayer = _useState60[0],
+    setEditingPlayer = _useState60[1]; // player index being renamed, or null
+  var _useState61 = useState(''),
+    _useState62 = _slicedToArray(_useState61, 2),
+    editNameValue = _useState62[0],
+    setEditNameValue = _useState62[1];
 
   // Cross-session stats (per player name): games, wins, totalScore, bestScore, yatzys
-  const [stats, setStats] = useState({});
-  const [statsLoaded, setStatsLoaded] = useState(false);
-  const [statsRecorded, setStatsRecorded] = useState(false); // has this finished game been added to stats?
-  const [statsSnapshot, setStatsSnapshot] = useState(null); // pre-update stats, for undo
-  const [showStats, setShowStats] = useState(false);
-  const intervalRef = useRef(null);
-  const saveTimeoutRef = useRef(null);
-  const celebrationTimeoutRef = useRef(null);
-  const rollSoundIndexRef = useRef(0);
-  const aiTimeoutRef = useRef(null);
-  useEffect(() => () => intervalRef.current && clearInterval(intervalRef.current), []);
-  useEffect(() => () => celebrationTimeoutRef.current && clearTimeout(celebrationTimeoutRef.current), []);
-  useEffect(() => () => aiTimeoutRef.current && clearTimeout(aiTimeoutRef.current), []);
+  var _useState63 = useState({}),
+    _useState64 = _slicedToArray(_useState63, 2),
+    stats = _useState64[0],
+    setStats = _useState64[1];
+  var _useState65 = useState(false),
+    _useState66 = _slicedToArray(_useState65, 2),
+    statsLoaded = _useState66[0],
+    setStatsLoaded = _useState66[1];
+  var _useState67 = useState(false),
+    _useState68 = _slicedToArray(_useState67, 2),
+    statsRecorded = _useState68[0],
+    setStatsRecorded = _useState68[1]; // has this finished game been added to stats?
+  var _useState69 = useState(null),
+    _useState70 = _slicedToArray(_useState69, 2),
+    statsSnapshot = _useState70[0],
+    setStatsSnapshot = _useState70[1]; // pre-update stats, for undo
+  var _useState71 = useState(false),
+    _useState72 = _slicedToArray(_useState71, 2),
+    showStats = _useState72[0],
+    setShowStats = _useState72[1];
+
+  // Track what the AI just did so we can show its dice + highlight its scored category
+  var _useState73 = useState(null),
+    _useState74 = _slicedToArray(_useState73, 2),
+    lastAiAction = _useState74[0],
+    setLastAiAction = _useState74[1]; // { dice, categoryId, playerIndex } | null
+
+  var intervalRef = useRef(null);
+  var saveTimeoutRef = useRef(null);
+  var celebrationTimeoutRef = useRef(null);
+  var rollSoundIndexRef = useRef(0);
+  var initialRollRef = useRef(false); // true on the very first roll of a turn (for naturalBonus)
+  var aiTimeoutRef = useRef(null);
+  var houseRulesRef = useRef(houseRules);
+  useEffect(function () {
+    houseRulesRef.current = houseRules;
+  }, [houseRules]);
+  useEffect(function () {
+    return function () {
+      return intervalRef.current && clearInterval(intervalRef.current);
+    };
+  }, []);
+  useEffect(function () {
+    return function () {
+      return celebrationTimeoutRef.current && clearTimeout(celebrationTimeoutRef.current);
+    };
+  }, []);
+  useEffect(function () {
+    return function () {
+      return aiTimeoutRef.current && clearTimeout(aiTimeoutRef.current);
+    };
+  }, []);
 
   // Plays a sound + haptic pattern together, respecting the sound toggle
   function feedback(soundFn, pattern) {
@@ -1159,124 +2226,214 @@ function YatzyApp() {
   }
 
   // Restore a saved game (if any) on first load
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        if (typeof window !== 'undefined') {
-          const _raw = localStorage.getItem(STORAGE_KEY);
-          const saved = _raw ? JSON.parse(_raw) : null;
-          if (saved && !cancelled) {
-            if (Array.isArray(saved.names)) setNames(saved.names);
-            if (typeof saved.numPlayers === 'number') setNumPlayers(saved.numPlayers);
-            if (Array.isArray(saved.aiFlags)) setAiFlags(saved.aiFlags);
-            if (Array.isArray(saved.aiDifficulties)) setAiDifficulties(saved.aiDifficulties);
-            if (saved.mode === 'auto' || saved.mode === 'manual') setMode(saved.mode);
-            if (typeof saved.soundEnabled === 'boolean') setSoundEnabled(saved.soundEnabled);
-            if (typeof saved.statsRecorded === 'boolean') setStatsRecorded(saved.statsRecorded);
-            if (saved.statsSnapshot && typeof saved.statsSnapshot === 'object') setStatsSnapshot(saved.statsSnapshot);
-            if ((saved.phase === 'playing' || saved.phase === 'finished') && Array.isArray(saved.players) && saved.players.length > 0) {
-              setPlayers(saved.players);
-              setCurrentPlayer(saved.currentPlayer ?? 0);
-              setDice(Array.isArray(saved.dice) ? saved.dice : [1, 2, 3, 4, 5]);
-              const restoredHeld = Array.isArray(saved.held) ? saved.held.map(Boolean) : [false, false, false, false, false];
-              setHeld(restoredHeld);
-              setRollsLeft(saved.rollsLeft ?? 3);
-              setTurnsPlayed(saved.turnsPlayed ?? 0);
-              setHistory(Array.isArray(saved.history) ? saved.history : []);
-              setPhase(saved.phase);
+  useEffect(function () {
+    var cancelled = false;
+    _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
+      var result, saved, _saved$currentPlayer, _saved$rollsLeft, _saved$turnsPlayed, restoredHeld, _t;
+      return _regenerator().w(function (_context) {
+        while (1) switch (_context.p = _context.n) {
+          case 0:
+            _context.p = 0;
+            if (!(typeof window !== 'undefined' && window.storage)) {
+              _context.n = 2;
+              break;
             }
-          }
+            _context.n = 1;
+            return window.storage.get(STORAGE_KEY);
+          case 1:
+            result = _context.v;
+            saved = result && result.value ? JSON.parse(result.value) : null;
+            if (saved && !cancelled) {
+              if (Array.isArray(saved.names)) setNames(saved.names);
+              if (typeof saved.numPlayers === 'number') setNumPlayers(saved.numPlayers);
+              if (Array.isArray(saved.aiFlags)) setAiFlags(saved.aiFlags);
+              if (Array.isArray(saved.aiDifficulties)) setAiDifficulties(saved.aiDifficulties);
+              if (Array.isArray(saved.avatars)) setAvatars(saved.avatars);
+              if (saved.houseRules && _typeof(saved.houseRules) === 'object') setHouseRules(_objectSpread(_objectSpread({}, DEFAULT_HOUSE_RULES), saved.houseRules));
+              if (saved.tournament) setTournament(saved.tournament);
+              if (typeof saved.tournamentMode === 'boolean') setTournamentMode(saved.tournamentMode);
+              if (typeof saved.tournamentRounds === 'number') setTournamentRounds(saved.tournamentRounds);
+              if (saved.mode === 'auto' || saved.mode === 'manual') setMode(saved.mode);
+              if (typeof saved.soundEnabled === 'boolean') setSoundEnabled(saved.soundEnabled);
+              if (typeof saved.statsRecorded === 'boolean') setStatsRecorded(saved.statsRecorded);
+              if (saved.statsSnapshot && _typeof(saved.statsSnapshot) === 'object') setStatsSnapshot(saved.statsSnapshot);
+              if ((saved.phase === 'playing' || saved.phase === 'finished') && Array.isArray(saved.players) && saved.players.length > 0) {
+                setPlayers(saved.players);
+                setCurrentPlayer((_saved$currentPlayer = saved.currentPlayer) !== null && _saved$currentPlayer !== void 0 ? _saved$currentPlayer : 0);
+                setDice(Array.isArray(saved.dice) ? saved.dice : [1, 2, 3, 4, 5]);
+                restoredHeld = Array.isArray(saved.held) ? saved.held.map(Boolean) : [false, false, false, false, false];
+                setHeld(restoredHeld);
+                setRollsLeft((_saved$rollsLeft = saved.rollsLeft) !== null && _saved$rollsLeft !== void 0 ? _saved$rollsLeft : 3);
+                setTurnsPlayed((_saved$turnsPlayed = saved.turnsPlayed) !== null && _saved$turnsPlayed !== void 0 ? _saved$turnsPlayed : 0);
+                setHistory(Array.isArray(saved.history) ? saved.history : []);
+                setPhase(saved.phase);
+              }
+            }
+          case 2:
+            _context.n = 4;
+            break;
+          case 3:
+            _context.p = 3;
+            _t = _context.v;
+          case 4:
+            _context.p = 4;
+            if (!cancelled) setLoading(false);
+            return _context.f(4);
+          case 5:
+            return _context.a(2);
         }
-      } catch {
-        // No saved game, or storage unavailable — start fresh
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
+      }, _callee, null, [[0, 3, 4, 5]]);
+    }))();
+    return function () {
       cancelled = true;
     };
   }, []);
 
   // Load cross-session stats (per player name)
-  useEffect(() => {
-    (async () => {
-      try {
-        if (typeof window !== 'undefined') {
-          const _rawStats = localStorage.getItem(STATS_KEY);
-          const savedStats = _rawStats ? JSON.parse(_rawStats) : null;
-          if (savedStats && typeof savedStats === 'object') setStats(savedStats);
+  useEffect(function () {
+    _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+      var result, savedStats, _t2;
+      return _regenerator().w(function (_context2) {
+        while (1) switch (_context2.p = _context2.n) {
+          case 0:
+            _context2.p = 0;
+            if (!(typeof window !== 'undefined' && window.storage)) {
+              _context2.n = 2;
+              break;
+            }
+            _context2.n = 1;
+            return window.storage.get(STATS_KEY);
+          case 1:
+            result = _context2.v;
+            savedStats = result && result.value ? JSON.parse(result.value) : null;
+            if (savedStats && _typeof(savedStats) === 'object') setStats(savedStats);
+          case 2:
+            _context2.n = 4;
+            break;
+          case 3:
+            _context2.p = 3;
+            _t2 = _context2.v;
+          case 4:
+            _context2.p = 4;
+            setStatsLoaded(true);
+            return _context2.f(4);
+          case 5:
+            return _context2.a(2);
         }
-      } catch {
-        // No stats yet
-      } finally {
-        setStatsLoaded(true);
-      }
-    })();
+      }, _callee2, null, [[0, 3, 4, 5]]);
+    }))();
+  }, []);
+
+  // Load leaderboard
+  useEffect(function () {
+    _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
+      var result, saved, _t3;
+      return _regenerator().w(function (_context3) {
+        while (1) switch (_context3.p = _context3.n) {
+          case 0:
+            _context3.p = 0;
+            if (!(typeof window !== 'undefined' && window.storage)) {
+              _context3.n = 2;
+              break;
+            }
+            _context3.n = 1;
+            return window.storage.get(LEADERBOARD_KEY);
+          case 1:
+            result = _context3.v;
+            saved = result && result.value ? JSON.parse(result.value) : null;
+            if (saved && _typeof(saved) === 'object') setLeaderboard(saved);
+          case 2:
+            _context3.n = 4;
+            break;
+          case 3:
+            _context3.p = 3;
+            _t3 = _context3.v;
+          case 4:
+            _context3.p = 4;
+            setLeaderboardLoaded(true);
+            return _context3.f(4);
+          case 5:
+            return _context3.a(2);
+        }
+      }, _callee3, null, [[0, 3, 4, 5]]);
+    }))();
   }, []);
 
   // Auto-save the game so it can be resumed later (debounced to avoid spamming storage)
-  useEffect(() => {
+  useEffect(function () {
     if (loading) return;
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !window.storage) return;
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(() => {
-      const state = {
-        phase,
-        numPlayers,
-        names,
-        aiFlags,
-        aiDifficulties,
-        players,
-        currentPlayer,
-        dice,
-        held,
-        rollsLeft,
-        turnsPlayed,
-        history,
-        mode,
-        soundEnabled,
-        statsRecorded,
-        statsSnapshot
+    saveTimeoutRef.current = setTimeout(function () {
+      var state = {
+        phase: phase,
+        numPlayers: numPlayers,
+        names: names,
+        aiFlags: aiFlags,
+        aiDifficulties: aiDifficulties,
+        avatars: avatars,
+        houseRules: houseRules,
+        tournament: tournament,
+        tournamentMode: tournamentMode,
+        tournamentRounds: tournamentRounds,
+        players: players,
+        currentPlayer: currentPlayer,
+        dice: dice,
+        held: held,
+        rollsLeft: rollsLeft,
+        turnsPlayed: turnsPlayed,
+        history: history,
+        mode: mode,
+        soundEnabled: soundEnabled,
+        statsRecorded: statsRecorded,
+        statsSnapshot: statsSnapshot
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      window.storage.set(STORAGE_KEY, JSON.stringify(state)).catch(function () {});
     }, 500);
-    return () => {
+    return function () {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [loading, phase, numPlayers, names, aiFlags, aiDifficulties, players, currentPlayer, dice, held, rollsLeft, turnsPlayed, history, mode, soundEnabled, statsRecorded, statsSnapshot]);
+  }, [loading, phase, numPlayers, names, aiFlags, aiDifficulties, avatars, houseRules, tournament, tournamentMode, tournamentRounds, players, currentPlayer, dice, held, rollsLeft, turnsPlayed, history, mode, soundEnabled, statsRecorded, statsSnapshot]);
   function persistStats(newStats) {
     setStats(newStats);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STATS_KEY, JSON.stringify(newStats));
+    if (typeof window !== 'undefined' && window.storage) {
+      window.storage.set(STATS_KEY, JSON.stringify(newStats)).catch(function () {});
+    }
+  }
+  function persistLeaderboard(lb) {
+    setLeaderboard(lb);
+    if (typeof window !== 'undefined' && window.storage) {
+      window.storage.set(LEADERBOARD_KEY, JSON.stringify(lb)).catch(function () {});
     }
   }
 
   // Record this game's results into cross-session stats, once
-  useEffect(() => {
+  // Skip entirely if any house rule is active — modified rules inflate scores.
+  useEffect(function () {
     if (loading || !statsLoaded || phase !== 'finished' || statsRecorded) return;
-    const totals = players.map(p => calcTotals(p.scores).total);
-    const maxTotal = Math.max(...totals);
-    const snapshot = {};
-    const newStats = {
-      ...stats
-    };
-    players.forEach((p, idx) => {
-      // Don't let an AI's result pollute a human's history if it shares their name
-      if (p.isAI && newStats[p.name] !== undefined) return;
-      snapshot[p.name] = newStats[p.name] ? {
-        ...newStats[p.name]
-      } : null;
-      const prev = newStats[p.name] || {
+    if (Object.values(houseRules).some(Boolean)) {
+      setStatsRecorded(true);
+      return;
+    }
+    var totals = players.map(function (p) {
+      return calcTotals(p.scores).total;
+    });
+    var maxTotal = Math.max.apply(Math, _toConsumableArray(totals));
+    var snapshot = {};
+    var newStats = _objectSpread({}, stats);
+    players.forEach(function (p, idx) {
+      // AI players never appear in statistics
+      if (p.isAI) return;
+      snapshot[p.name] = newStats[p.name] ? _objectSpread({}, newStats[p.name]) : null;
+      var prev = newStats[p.name] || {
         games: 0,
         wins: 0,
         totalScore: 0,
         bestScore: 0,
         yatzys: 0
       };
-      const isWinner = numPlayers > 1 && totals[idx] === maxTotal;
-      const yatzyCount = p.scores.yatzy === 50 ? 1 : 0;
+      var isWinner = numPlayers > 1 && totals[idx] === maxTotal;
+      var yatzyCount = p.scores.yatzy === 50 ? 1 : 0;
       newStats[p.name] = {
         games: prev.games + 1,
         wins: prev.wins + (isWinner ? 1 : 0),
@@ -1288,38 +2445,79 @@ function YatzyApp() {
     persistStats(newStats);
     setStatsSnapshot(snapshot);
     setStatsRecorded(true);
+
+    // Update leaderboard (all-time wins + best score, including AI for now)
+    var newLb = _objectSpread({}, leaderboard);
+    players.forEach(function (p, idx) {
+      if (p.isAI) return;
+      var isWinner = numPlayers > 1 && totals[idx] === maxTotal;
+      var prev = newLb[p.name] || {
+        wins: 0,
+        games: 0,
+        bestScore: 0,
+        totalScore: 0
+      };
+      newLb[p.name] = {
+        wins: prev.wins + (isWinner ? 1 : 0),
+        games: prev.games + 1,
+        bestScore: Math.max(prev.bestScore, totals[idx]),
+        totalScore: prev.totalScore + totals[idx]
+      };
+    });
+    persistLeaderboard(newLb);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, statsLoaded, phase, statsRecorded]);
   function startGame() {
-    const initPlayers = Array.from({
+    var initPlayers = Array.from({
       length: numPlayers
-    }, (_, i) => {
+    }, function (_, i) {
       if (aiFlags[i]) {
-        const diff = AI_DIFFICULTIES[aiDifficulties[i]] || AI_DIFFICULTIES.mellan;
-        const {
-          name
-        } = parseNameInput(names[i], `Dator ${i + 1}`);
+        var diff = AI_DIFFICULTIES[aiDifficulties[i]] || AI_DIFFICULTIES.mellan;
+        var _parseNameInput = parseNameInput(names[i], "Dator ".concat(i + 1)),
+          _name = _parseNameInput.name;
         return {
-          name,
+          name: _name,
           scores: {},
           isAI: true,
           difficulty: aiDifficulties[i],
           lucky: diff.lucky,
-          unlucky: diff.unlucky
+          unlucky: diff.unlucky,
+          colorIndex: i,
+          avatar: avatars[i] || AVATAR_OPTIONS[i]
         };
       }
-      const {
-        name,
-        lucky
-      } = parseNameInput(names[i], `Spelare ${i + 1}`);
+      var _parseNameInput2 = parseNameInput(names[i], "Spelare ".concat(i + 1)),
+        name = _parseNameInput2.name,
+        lucky = _parseNameInput2.lucky;
       return {
-        name,
+        name: name,
         scores: {},
         isAI: false,
-        lucky,
-        unlucky: false
+        lucky: lucky,
+        unlucky: false,
+        colorIndex: i,
+        avatar: avatars[i] || AVATAR_OPTIONS[i]
       };
     });
+    // Initialise tournament if mode is on
+    if (tournamentMode) {
+      setTournament({
+        rounds: tournamentRounds,
+        currentRound: 1,
+        standings: initPlayers.map(function (p) {
+          return {
+            name: p.name,
+            avatar: p.avatar,
+            colorIndex: p.colorIndex,
+            wins: 0,
+            totalScore: 0,
+            gamesPlayed: 0
+          };
+        })
+      });
+    } else {
+      setTournament(null);
+    }
     setPlayers(initPlayers);
     setCurrentPlayer(0);
     setDice([1, 2, 3, 4, 5]);
@@ -1332,6 +2530,79 @@ function YatzyApp() {
     if (aiFlags.slice(0, numPlayers).some(Boolean)) setMode('auto');
     setPhase('playing');
   }
+
+  // Start next tournament round — carry over players but clear scores
+  function nextTournamentRound() {
+    var totals = players.map(function (p) {
+      return calcTotals(p.scores).total;
+    });
+    var maxTotal = Math.max.apply(Math, _toConsumableArray(totals));
+    // Count winners (ties split the win)
+    var winnerCount = totals.filter(function (t) {
+      return t === maxTotal;
+    }).length;
+    var newStandings = tournament.standings.map(function (s, idx) {
+      var _totals$idx;
+      var roundTotal = (_totals$idx = totals[idx]) !== null && _totals$idx !== void 0 ? _totals$idx : 0;
+      var isWinner = roundTotal === maxTotal;
+      return _objectSpread(_objectSpread({}, s), {}, {
+        wins: s.wins + (isWinner ? 1 / winnerCount : 0),
+        totalScore: s.totalScore + roundTotal,
+        gamesPlayed: s.gamesPlayed + 1
+      });
+    });
+    var newTournament = _objectSpread(_objectSpread({}, tournament), {}, {
+      currentRound: tournament.currentRound + 1,
+      standings: newStandings
+    });
+    setTournament(newTournament);
+    // Reset game state for next round
+    setPlayers(function (prev) {
+      return prev.map(function (p) {
+        return _objectSpread(_objectSpread({}, p), {}, {
+          scores: {}
+        });
+      });
+    });
+    setCurrentPlayer(0);
+    setDice([1, 2, 3, 4, 5]);
+    setHeld([false, false, false, false, false]);
+    setRollsLeft(3);
+    setTurnsPlayed(0);
+    setHistory([]);
+    setStatsRecorded(false);
+    setStatsSnapshot(null);
+    setPhase('playing');
+  }
+
+  // End tournament — update standings for final round then show champion screen
+  function endTournament() {
+    var totals = players.map(function (p) {
+      return calcTotals(p.scores).total;
+    });
+    var maxTotal = Math.max.apply(Math, _toConsumableArray(totals));
+    var winnerCount = totals.filter(function (t) {
+      return t === maxTotal;
+    }).length;
+    var finalStandings = tournament.standings.map(function (s, idx) {
+      var _totals$idx2;
+      return _objectSpread(_objectSpread({}, s), {}, {
+        wins: s.wins + (totals[idx] === maxTotal ? 1 / winnerCount : 0),
+        totalScore: s.totalScore + ((_totals$idx2 = totals[idx]) !== null && _totals$idx2 !== void 0 ? _totals$idx2 : 0),
+        gamesPlayed: s.gamesPlayed + 1
+      });
+    });
+    setTournament(_objectSpread(_objectSpread({}, tournament), {}, {
+      currentRound: tournament.rounds,
+      standings: finalStandings
+    }));
+    setPhase('tournament-standings');
+  }
+  function abortTournament() {
+    setTournament(null);
+    setTournamentMode(false);
+    resetGame();
+  }
   function resetGame() {
     setPhase('setup');
     setPlayers([]);
@@ -1339,109 +2610,163 @@ function YatzyApp() {
     setStatsRecorded(false);
     setStatsSnapshot(null);
     setConfirmReset(false);
+    setTournament(null);
+    setTournamentMode(false);
   }
   function rollDice(forcedHeld) {
+    var _players$currentPlaye;
     if (rolling || rollsLeft === 0) return;
-    const player = players[currentPlayer];
-    const lucky = !!player?.lucky;
-    const unlucky = !!player?.unlucky;
+    // When a human rolls, clear the AI's last-action display
+    if (!((_players$currentPlaye = players[currentPlayer]) !== null && _players$currentPlaye !== void 0 && _players$currentPlaye.isAI)) setLastAiAction(null);
+    var isFirstRoll = rollsLeft === 3;
+    if (isFirstRoll) initialRollRef.current = true;
+    var player = players[currentPlayer];
+    var lucky = !!(player !== null && player !== void 0 && player.lucky);
+    var unlucky = !!(player !== null && player !== void 0 && player.unlucky);
     // Snapshot the effective held state right now so the interval closure never goes stale
-    const safeForced = Array.isArray(forcedHeld) && forcedHeld.length === 5 ? forcedHeld.map(Boolean) : null;
-    const heldSnapshot = safeForced || held.map(Boolean);
+    var safeForced = Array.isArray(forcedHeld) && forcedHeld.length === 5 ? forcedHeld.map(Boolean) : null;
+    var heldSnapshot = safeForced || held.map(Boolean);
     if (safeForced) setHeld(safeForced);
-    const variant = rollSoundIndexRef.current;
+    var variant = rollSoundIndexRef.current;
     rollSoundIndexRef.current = (rollSoundIndexRef.current + 1) % ROLL_SOUND_VARIANTS;
-    feedback(() => playRollSound(variant), [10, 40, 10, 40, 10, 40, 30]);
+    feedback(function () {
+      return playRollSound(variant);
+    }, [10, 40, 10, 40, 10, 40, 30]);
     setRolling(true);
-    let ticks = 0;
-    intervalRef.current = setInterval(() => {
+    var ticks = 0;
+    intervalRef.current = setInterval(function () {
       ticks++;
-      setDice(prev => prev.map((d, i) => heldSnapshot[i] ? d : rollDie(lucky, unlucky)));
+      setDice(function (prev) {
+        return prev.map(function (d, i) {
+          return heldSnapshot[i] ? d : rollDie(lucky, unlucky);
+        });
+      });
       if (ticks >= 8) {
         clearInterval(intervalRef.current);
         setRolling(false);
-        setRollsLeft(r => r - 1);
+        setRollsLeft(function (r) {
+          return r - 1;
+        });
       }
     }, 70);
   }
   function toggleHold(i) {
     if (rolling || rollsLeft === 3 || rollsLeft === 0) return;
     feedback(playHoldSound, 8);
-    setHeld(h => {
-      if (!Array.isArray(h)) return [false, false, false, false, false].map((v, idx) => idx === i);
-      return h.map((v, idx) => idx === i ? !v : v);
+    setHeld(function (h) {
+      if (!Array.isArray(h)) return [false, false, false, false, false].map(function (v, idx) {
+        return idx === i;
+      });
+      return h.map(function (v, idx) {
+        return idx === i ? !v : v;
+      });
     });
   }
 
   // Shared logic: record a score for the current player and advance to the next turn
   function recordScore(catId, score) {
-    const cat = CATEGORIES.find(c => c.id === catId);
-    const prevUpperSum = calcTotals(players[currentPlayer].scores).upperSum;
-    const updated = players.map((p, idx) => idx === currentPlayer ? {
-      ...p,
-      scores: {
-        ...p.scores,
-        [catId]: score
-      }
-    } : p);
-    const newUpperSum = calcTotals(updated[currentPlayer].scores).upperSum;
+    var _players$currentPlaye2;
+    var bonusYatzyFired = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    var cat = CATEGORIES.find(function (c) {
+      return c.id === catId;
+    });
+    var prevUpperSum = calcTotals(players[currentPlayer].scores).upperSum;
+    var isAITurn = !!((_players$currentPlaye2 = players[currentPlayer]) !== null && _players$currentPlaye2 !== void 0 && _players$currentPlaye2.isAI);
+    var updated = players.map(function (p, idx) {
+      return idx === currentPlayer ? _objectSpread(_objectSpread({}, p), {}, {
+        scores: _objectSpread(_objectSpread({}, p.scores), {}, _defineProperty({}, catId, score))
+      }) : p;
+    });
+    var newUpperSum = calcTotals(updated[currentPlayer].scores).upperSum;
     setPlayers(updated);
-    setHistory(h => [...h, {
-      playerIndex: currentPlayer,
-      categoryId: catId,
-      prevDice: [...dice],
-      prevHeld: [...held],
-      prevRollsLeft: rollsLeft
-    }]);
+    // Remember what the AI just scored so we can show its dice + highlight its category
+    if (isAITurn) {
+      setLastAiAction({
+        dice: _toConsumableArray(dice),
+        categoryId: catId,
+        playerIndex: currentPlayer
+      });
+    } else {
+      setLastAiAction(null);
+    }
+    setHistory(function (h) {
+      return [].concat(_toConsumableArray(h), [{
+        playerIndex: currentPlayer,
+        categoryId: catId,
+        prevDice: _toConsumableArray(dice),
+        prevHeld: _toConsumableArray(held),
+        prevRollsLeft: rollsLeft
+      }]);
+    });
     setSelectedCategory(null);
     setInputBuffer('');
     setInputError(null);
-    const justGotBonus = cat.section === 'upper' && prevUpperSum < 63 && newUpperSum >= 63;
-    if (catId === 'yatzy' && score === 50) {
+    var justGotBonus = cat.section === 'upper' && prevUpperSum < 63 && newUpperSum >= 63;
+    if (catId === 'yatzy' && (score === 50 || score === 100)) {
       feedback(playYatzySound, [60, 50, 60, 50, 60, 50, 120]);
-      setCelebration('yatzy');
+      setCelebration(score === 100 ? 'naturalyatzy' : 'yatzy');
       if (celebrationTimeoutRef.current) clearTimeout(celebrationTimeoutRef.current);
-      celebrationTimeoutRef.current = setTimeout(() => setCelebration(null), 2200);
+      celebrationTimeoutRef.current = setTimeout(function () {
+        return setCelebration(null);
+      }, 2200);
+    } else if (bonusYatzyFired) {
+      feedback(playBonusSound, [30, 30, 60, 30, 30, 60, 80]);
+      setCelebration('bonusyatzy');
+      if (celebrationTimeoutRef.current) clearTimeout(celebrationTimeoutRef.current);
+      celebrationTimeoutRef.current = setTimeout(function () {
+        return setCelebration(null);
+      }, 1600);
     } else if (justGotBonus) {
       feedback(playBonusSound, [40, 40, 40, 40, 90]);
       setCelebration('bonus');
       if (celebrationTimeoutRef.current) clearTimeout(celebrationTimeoutRef.current);
-      celebrationTimeoutRef.current = setTimeout(() => setCelebration(null), 1800);
+      celebrationTimeoutRef.current = setTimeout(function () {
+        return setCelebration(null);
+      }, 1800);
     } else if (score === 0) {
       feedback(playStrokeSound, 20);
     } else {
       feedback(playConfirmSound, 18);
     }
-    const nextTurn = turnsPlayed + 1;
+    var nextTurn = turnsPlayed + 1;
     setTurnsPlayed(nextTurn);
     if (nextTurn === numPlayers * 15) {
-      setPhase('finished');
+      if (tournament) {
+        // Let the stats effect fire (it won't save if houseRules active), then go to standings
+        setPhase('finished'); // will redirect below
+      } else {
+        setPhase('finished');
+      }
       return;
     }
     setCurrentPlayer((currentPlayer + 1) % numPlayers);
     setDice([1, 2, 3, 4, 5]);
     setHeld([false, false, false, false, false]);
     setRollsLeft(3);
+    initialRollRef.current = false;
   }
 
   // Undo the most recent score, one entry at a time. Restores the dice/holds/rolls
   // exactly as they were before that score was picked, so it can be reassigned.
   function undo() {
     if (history.length === 0) return;
-    const last = history[history.length - 1];
-    setHistory(h => h.slice(0, -1));
-    setPlayers(prev => prev.map((p, idx) => {
-      if (idx !== last.playerIndex) return p;
-      const newScores = {
-        ...p.scores
-      };
-      delete newScores[last.categoryId];
-      return {
-        ...p,
-        scores: newScores
-      };
-    }));
-    setTurnsPlayed(t => t - 1);
+    var last = history[history.length - 1];
+    setHistory(function (h) {
+      return h.slice(0, -1);
+    });
+    setPlayers(function (prev) {
+      return prev.map(function (p, idx) {
+        if (idx !== last.playerIndex) return p;
+        var newScores = _objectSpread({}, p.scores);
+        delete newScores[last.categoryId];
+        return _objectSpread(_objectSpread({}, p), {}, {
+          scores: newScores
+        });
+      });
+    });
+    setTurnsPlayed(function (t) {
+      return t - 1;
+    });
     setCurrentPlayer(last.playerIndex);
     setDice(Array.isArray(last.prevDice) ? last.prevDice : [1, 2, 3, 4, 5]);
     setHeld(Array.isArray(last.prevHeld) ? last.prevHeld.map(Boolean) : [false, false, false, false, false]);
@@ -1452,10 +2777,11 @@ function YatzyApp() {
     if (phase === 'finished') {
       setPhase('playing');
       if (statsRecorded && statsSnapshot) {
-        const restored = {
-          ...stats
-        };
-        Object.entries(statsSnapshot).forEach(([name, prevValue]) => {
+        var restored = _objectSpread({}, stats);
+        Object.entries(statsSnapshot).forEach(function (_ref20) {
+          var _ref21 = _slicedToArray(_ref20, 2),
+            name = _ref21[0],
+            prevValue = _ref21[1];
           if (prevValue === null) delete restored[name];else restored[name] = prevValue;
         });
         persistStats(restored);
@@ -1465,36 +2791,109 @@ function YatzyApp() {
     }
     if (celebrationTimeoutRef.current) clearTimeout(celebrationTimeoutRef.current);
     setCelebration(null);
+    setLastAiAction(null);
   }
 
   // Auto mode: score is derived from the app-rolled dice
   function selectCategory(catId) {
     if (rolling || rollsLeft === 3) return;
-    const current = players[currentPlayer];
-    if (current.scores[catId] !== undefined) return;
-    const cat = CATEGORIES.find(c => c.id === catId);
-    recordScore(catId, cat.calc(dice));
+    var current = players[currentPlayer];
+    var hr = houseRulesRef.current;
+
+    // Forced order: only the next unfilled category is allowed
+    if (hr.forcedOrder) {
+      var required = forcedOrderCat(current.scores);
+      if (catId !== required) return;
+    }
+
+    // Strict upper: lower section locked until all upper cats are filled
+    if (hr.strictUpper) {
+      var cat = CATEGORIES.find(function (c) {
+        return c.id === catId;
+      });
+      if ((cat === null || cat === void 0 ? void 0 : cat.section) === 'lower') {
+        var upperDone = CATEGORIES.filter(function (c) {
+          return c.section === 'upper';
+        }).every(function (c) {
+          return current.scores[c.id] !== undefined;
+        });
+        if (!upperDone) return;
+      }
+    }
+    if (current.scores[catId] !== undefined) {
+      // Joker: if slot is filled but joker applies, we can still use it
+      if (!isJokerEligible(catId, dice, current.scores, hr)) return;
+    }
+
+    // Calculate score with house rules
+    var score = calcScore(catId, dice, hr, current.scores);
+
+    // Joker: if natural score is 0 but joker applies, treat as non-zero pair/whatever
+    // The scored value is just the natural calcScore result (already handled above)
+
+    // Natural bonus: Yatzy on first roll scores 100
+    if (catId === 'yatzy' && score === 50 && hr.naturalBonus && initialRollRef.current && rollsLeft === 2) {
+      score = 100;
+    }
+
+    // Bonus Yatzy: already scored a Yatzy (50 or 100), rolling another — add 50
+    var bonusYatzyFired = false;
+    if (catId !== 'yatzy' && counts(dice).includes(5) && hr.bonusYatzy && current.scores['yatzy'] !== undefined && current.scores['yatzy'] > 0) {
+      score = Math.max(score, 0) + 50;
+      bonusYatzyFired = true;
+    }
+    initialRollRef.current = false;
+    recordScore(catId, score, bonusYatzyFired);
   }
 
   // AI turn: roll, hold/re-roll twice more, then lock in a category — paced with
   // short "thinking" pauses so it plays out like a human turn.
-  useEffect(() => {
+  useEffect(function () {
+    var _AI_DIFFICULTIES$play, _AI_DIFFICULTIES$play2;
     if (loading || phase !== 'playing' || mode !== 'auto') return;
     if (rolling || celebration) return;
     if (showRules || confirmReset || editingPlayer !== null || showStats) return;
-    const player = players[currentPlayer];
-    if (!player?.isAI) return;
-    const errorRate = AI_DIFFICULTIES[player.difficulty]?.errorRate ?? 0;
-    aiTimeoutRef.current = setTimeout(() => {
+    var player = players[currentPlayer];
+    if (!(player !== null && player !== void 0 && player.isAI)) return;
+    var errorRate = (_AI_DIFFICULTIES$play = (_AI_DIFFICULTIES$play2 = AI_DIFFICULTIES[player.difficulty]) === null || _AI_DIFFICULTIES$play2 === void 0 ? void 0 : _AI_DIFFICULTIES$play2.errorRate) !== null && _AI_DIFFICULTIES$play !== void 0 ? _AI_DIFFICULTIES$play : 0;
+    aiTimeoutRef.current = setTimeout(function () {
       if (rollsLeft === 3) {
         rollDice();
       } else if (rollsLeft > 0) {
-        rollDice(aiChooseHolds(dice, errorRate));
+        rollDice(aiChooseHolds(dice, player.scores, errorRate, rollsLeft));
       } else {
-        selectCategory(aiChooseCategory(player.scores, dice, errorRate));
+        {
+          var hr = houseRulesRef.current;
+          var catId = aiChooseCategory(player.scores, dice, errorRate);
+          // If forced order is on, override the AI's choice
+          if (hr.forcedOrder) {
+            catId = forcedOrderCat(player.scores) || catId;
+          }
+          // If strict upper is on, only allow upper cats until all are done
+          if (hr.strictUpper) {
+            var upperDone = CATEGORIES.filter(function (c) {
+              return c.section === 'upper';
+            }).every(function (c) {
+              return player.scores[c.id] !== undefined;
+            });
+            if (!upperDone) {
+              var upperCat = aiChooseCategory(player.scores, dice, errorRate);
+              var cat = CATEGORIES.find(function (c) {
+                return c.id === upperCat;
+              });
+              if ((cat === null || cat === void 0 ? void 0 : cat.section) === 'lower') {
+                var _CATEGORIES$find;
+                catId = ((_CATEGORIES$find = CATEGORIES.find(function (c) {
+                  return c.section === 'upper' && player.scores[c.id] === undefined;
+                })) === null || _CATEGORIES$find === void 0 ? void 0 : _CATEGORIES$find.id) || upperCat;
+              }
+            }
+          }
+          selectCategory(catId);
+        }
       }
     }, 700);
-    return () => {
+    return function () {
       if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1502,28 +2901,37 @@ function YatzyApp() {
 
   // Manual mode: pick which category to enter a score for
   function onSelectCell(catId) {
-    setSelectedCategory(prev => prev === catId ? null : catId);
+    setSelectedCategory(function (prev) {
+      return prev === catId ? null : catId;
+    });
     setInputBuffer('');
     setInputError(null);
   }
   function pressDigit(n) {
     if (!selectedCategory) return;
     setInputError(null);
-    setInputBuffer(b => b.length >= 2 ? b : b + String(n));
+    setInputBuffer(function (b) {
+      return b.length >= 2 ? b : b + String(n);
+    });
   }
   function backspace() {
     setInputError(null);
-    setInputBuffer(b => b.slice(0, -1));
+    setInputBuffer(function (b) {
+      return b.slice(0, -1);
+    });
   }
 
   // Manual mode: confirm the typed number, or the suggested default if nothing was typed
   function confirmScore() {
     if (!selectedCategory) return;
-    const score = inputBuffer !== '' ? parseInt(inputBuffer, 10) : getDefaultScore(selectedCategory);
+    var score = inputBuffer !== '' ? parseInt(inputBuffer, 10) : getDefaultScore(selectedCategory);
     if (score === null) return;
     if (!isValidScore(selectedCategory, score)) {
-      const label = CATEGORIES.find(c => c.id === selectedCategory)?.label;
-      setInputError(`${score} p går inte att få på ${label}. Kontrollera värdet eller tryck ✕ för att stryka.`);
+      var _CATEGORIES$find2;
+      var label = (_CATEGORIES$find2 = CATEGORIES.find(function (c) {
+        return c.id === selectedCategory;
+      })) === null || _CATEGORIES$find2 === void 0 ? void 0 : _CATEGORIES$find2.label;
+      setInputError("".concat(score, " p g\xE5r inte att f\xE5 p\xE5 ").concat(label, ". Kontrollera v\xE4rdet eller tryck \u2715 f\xF6r att stryka."));
       return;
     }
     recordScore(selectedCategory, score);
@@ -1549,21 +2957,23 @@ function YatzyApp() {
   // In-game name editing. Pre-fills with a trailing space if the "lucky" flag is
   // already on, so saving without changes doesn't silently flip it off.
   function openEditName(idx) {
-    const p = players[idx];
+    var p = players[idx];
     setEditingPlayer(idx);
-    setEditNameValue(p.lucky ? `${p.name} ` : p.name);
+    setEditNameValue(p.lucky ? "".concat(p.name, " ") : p.name);
   }
   function saveEditName() {
     if (editingPlayer === null) return;
-    const {
-      name,
-      lucky
-    } = parseNameInput(editNameValue, players[editingPlayer].name);
-    setPlayers(prev => prev.map((p, idx) => idx === editingPlayer ? {
-      ...p,
-      name,
-      lucky
-    } : p));
+    var _parseNameInput3 = parseNameInput(editNameValue, players[editingPlayer].name),
+      name = _parseNameInput3.name,
+      lucky = _parseNameInput3.lucky;
+    setPlayers(function (prev) {
+      return prev.map(function (p, idx) {
+        return idx === editingPlayer ? _objectSpread(_objectSpread({}, p), {}, {
+          name: name,
+          lucky: lucky
+        }) : p;
+      });
+    });
     setEditingPlayer(null);
     setEditNameValue('');
   }
@@ -1580,6 +2990,8 @@ function YatzyApp() {
       setNumPlayers: setNumPlayers,
       names: names,
       setNames: setNames,
+      avatars: avatars,
+      setAvatars: setAvatars,
       aiFlags: aiFlags,
       setAiFlags: setAiFlags,
       aiDifficulties: aiDifficulties,
@@ -1588,53 +3000,118 @@ function YatzyApp() {
       stats: stats,
       showStats: showStats,
       setShowStats: setShowStats,
-      onClearStats: () => persistStats({})
+      onClearStats: function onClearStats() {
+        return persistStats({});
+      },
+      leaderboard: leaderboard,
+      showLeaderboard: showLeaderboard,
+      setShowLeaderboard: setShowLeaderboard,
+      onClearLeaderboard: function onClearLeaderboard() {
+        return persistLeaderboard({});
+      },
+      rules: houseRules,
+      onRulesChange: setHouseRules,
+      tournamentMode: tournamentMode,
+      setTournamentMode: setTournamentMode,
+      tournamentRounds: tournamentRounds,
+      setTournamentRounds: setTournamentRounds
     });
   }
   if (phase === 'finished') {
+    // If tournament is active and this was the final round, go straight to standings
+    if (tournament && statsRecorded && tournament.currentRound >= tournament.rounds) {
+      // Trigger endTournament once (statsRecorded means the score effect has fired)
+      // We use a different approach: just show FinishedScreen with tournament next-round button
+    }
     return /*#__PURE__*/React.createElement(FinishedScreen, {
       players: players,
       onRestart: resetGame,
       onUndo: undo,
       canUndo: history.length > 0,
-      stats: stats
+      stats: stats,
+      leaderboard: leaderboard,
+      onClearLeaderboard: function onClearLeaderboard() {
+        return persistLeaderboard({});
+      },
+      tournament: tournament,
+      onNextRound: tournament && tournament.currentRound < tournament.rounds ? nextTournamentRound : endTournament,
+      onEndTournament: endTournament
     });
   }
-  const gridCols = `116px repeat(${numPlayers}, minmax(56px, 1fr))`;
-  const round = Math.floor(turnsPlayed / numPlayers) + 1;
-  const diceDisabled = rolling || rollsLeft === 3 || rollsLeft === 0;
-  const selDefault = selectedCategory ? getDefaultScore(selectedCategory) : null;
-  const selLabel = selectedCategory ? CATEGORIES.find(c => c.id === selectedCategory)?.label : null;
-  const canConfirm = !!selectedCategory;
-  const hasAI = players.some(p => p.isAI);
-  const currentIsAI = !!players[currentPlayer]?.isAI;
-  const currentScores = players[currentPlayer]?.scores ?? {};
-  const currentTotals = calcTotals(currentScores);
-  const upperSum = currentTotals.upperSum;
-  const upperFilledCount = CATEGORIES.filter(c => c.section === 'upper' && currentScores[c.id] !== undefined).length;
-  const bonusAchieved = upperSum >= 63;
-  const bonusMissed = !bonusAchieved && upperFilledCount === 6;
-  const pointsToBonus = Math.max(0, 63 - upperSum);
-  const bonusProgressPct = Math.min(100, upperSum / 63 * 100);
-  const leaderTotal = Math.max(...players.map(p => calcTotals(p.scores).total));
+  if (phase === 'tournament-standings') {
+    return /*#__PURE__*/React.createElement(TournamentStandingsScreen, {
+      tournament: tournament,
+      onNextRound: nextTournamentRound,
+      onAbort: abortTournament
+    });
+  }
+  var gridCols = "116px repeat(".concat(numPlayers, ", minmax(56px, 1fr))");
+  var round = Math.floor(turnsPlayed / numPlayers) + 1;
+  var diceDisabled = rolling || rollsLeft === 3 || rollsLeft === 0;
+  var selDefault = selectedCategory ? getDefaultScore(selectedCategory) : null;
+  var selLabel = selectedCategory ? (_CATEGORIES$find3 = CATEGORIES.find(function (c) {
+    return c.id === selectedCategory;
+  })) === null || _CATEGORIES$find3 === void 0 ? void 0 : _CATEGORIES$find3.label : null;
+  var canConfirm = !!selectedCategory;
+  var hasAI = players.some(function (p) {
+    return p.isAI;
+  });
+  var currentIsAI = !!((_players$currentPlaye3 = players[currentPlayer]) !== null && _players$currentPlaye3 !== void 0 && _players$currentPlaye3.isAI);
+  var currentScores = (_players$currentPlaye4 = (_players$currentPlaye5 = players[currentPlayer]) === null || _players$currentPlaye5 === void 0 ? void 0 : _players$currentPlaye5.scores) !== null && _players$currentPlaye4 !== void 0 ? _players$currentPlaye4 : {};
+  var currentTotals = calcTotals(currentScores);
+  var upperSum = currentTotals.upperSum;
+  var upperFilledCount = CATEGORIES.filter(function (c) {
+    return c.section === 'upper' && currentScores[c.id] !== undefined;
+  }).length;
+  var bonusAchieved = upperSum >= 63;
+  var bonusMissed = !bonusAchieved && upperFilledCount === 6;
+  var pointsToBonus = Math.max(0, 63 - upperSum);
+  var bonusProgressPct = Math.min(100, upperSum / 63 * 100);
+  var leaderTotal = Math.max.apply(Math, _toConsumableArray(players.map(function (p) {
+    return calcTotals(p.scores).total;
+  })));
 
   // Pace toward the bonus: compare actual upper-section sum so far to the
   // "3 of a kind" baseline (FIXED_DEFAULTS) for only the categories already filled.
-  const expectedSoFar = CATEGORIES.filter(c => c.section === 'upper' && currentScores[c.id] !== undefined).reduce((sum, c) => sum + FIXED_DEFAULTS[c.id], 0);
-  const paceDiff = upperSum - expectedSoFar;
-  const paceText = paceDiff > 0 ? `${paceDiff} p före` : paceDiff < 0 ? `${Math.abs(paceDiff)} p efter` : 'jämnt läge';
+  var expectedSoFar = CATEGORIES.filter(function (c) {
+    return c.section === 'upper' && currentScores[c.id] !== undefined;
+  }).reduce(function (sum, c) {
+    return sum + FIXED_DEFAULTS[c.id];
+  }, 0);
+  var paceDiff = upperSum - expectedSoFar;
+  var paceText = paceDiff > 0 ? "".concat(paceDiff, " p f\xF6re") : paceDiff < 0 ? "".concat(Math.abs(paceDiff), " p efter") : 'jämnt läge';
   return /*#__PURE__*/React.createElement("div", {
     className: "h-screen flex flex-col bg-stone-100 font-sans overflow-hidden"
   }, /*#__PURE__*/React.createElement("style", null, FONT_STYLES), /*#__PURE__*/React.createElement("header", {
     className: "px-4 pt-4 pb-2 bg-stone-50 border-b-4 border-stone-900 flex items-center justify-between shrink-0"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     className: "font-display text-2xl font-extrabold tracking-tight text-stone-900 leading-none"
-  }, "YATZY"), /*#__PURE__*/React.createElement("p", {
-    className: "text-[10px] uppercase tracking-widest text-stone-400 mt-0.5"
-  }, "Svenska regler")), /*#__PURE__*/React.createElement("div", {
+  }, "YATZY"), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-1 mt-0.5 flex-wrap"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] uppercase tracking-widest text-stone-400"
+  }, tournament ? "Omg\xE5ng ".concat(tournament.currentRound, "/").concat(tournament.rounds) : 'Svenska regler'), Object.entries(houseRules).filter(function (_ref22) {
+    var _ref23 = _slicedToArray(_ref22, 2),
+      v = _ref23[1];
+    return v;
+  }).map(function (_ref24) {
+    var _ref25 = _slicedToArray(_ref24, 1),
+      k = _ref25[0];
+    var def = HOUSE_RULE_DEFS.find(function (d) {
+      return d.id === k;
+    });
+    return def ? /*#__PURE__*/React.createElement("span", {
+      key: k,
+      className: "text-[9px] bg-amber-100 text-amber-700 rounded-full px-1.5 font-bold border border-amber-300"
+    }, def.emoji) : null;
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-1.5"
   }, /*#__PURE__*/React.createElement("button", {
-    onClick: () => setSoundEnabled(s => !s),
+    onClick: function onClick() {
+      return setSoundEnabled(function (s) {
+        return !s;
+      });
+    },
     className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center text-stone-900",
     "aria-label": soundEnabled ? 'Stäng av ljud och vibration' : 'Sätt på ljud och vibration'
   }, soundEnabled ? /*#__PURE__*/React.createElement(Volume2, {
@@ -1645,87 +3122,112 @@ function YatzyApp() {
     onClick: undo,
     disabled: history.length === 0,
     className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center text-stone-900 disabled:opacity-30",
-    "aria-label": "Ångra senaste registrering"
+    "aria-label": "\xC5ngra senaste registrering"
   }, /*#__PURE__*/React.createElement(Undo2, {
     className: "w-4 h-4"
   })), /*#__PURE__*/React.createElement("button", {
-    onClick: () => setShowRules(true),
+    onClick: function onClick() {
+      return setShowRules(true);
+    },
     className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center font-display font-bold text-stone-900",
     "aria-label": "Visa regler"
   }, "?"), /*#__PURE__*/React.createElement("button", {
-    onClick: () => setConfirmReset(true),
+    onClick: function onClick() {
+      return setConfirmReset(true);
+    },
     className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center text-stone-900 text-lg",
     "aria-label": "Nytt spel"
-  }, "↺"))), celebration === 'yatzy' && /*#__PURE__*/React.createElement(YatzyCelebration, null), celebration === 'bonus' && /*#__PURE__*/React.createElement(BonusCelebration, null), /*#__PURE__*/React.createElement("div", {
+  }, "\u21BA"))), celebration === 'yatzy' && /*#__PURE__*/React.createElement(YatzyCelebration, null), celebration === 'naturalyatzy' && /*#__PURE__*/React.createElement(NaturalYatzyCelebration, null), celebration === 'bonus' && /*#__PURE__*/React.createElement(BonusCelebration, null), celebration === 'bonusyatzy' && /*#__PURE__*/React.createElement(BonusYatzyCelebration, null), /*#__PURE__*/React.createElement("div", {
     className: "bg-red-600 shrink-0"
   }, /*#__PURE__*/React.createElement("div", {
     className: "px-4 py-2 flex items-center justify-between"
   }, /*#__PURE__*/React.createElement("span", {
     className: "font-display font-bold uppercase tracking-wide text-sm text-stone-50"
-  }, players[currentPlayer]?.name, "s tur"), /*#__PURE__*/React.createElement("span", {
+  }, (_players$currentPlaye6 = players[currentPlayer]) === null || _players$currentPlaye6 === void 0 ? void 0 : _players$currentPlaye6.name, "s tur"), /*#__PURE__*/React.createElement("span", {
     className: "font-mono-score text-xs text-red-100"
-  }, "Omgång ", round, " / 15")), /*#__PURE__*/React.createElement("div", {
+  }, "Omg\xE5ng ", round, " / 15")), /*#__PURE__*/React.createElement("div", {
     className: "px-4 pb-2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-between mb-1 gap-2"
   }, /*#__PURE__*/React.createElement("span", {
     className: "text-[10px] uppercase tracking-widest font-display font-bold text-red-100 truncate min-w-0"
-  }, bonusAchieved ? 'Bonus säkrad — +50' : bonusMissed ? 'Bonus missad' : `${pointsToBonus} p till bonus${upperFilledCount > 0 ? ` · ${paceText}` : ''}`), /*#__PURE__*/React.createElement("span", {
+  }, bonusAchieved ? 'Bonus säkrad — +50' : bonusMissed ? 'Bonus missad' : "".concat(pointsToBonus, " p till bonus").concat(upperFilledCount > 0 ? " \xB7 ".concat(paceText) : '')), /*#__PURE__*/React.createElement("span", {
     className: "text-[10px] font-mono-score text-red-100 shrink-0"
   }, upperSum, " / 63")), /*#__PURE__*/React.createElement("div", {
     className: "h-1.5 bg-red-800 rounded-full overflow-hidden"
   }, /*#__PURE__*/React.createElement("div", {
-    className: `h-full rounded-full transition-all duration-300 ${bonusAchieved ? 'bg-emerald-400' : bonusMissed ? 'bg-stone-400' : 'bg-amber-400'}`,
+    className: "h-full rounded-full transition-all duration-300 ".concat(bonusAchieved ? 'bg-emerald-400' : bonusMissed ? 'bg-stone-400' : 'bg-amber-400'),
     style: {
-      width: `${bonusProgressPct}%`
+      width: "".concat(bonusProgressPct, "%")
     }
   })))), hasAI ? /*#__PURE__*/React.createElement("div", {
     className: "px-4 py-1.5 bg-stone-50 border-b border-stone-200 flex items-center justify-center shrink-0"
   }, /*#__PURE__*/React.createElement("p", {
     className: "text-[11px] text-stone-400 uppercase tracking-widest font-display font-bold"
-  }, currentIsAI ? `Datorn (${AI_DIFFICULTIES[players[currentPlayer]?.difficulty]?.label ?? ''}) spelar …` : 'Din tur')) : /*#__PURE__*/React.createElement("div", {
+  }, currentIsAI ? "Datorn (".concat((_AI_DIFFICULTIES$play3 = (_AI_DIFFICULTIES$play4 = AI_DIFFICULTIES[(_players$currentPlaye7 = players[currentPlayer]) === null || _players$currentPlaye7 === void 0 ? void 0 : _players$currentPlaye7.difficulty]) === null || _AI_DIFFICULTIES$play4 === void 0 ? void 0 : _AI_DIFFICULTIES$play4.label) !== null && _AI_DIFFICULTIES$play3 !== void 0 ? _AI_DIFFICULTIES$play3 : '', ") spelar \u2026") : 'Din tur')) : /*#__PURE__*/React.createElement("div", {
     className: "px-4 py-1.5 bg-stone-50 border-b border-stone-200 flex flex-col items-center gap-1 shrink-0"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-center gap-2"
   }, /*#__PURE__*/React.createElement("button", {
-    onClick: () => switchMode('auto'),
-    className: `px-3 py-1 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ${mode === 'auto' ? 'bg-stone-900 text-stone-50' : 'text-stone-400'}`
+    onClick: function onClick() {
+      return switchMode('auto');
+    },
+    className: "px-3 py-1 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ".concat(mode === 'auto' ? 'bg-stone-900 text-stone-50' : 'text-stone-400')
   }, "Slumpa i appen"), /*#__PURE__*/React.createElement("button", {
-    onClick: () => switchMode('manual'),
-    className: `px-3 py-1 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ${mode === 'manual' ? 'bg-stone-900 text-stone-50' : 'text-stone-400'}`
-  }, "Egna tärningar")), mode === 'manual' && !selectedCategory && /*#__PURE__*/React.createElement("p", {
+    onClick: function onClick() {
+      return switchMode('manual');
+    },
+    className: "px-3 py-1 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ".concat(mode === 'manual' ? 'bg-stone-900 text-stone-50' : 'text-stone-400')
+  }, "Egna t\xE4rningar")), mode === 'manual' && !selectedCategory && /*#__PURE__*/React.createElement("p", {
     className: "text-[11px] text-stone-400"
-  }, "Tryck på en gul ruta i tabellen för att registrera poäng")), mode === 'auto' && /*#__PURE__*/React.createElement("div", {
+  }, "Tryck p\xE5 en gul ruta i tabellen f\xF6r att registrera po\xE4ng")), mode === 'auto' && /*#__PURE__*/React.createElement("div", {
     className: "bg-emerald-800 px-4 py-4 shrink-0"
-  }, /*#__PURE__*/React.createElement("div", {
+  }, lastAiAction && rollsLeft === 3 && !currentIsAI ? /*#__PURE__*/React.createElement("div", {
     className: "flex justify-center gap-2 sm:gap-3 mb-3"
-  }, dice.map((v, i) => /*#__PURE__*/React.createElement(Die, {
-    key: i,
-    value: v,
-    held: held[i],
-    disabled: diceDisabled,
-    rolling: rolling,
-    onClick: () => toggleHold(i)
-  }))), /*#__PURE__*/React.createElement("div", {
+  }, lastAiAction.dice.map(function (v, i) {
+    return /*#__PURE__*/React.createElement(Die, {
+      key: i,
+      value: v,
+      held: false,
+      disabled: true,
+      rolling: false,
+      onClick: function onClick() {}
+    });
+  })) : /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-center gap-2 sm:gap-3 mb-3"
+  }, dice.map(function (v, i) {
+    return /*#__PURE__*/React.createElement(Die, {
+      key: i,
+      value: v,
+      held: held[i],
+      disabled: diceDisabled || currentIsAI,
+      rolling: rolling,
+      onClick: function onClick() {
+        return toggleHold(i);
+      }
+    });
+  })), /*#__PURE__*/React.createElement("div", {
     className: "flex flex-col items-center gap-2"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: rollDice,
     disabled: rolling || rollsLeft === 0,
     className: "px-6 py-2.5 rounded-full bg-amber-400 border-2 border-stone-900 font-display font-bold text-stone-900 text-sm uppercase tracking-wide disabled:opacity-50 active:scale-95 transition"
-  }, rollsLeft === 3 ? 'Kasta tärningarna' : rollsLeft === 0 ? 'Välj en rad nedan' : `Kasta igen (${rollsLeft} kvar)`), /*#__PURE__*/React.createElement("div", {
+  }, rollsLeft === 3 ? 'Kasta tärningarna' : rollsLeft === 0 ? 'Välj en rad nedan' : "Kasta igen (".concat(rollsLeft, " kvar)")), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-1.5"
-  }, [0, 1, 2].map(i => /*#__PURE__*/React.createElement("span", {
-    key: i,
-    className: `w-2.5 h-2.5 rounded-full ${i < rollsLeft ? 'bg-amber-400' : 'bg-emerald-600'}`
-  }))), rollsLeft < 3 && rollsLeft > 0 && /*#__PURE__*/React.createElement("p", {
+  }, [0, 1, 2].map(function (i) {
+    return /*#__PURE__*/React.createElement("span", {
+      key: i,
+      className: "w-2.5 h-2.5 rounded-full ".concat(i < rollsLeft ? 'bg-amber-400' : 'bg-emerald-600')
+    });
+  })), rollsLeft < 3 && rollsLeft > 0 && /*#__PURE__*/React.createElement("p", {
     className: "text-emerald-100 text-[11px] text-center mt-1"
-  }, "Tryck på en tärning för att spara den till nästa kast."))), mode === 'auto' && /*#__PURE__*/React.createElement("div", {
+  }, "Tryck p\xE5 en t\xE4rning f\xF6r att spara den till n\xE4sta kast."))), mode === 'auto' && /*#__PURE__*/React.createElement("div", {
     className: "h-3 bg-stone-50 shrink-0",
     style: {
       clipPath: TORN_EDGE
     }
   }), /*#__PURE__*/React.createElement("div", {
-    className: `flex-1 min-h-0 overflow-auto bg-stone-50 px-3 ${mode === 'manual' && selectedCategory ? 'pb-80' : 'pb-6'}`
+    className: "flex-1 min-h-0 overflow-auto bg-stone-50 px-3 ".concat(mode === 'manual' && selectedCategory ? 'pb-80' : 'pb-6')
   }, /*#__PURE__*/React.createElement("div", {
     className: "grid",
     style: {
@@ -1733,70 +3235,97 @@ function YatzyApp() {
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "sticky left-0 bg-stone-50 z-20"
-  }), players.map((p, i) => {
-    const total = calcTotals(p.scores).total;
-    const isLeader = numPlayers > 1 && total > 0 && total === leaderTotal;
+  }), players.map(function (p, i) {
+    var _PLAYER_COLORS$header, _PLAYER_COLORS3, _p$colorIndex3;
+    var total = calcTotals(p.scores).total;
+    var isLeader = numPlayers > 1 && total > 0 && total === leaderTotal;
     return /*#__PURE__*/React.createElement("button", {
       key: i,
-      onClick: () => openEditName(i),
-      className: `text-center py-1.5 px-1 rounded-t-lg font-display font-bold text-xs uppercase tracking-wide active:scale-95 transition ${i === currentPlayer ? 'bg-emerald-600 text-stone-50' : 'bg-stone-200 text-stone-500'}`
+      onClick: function onClick() {
+        return openEditName(i);
+      },
+      className: "text-center py-1.5 px-1 rounded-t-lg font-display font-bold text-xs uppercase tracking-wide active:scale-95 transition ".concat(i === currentPlayer ? (_PLAYER_COLORS$header = (_PLAYER_COLORS3 = PLAYER_COLORS[(_p$colorIndex3 = p.colorIndex) !== null && _p$colorIndex3 !== void 0 ? _p$colorIndex3 : i % 4]) === null || _PLAYER_COLORS3 === void 0 ? void 0 : _PLAYER_COLORS3.header) !== null && _PLAYER_COLORS$header !== void 0 ? _PLAYER_COLORS$header : 'bg-emerald-600 text-stone-50' : 'bg-stone-200 text-stone-500')
     }, /*#__PURE__*/React.createElement("div", {
       className: "flex items-center justify-center gap-1 truncate"
     }, isLeader && /*#__PURE__*/React.createElement(Trophy, {
       className: "w-3 h-3 text-amber-400 shrink-0"
     }), /*#__PURE__*/React.createElement("span", {
+      className: "text-base leading-none"
+    }, p.avatar || AVATAR_OPTIONS[i]), /*#__PURE__*/React.createElement("span", {
       className: "truncate"
     }, p.name), /*#__PURE__*/React.createElement(Pencil, {
-      className: `w-2.5 h-2.5 shrink-0 ${i === currentPlayer ? 'text-emerald-100' : 'text-stone-400'}`
+      className: "w-2.5 h-2.5 shrink-0 opacity-60"
     })), /*#__PURE__*/React.createElement("div", {
-      className: `font-mono-score text-[11px] font-bold mt-0.5 ${i === currentPlayer ? 'text-emerald-100' : 'text-stone-400'}`
+      className: "font-mono-score text-[11px] font-bold mt-0.5 opacity-80"
     }, total, " p"));
   }), /*#__PURE__*/React.createElement("div", {
     className: "py-1.5 px-1 mt-2 bg-slate-700 text-stone-50 font-display font-bold text-[11px] uppercase tracking-widest rounded",
     style: {
       gridColumn: '1 / -1'
     }
-  }, "Övre sektion"), CATEGORIES.filter(c => c.section === 'upper').map(cat => /*#__PURE__*/React.createElement(ScoreRow, {
-    key: cat.id,
-    category: cat,
-    players: players,
-    currentPlayer: currentPlayer,
-    dice: dice,
-    rollsLeft: rollsLeft,
-    mode: mode,
-    selectedCategory: selectedCategory,
-    inputBuffer: inputBuffer,
-    onSelect: selectCategory,
-    onSelectCell: onSelectCell
-  })), /*#__PURE__*/React.createElement(TotalsRow, {
+  }, "\xD6vre sektion"), CATEGORIES.filter(function (c) {
+    return c.section === 'upper';
+  }).map(function (cat) {
+    var _players$currentPlaye8, _players$currentPlaye9;
+    return /*#__PURE__*/React.createElement(ScoreRow, {
+      key: cat.id,
+      category: cat,
+      players: players,
+      currentPlayer: currentPlayer,
+      dice: dice,
+      rollsLeft: rollsLeft,
+      mode: mode,
+      selectedCategory: selectedCategory,
+      inputBuffer: inputBuffer,
+      onSelect: selectCategory,
+      onSelectCell: onSelectCell,
+      lastAiAction: lastAiAction,
+      houseRules: houseRules,
+      forcedCat: houseRules.forcedOrder ? forcedOrderCat((_players$currentPlaye8 = (_players$currentPlaye9 = players[currentPlayer]) === null || _players$currentPlaye9 === void 0 ? void 0 : _players$currentPlaye9.scores) !== null && _players$currentPlaye8 !== void 0 ? _players$currentPlaye8 : {}) : null
+    });
+  }), /*#__PURE__*/React.createElement(TotalsRow, {
     label: "Summa",
-    sub: "Ettor–Sexor",
-    values: players.map(p => calcTotals(p.scores).upperSum)
+    sub: "Ettor\u2013Sexor",
+    values: players.map(function (p) {
+      return calcTotals(p.scores).upperSum;
+    })
   }), /*#__PURE__*/React.createElement(TotalsRow, {
     label: "Bonus",
-    sub: "63 p → +50",
-    values: players.map(p => calcTotals(p.scores).bonus),
+    sub: "63 p \u2192 +50",
+    values: players.map(function (p) {
+      return calcTotals(p.scores).bonus;
+    }),
     accent: "amber"
   }), /*#__PURE__*/React.createElement("div", {
     className: "py-1.5 px-1 mt-2 bg-emerald-800 text-stone-50 font-display font-bold text-[11px] uppercase tracking-widest rounded",
     style: {
       gridColumn: '1 / -1'
     }
-  }, "Nedre sektion"), CATEGORIES.filter(c => c.section === 'lower').map(cat => /*#__PURE__*/React.createElement(ScoreRow, {
-    key: cat.id,
-    category: cat,
-    players: players,
-    currentPlayer: currentPlayer,
-    dice: dice,
-    rollsLeft: rollsLeft,
-    mode: mode,
-    selectedCategory: selectedCategory,
-    inputBuffer: inputBuffer,
-    onSelect: selectCategory,
-    onSelectCell: onSelectCell
-  })), /*#__PURE__*/React.createElement(TotalsRow, {
+  }, "Nedre sektion"), CATEGORIES.filter(function (c) {
+    return c.section === 'lower';
+  }).map(function (cat) {
+    var _players$currentPlaye0, _players$currentPlaye1;
+    return /*#__PURE__*/React.createElement(ScoreRow, {
+      key: cat.id,
+      category: cat,
+      players: players,
+      currentPlayer: currentPlayer,
+      dice: dice,
+      rollsLeft: rollsLeft,
+      mode: mode,
+      selectedCategory: selectedCategory,
+      inputBuffer: inputBuffer,
+      onSelect: selectCategory,
+      onSelectCell: onSelectCell,
+      lastAiAction: lastAiAction,
+      houseRules: houseRules,
+      forcedCat: houseRules.forcedOrder ? forcedOrderCat((_players$currentPlaye0 = (_players$currentPlaye1 = players[currentPlayer]) === null || _players$currentPlaye1 === void 0 ? void 0 : _players$currentPlaye1.scores) !== null && _players$currentPlaye0 !== void 0 ? _players$currentPlaye0 : {}) : null
+    });
+  }), /*#__PURE__*/React.createElement(TotalsRow, {
     label: "TOTALT",
-    values: players.map(p => calcTotals(p.scores).total),
+    values: players.map(function (p) {
+      return calcTotals(p.scores).total;
+    }),
     accent: "dark"
   }))), mode === 'manual' && selectedCategory && /*#__PURE__*/React.createElement("div", {
     className: "fixed bottom-0 left-0 right-0 z-40 bg-emerald-800 border-t-4 border-stone-900 rounded-t-2xl px-4 pt-2 pb-4 shadow-2xl"
@@ -1809,77 +3338,97 @@ function YatzyApp() {
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
     className: "font-display font-bold text-stone-50 text-sm uppercase tracking-wide"
   }, selLabel), /*#__PURE__*/React.createElement("p", {
-    className: `font-mono-score text-3xl font-extrabold leading-none mt-0.5 ${inputError ? 'text-red-400' : 'text-amber-400'}`
+    className: "font-mono-score text-3xl font-extrabold leading-none mt-0.5 ".concat(inputError ? 'text-red-400' : 'text-amber-400')
   }, inputBuffer !== '' ? inputBuffer : selDefault)), /*#__PURE__*/React.createElement("button", {
     onClick: closeKeypad,
-    "aria-label": "Stäng",
+    "aria-label": "St\xE4ng",
     className: "w-8 h-8 rounded-full border-2 border-emerald-600 text-emerald-100 flex items-center justify-center text-sm shrink-0"
-  }, "×")), /*#__PURE__*/React.createElement("div", {
+  }, "\xD7")), /*#__PURE__*/React.createElement("div", {
     className: "grid grid-cols-3 gap-2"
-  }, [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => /*#__PURE__*/React.createElement("button", {
-    key: n,
-    onClick: () => pressDigit(n),
-    className: "py-3 rounded-xl bg-stone-50 border-2 border-stone-900 font-mono-score text-xl font-bold text-stone-900 active:scale-95 transition"
-  }, n)), /*#__PURE__*/React.createElement("button", {
+  }, [1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (n) {
+    return /*#__PURE__*/React.createElement("button", {
+      key: n,
+      onClick: function onClick() {
+        return pressDigit(n);
+      },
+      className: "py-3 rounded-xl bg-stone-50 border-2 border-stone-900 font-mono-score text-xl font-bold text-stone-900 active:scale-95 transition"
+    }, n);
+  }), /*#__PURE__*/React.createElement("button", {
     onClick: backspace,
     disabled: inputBuffer === '',
     className: "py-3 rounded-xl bg-stone-200 border-2 border-stone-900 font-display text-base font-bold text-stone-700 disabled:opacity-40 active:scale-95 transition"
-  }, "⌫"), /*#__PURE__*/React.createElement("button", {
-    onClick: () => pressDigit(0),
+  }, "\u232B"), /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return pressDigit(0);
+    },
     className: "py-3 rounded-xl bg-stone-50 border-2 border-stone-900 font-mono-score text-xl font-bold text-stone-900 active:scale-95 transition"
   }, "0"), /*#__PURE__*/React.createElement("button", {
     onClick: confirmScore,
     disabled: !canConfirm,
     className: "py-3 rounded-xl bg-amber-400 border-2 border-stone-900 font-display text-xl font-bold text-stone-900 disabled:opacity-40 active:scale-95 transition"
-  }, "✓")), /*#__PURE__*/React.createElement("button", {
+  }, "\u2713")), /*#__PURE__*/React.createElement("button", {
     onClick: crossOut,
     className: "w-full mt-2 py-2.5 rounded-xl bg-red-600 border-2 border-stone-900 font-display font-bold text-stone-50 uppercase tracking-wide text-sm active:scale-95 transition"
-  }, "✕ Stryk (0 poäng)"), inputError ? /*#__PURE__*/React.createElement("p", {
+  }, "\u2715 Stryk (0 po\xE4ng)"), inputError ? /*#__PURE__*/React.createElement("p", {
     className: "text-red-300 text-[11px] text-center mt-2 leading-relaxed font-semibold"
-  }, "⚠ ", inputError) : /*#__PURE__*/React.createElement("p", {
+  }, "\u26A0 ", inputError) : /*#__PURE__*/React.createElement("p", {
     className: "text-emerald-200 text-[11px] text-center mt-2 leading-relaxed"
-  }, inputBuffer !== '' ? `Tryck ✓ för att registrera ${inputBuffer} p.` : selectedCategory in FIXED_DEFAULTS ? `✓ ger ${selDefault} p direkt – eller skriv ett eget värde.` : `✓ ger ${selDefault} p (högsta möjliga) – eller skriv ett eget värde.`))), showRules && /*#__PURE__*/React.createElement("div", {
+  }, inputBuffer !== '' ? "Tryck \u2713 f\xF6r att registrera ".concat(inputBuffer, " p.") : selectedCategory in FIXED_DEFAULTS ? "\u2713 ger ".concat(selDefault, " p direkt \u2013 eller skriv ett eget v\xE4rde.") : "\u2713 ger ".concat(selDefault, " p (h\xF6gsta m\xF6jliga) \u2013 eller skriv ett eget v\xE4rde.")))), showRules && /*#__PURE__*/React.createElement("div", {
     className: "fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4",
-    onClick: () => setShowRules(false)
+    onClick: function onClick() {
+      return setShowRules(false);
+    }
   }, /*#__PURE__*/React.createElement("div", {
     className: "bg-stone-50 rounded-2xl max-w-sm w-full max-h-[85vh] overflow-auto p-5 border-4 border-stone-900",
-    onClick: e => e.stopPropagation()
+    onClick: function onClick(e) {
+      return e.stopPropagation();
+    }
   }, /*#__PURE__*/React.createElement("h2", {
     className: "font-display text-xl font-extrabold text-stone-900 mb-1"
-  }, "Poängregler"), /*#__PURE__*/React.createElement("p", {
+  }, "Po\xE4ngregler"), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-stone-400 mb-3"
-  }, "Svensk Yatzy · 15 rutor per spelare"), /*#__PURE__*/React.createElement("div", {
+  }, "Svensk Yatzy \xB7 15 rutor per spelare"), /*#__PURE__*/React.createElement("div", {
     className: "space-y-1.5"
-  }, CATEGORIES.map(c => /*#__PURE__*/React.createElement("div", {
-    key: c.id,
-    className: "flex justify-between items-baseline border-b border-stone-100 pb-1"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "text-sm font-semibold text-stone-800"
-  }, c.label), /*#__PURE__*/React.createElement("span", {
-    className: "text-xs text-stone-400 text-right"
-  }, c.sub)))), /*#__PURE__*/React.createElement("p", {
+  }, CATEGORIES.map(function (c) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: c.id,
+      className: "flex justify-between items-baseline border-b border-stone-100 pb-1"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "text-sm font-semibold text-stone-800"
+    }, c.label), /*#__PURE__*/React.createElement("span", {
+      className: "text-xs text-stone-400 text-right"
+    }, c.sub));
+  })), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-stone-500 mt-3 leading-relaxed"
-  }, "Bonus: om summan av Ettor–Sexor är minst 63 poäng får du 50 extra poäng."), /*#__PURE__*/React.createElement("p", {
+  }, "Bonus: om summan av Ettor\u2013Sexor \xE4r minst 63 po\xE4ng f\xE5r du 50 extra po\xE4ng."), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-stone-500 mt-2 leading-relaxed"
-  }, "Spelar ni med egna tärningar? Växla till \"Egna tärningar\" högst upp. Tryck på en ruta i tabellen, skriv poängen eller tryck bara ✓ för förslaget: 3-i-rad för Ettor–Sexor, 15/20/50 för stegar och Yatzy, och högsta möjliga poäng för övriga rader (t.ex. 30 för Chans, 28 för Kåk). Tryck ✕ för att stryka en ruta (0 poäng). Appen kontrollerar att den inskrivna poängen verkligen går att få i den rutan – annars visas ett felmeddelande."), /*#__PURE__*/React.createElement("p", {
+  }, "Spelar ni med egna t\xE4rningar? V\xE4xla till \"Egna t\xE4rningar\" h\xF6gst upp. Tryck p\xE5 en ruta i tabellen, skriv po\xE4ngen eller tryck bara \u2713 f\xF6r f\xF6rslaget: 3-i-rad f\xF6r Ettor\u2013Sexor, 15/20/50 f\xF6r stegar och Yatzy, och h\xF6gsta m\xF6jliga po\xE4ng f\xF6r \xF6vriga rader (t.ex. 30 f\xF6r Chans, 28 f\xF6r K\xE5k). Tryck \u2715 f\xF6r att stryka en ruta (0 po\xE4ng). Appen kontrollerar att den inskrivna po\xE4ngen verkligen g\xE5r att f\xE5 i den rutan \u2013 annars visas ett felmeddelande."), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-stone-500 mt-2 leading-relaxed"
-  }, "Spelet sparas automatiskt på den här enheten, så du kan stänga appen och fortsätta partiet senare. Ljud och vibration vid kast, registrering och Yatzy kan stängas av med högtalarikonen högst upp."), /*#__PURE__*/React.createElement("button", {
-    onClick: () => setShowRules(false),
+  }, "Spelet sparas automatiskt p\xE5 den h\xE4r enheten, s\xE5 du kan st\xE4nga appen och forts\xE4tta partiet senare. Ljud och vibration vid kast, registrering och Yatzy kan st\xE4ngas av med h\xF6gtalarikonen h\xF6gst upp."), /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return setShowRules(false);
+    },
     className: "mt-4 w-full py-2.5 rounded-xl bg-stone-900 text-stone-50 font-display font-bold uppercase tracking-wide"
-  }, "Stäng"))), confirmReset && /*#__PURE__*/React.createElement("div", {
+  }, "St\xE4ng"))), confirmReset && /*#__PURE__*/React.createElement("div", {
     className: "fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4",
-    onClick: () => setConfirmReset(false)
+    onClick: function onClick() {
+      return setConfirmReset(false);
+    }
   }, /*#__PURE__*/React.createElement("div", {
     className: "bg-stone-50 rounded-2xl max-w-xs w-full p-5 border-4 border-stone-900 text-center",
-    onClick: e => e.stopPropagation()
+    onClick: function onClick(e) {
+      return e.stopPropagation();
+    }
   }, /*#__PURE__*/React.createElement("h2", {
     className: "font-display text-lg font-extrabold text-stone-900 mb-2"
   }, "Avsluta spelet?"), /*#__PURE__*/React.createElement("p", {
     className: "text-sm text-stone-500 mb-4"
-  }, "Pågående poäng går förlorade."), /*#__PURE__*/React.createElement("div", {
+  }, "P\xE5g\xE5ende po\xE4ng g\xE5r f\xF6rlorade."), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-2"
   }, /*#__PURE__*/React.createElement("button", {
-    onClick: () => setConfirmReset(false),
+    onClick: function onClick() {
+      return setConfirmReset(false);
+    },
     className: "flex-1 py-2.5 rounded-xl border-2 border-stone-900 font-display font-bold text-stone-900"
   }, "Avbryt"), /*#__PURE__*/React.createElement("button", {
     onClick: resetGame,
@@ -1889,14 +3438,20 @@ function YatzyApp() {
     onClick: cancelEditName
   }, /*#__PURE__*/React.createElement("div", {
     className: "bg-stone-50 rounded-2xl max-w-xs w-full p-5 border-4 border-stone-900",
-    onClick: e => e.stopPropagation()
+    onClick: function onClick(e) {
+      return e.stopPropagation();
+    }
   }, /*#__PURE__*/React.createElement("h2", {
     className: "font-display text-lg font-extrabold text-stone-900 mb-3"
   }, "Redigera namn"), /*#__PURE__*/React.createElement("input", {
     autoFocus: true,
     value: editNameValue,
-    onChange: e => setEditNameValue(e.target.value),
-    onKeyDown: e => e.key === 'Enter' && saveEditName(),
+    onChange: function onChange(e) {
+      return setEditNameValue(e.target.value);
+    },
+    onKeyDown: function onKeyDown(e) {
+      return e.key === 'Enter' && saveEditName();
+    },
     className: "w-full px-3 py-2 rounded-lg border-2 border-stone-300 focus:border-red-600 focus:outline-none text-stone-800 mb-4"
   }), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-2"
@@ -1908,8 +3463,10 @@ function YatzyApp() {
     className: "flex-1 py-2.5 rounded-xl bg-red-600 text-stone-50 font-display font-bold"
   }, "Spara")))));
 }
-ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(YatzyApp, null));
-
+  </script>
+  <script>
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(YatzyApp));
   </script>
 </body>
 </html>
