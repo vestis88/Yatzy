@@ -16,8 +16,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <style>
-    body { margin: 0; background: #f5f5f4; }
+    html, body { margin: 0; height: 100%; background: #f5f5f4; overscroll-behavior-y: none; }
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    #root { height: 100%; }
   </style>
 </head>
 <body>
@@ -3156,7 +3157,8 @@ function YatzyApp() {
   return /*#__PURE__*/React.createElement("div", {
     className: "h-screen flex flex-col bg-stone-100 font-sans overflow-hidden"
   }, /*#__PURE__*/React.createElement("style", null, FONT_STYLES), /*#__PURE__*/React.createElement("header", {
-    className: "px-4 pt-4 pb-2 bg-stone-50 border-b-4 border-stone-900 flex items-center justify-between shrink-0"
+    className: "px-4 pb-2 bg-stone-50 border-b-4 border-stone-900 flex items-center justify-between shrink-0",
+    style: { paddingTop: 'max(1rem, calc(env(safe-area-inset-top) + 0.5rem))' }
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     className: "font-display text-2xl font-extrabold tracking-tight text-stone-900 leading-none"
   }, "YATZY"), /*#__PURE__*/React.createElement("div", {
