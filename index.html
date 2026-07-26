@@ -51,8 +51,39 @@ function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(
 function _createForOfIteratorHelper(r, e) { var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t.return || t.return(); } finally { if (u) throw o; } } }; }
 function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
-import React, { useState, useRef, useEffect } from 'react';
-import { Trophy, Undo2, Volume2, VolumeX, Pencil } from 'lucide-react';
+const { useState, useRef, useEffect } = React;
+
+function Trophy({ className = '' }) {
+  return React.createElement("svg", { className: className, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" },
+    React.createElement("path", { d: "M6 9H4.5a2.5 2.5 0 0 1 0-5H6" }),
+    React.createElement("path", { d: "M18 9h1.5a2.5 2.5 0 0 0 0-5H18" }),
+    React.createElement("path", { d: "M4 22h16" }),
+    React.createElement("path", { d: "M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" }),
+    React.createElement("path", { d: "M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" }),
+    React.createElement("path", { d: "M18 2H6v7a6 6 0 0 0 12 0V2Z" }));
+}
+function Undo2({ className = '' }) {
+  return React.createElement("svg", { className: className, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" },
+    React.createElement("path", { d: "M9 14 4 9l5-5" }),
+    React.createElement("path", { d: "M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11" }));
+}
+function Volume2({ className = '' }) {
+  return React.createElement("svg", { className: className, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" },
+    React.createElement("polygon", { points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5" }),
+    React.createElement("path", { d: "M15.54 8.46a5 5 0 0 1 0 7.07" }),
+    React.createElement("path", { d: "M19.07 4.93a10 10 0 0 1 0 14.14" }));
+}
+function VolumeX({ className = '' }) {
+  return React.createElement("svg", { className: className, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" },
+    React.createElement("polygon", { points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5" }),
+    React.createElement("line", { x1: "23", y1: "9", x2: "17", y2: "15" }),
+    React.createElement("line", { x1: "17", y1: "9", x2: "23", y2: "15" }));
+}
+function Pencil({ className = '' }) {
+  return React.createElement("svg", { className: className, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" },
+    React.createElement("path", { d: "M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" }),
+    React.createElement("path", { d: "m15 5 4 4" }));
+}
 
 // Personal storage keys
 var STORAGE_KEY = 'yatzy-game-state-v3';
@@ -2030,7 +2061,7 @@ function FinishedScreen(_ref16) {
 }
 
 // ---------- Main app ----------
-export default function YatzyApp() {
+function YatzyApp() {
   var _CATEGORIES$find3, _players$currentPlaye3, _players$currentPlaye4, _players$currentPlaye5, _players$currentPlaye6, _AI_DIFFICULTIES$play3, _AI_DIFFICULTIES$play4, _players$currentPlaye7;
   var _useState = useState('setup'),
     _useState2 = _slicedToArray(_useState, 2),
