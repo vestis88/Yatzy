@@ -13,6 +13,8 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <style>
     body { margin: 0; background: #f5f5f4; }
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
@@ -21,11 +23,51 @@
 <body>
   <div id="root"></div>
   <script>
-    // Shim: localStorage-backed window.storage for standalone HTML deployment
+    // Cloud sync (Firestore) for cross-device stats/leaderboard; the in-progress
+    // game itself stays local-only (STORAGE_KEY isn't in CLOUD_KEYS below).
+    const firebaseConfig = {
+      apiKey: "AIzaSyBI8E6z6382X9UDOhnNiG8CTdMpQl6qMLc",
+      authDomain: "yatzy-6f3ba.firebaseapp.com",
+      projectId: "yatzy-6f3ba",
+      storageBucket: "yatzy-6f3ba.firebasestorage.app",
+      messagingSenderId: "65220374180",
+      appId: "1:65220374180:web:5550a6cc7b2e5d4b0e8031"
+    };
+    let db = null;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+    } catch (e) {
+      // Cloud sync unavailable — falls back to local-only storage below
+    }
+    const CLOUD_KEYS = new Set(['yatzy-stats', 'yatzy-leaderboard']);
+
+    // Shim: window.storage backed by Firestore for cloud keys, localStorage for the rest
     window.storage = {
-      get: (key) => Promise.resolve((() => { try { const v = localStorage.getItem(key); return v ? { key, value: v } : null; } catch { return null; } })()),
-      set: (key, value) => Promise.resolve((() => { try { localStorage.setItem(key, value); return { key, value }; } catch { return null; } })()),
-      delete: (key) => Promise.resolve((() => { try { localStorage.removeItem(key); return { key, deleted: true }; } catch { return null; } })()),
+      get: (key) => {
+        if (db && CLOUD_KEYS.has(key)) {
+          return db.collection('yatzy').doc(key).get()
+            .then((doc) => doc.exists ? { key, value: doc.data().value } : null)
+            .catch(() => null);
+        }
+        return Promise.resolve((() => { try { const v = localStorage.getItem(key); return v ? { key, value: v } : null; } catch { return null; } })());
+      },
+      set: (key, value) => {
+        if (db && CLOUD_KEYS.has(key)) {
+          return db.collection('yatzy').doc(key).set({ value })
+            .then(() => ({ key, value }))
+            .catch(() => null);
+        }
+        return Promise.resolve((() => { try { localStorage.setItem(key, value); return { key, value }; } catch { return null; } })());
+      },
+      delete: (key) => {
+        if (db && CLOUD_KEYS.has(key)) {
+          return db.collection('yatzy').doc(key).delete()
+            .then(() => ({ key, deleted: true }))
+            .catch(() => null);
+        }
+        return Promise.resolve((() => { try { localStorage.removeItem(key); return { key, deleted: true }; } catch { return null; } })());
+      },
       list: (prefix) => Promise.resolve((() => { try { const keys = Object.keys(localStorage).filter(k => !prefix || k.startsWith(prefix)); return { keys }; } catch { return { keys: [] }; } })()),
     };
   </script>
