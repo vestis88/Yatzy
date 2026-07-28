@@ -3155,7 +3155,8 @@ function YatzyApp() {
   var paceDiff = upperSum - expectedSoFar;
   var paceText = paceDiff > 0 ? "".concat(paceDiff, " p f\xF6re") : paceDiff < 0 ? "".concat(Math.abs(paceDiff), " p efter") : 'jämnt läge';
   return /*#__PURE__*/React.createElement("div", {
-    className: "h-screen flex flex-col bg-stone-100 font-sans overflow-hidden"
+    className: "flex flex-col bg-stone-100 font-sans overflow-hidden",
+    style: { height: '100dvh' }
   }, /*#__PURE__*/React.createElement("style", null, FONT_STYLES), /*#__PURE__*/React.createElement("header", {
     className: "px-4 pb-2 bg-stone-50 border-b-4 border-stone-900 flex items-center justify-between shrink-0",
     style: { paddingTop: 'max(1rem, calc(env(safe-area-inset-top) + 0.5rem))' }
