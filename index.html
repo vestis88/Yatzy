@@ -1494,7 +1494,8 @@ function NaturalYatzyCelebration() {
 function TournamentStandingsScreen(_ref8) {
   var tournament = _ref8.tournament,
     onNextRound = _ref8.onNextRound,
-    onAbort = _ref8.onAbort;
+    onAbort = _ref8.onAbort,
+    onNewTournament = _ref8.onNewTournament;
   var standings = tournament.standings,
     currentRound = tournament.currentRound,
     rounds = tournament.rounds;
@@ -1546,12 +1547,12 @@ function TournamentStandingsScreen(_ref8) {
     onClick: onNextRound,
     className: "w-full max-w-sm py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition mb-3"
   }, "Omg\xE5ng ", currentRound + 1, " \u2192"), isLastRound && /*#__PURE__*/React.createElement("button", {
-    onClick: onAbort,
+    onClick: onNewTournament || onAbort,
     className: "w-full max-w-sm py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition mb-3"
   }, "Ny turnering"), /*#__PURE__*/React.createElement("button", {
     onClick: onAbort,
     className: "text-sm text-stone-400 underline active:scale-95 transition"
-  }, isLastRound ? 'Ny turnering' : 'Avbryt turnering'));
+  }, isLastRound ? 'St\xE4ng' : 'Avbryt turnering'));
 }
 function LoadingScreen() {
   return /*#__PURE__*/React.createElement("div", {
@@ -2037,6 +2038,26 @@ function FinishedScreen(_ref16) {
   }).sort(function (a, b) {
     return b.total - a.total;
   });
+  // Cumulative tournament standings *including* the round just played. The stored
+  // standings only get this round folded in when the next round starts, so project
+  // it here using the same win/score rules so the numbers match what gets saved.
+  var roundTotals = players.map(function (p) {
+    return calcTotals(p.scores).total;
+  });
+  var roundMax = roundTotals.length ? Math.max.apply(Math, _toConsumableArray(roundTotals)) : 0;
+  var roundWinners = roundTotals.filter(function (t) {
+    return t === roundMax;
+  }).length || 1;
+  var liveStandings = tournament ? tournament.standings.map(function (s, idx) {
+    var _roundTotals$idx;
+    var rt = (_roundTotals$idx = roundTotals[idx]) !== null && _roundTotals$idx !== void 0 ? _roundTotals$idx : 0;
+    return _objectSpread(_objectSpread({}, s), {}, {
+      wins: s.wins + (rt === roundMax ? 1 / roundWinners : 0),
+      totalScore: s.totalScore + rt
+    });
+  }).sort(function (a, b) {
+    return b.wins !== a.wins ? b.wins - a.wins : b.totalScore - a.totalScore;
+  }) : null;
   var _React$useState5 = React.useState(false),
     _React$useState6 = _slicedToArray(_React$useState5, 2),
     showLeaderboard = _React$useState6[0],
@@ -2074,7 +2095,35 @@ function FinishedScreen(_ref16) {
     className: "mt-8 w-full max-w-sm space-y-3"
   }, /*#__PURE__*/React.createElement("div", {
     className: "rounded-xl bg-stone-800 text-stone-50 px-4 py-2 text-center text-xs font-display font-bold uppercase tracking-widest"
-  }, "Omg\xE5ng ", tournament.currentRound, " av ", tournament.rounds), tournament.currentRound < tournament.rounds ? /*#__PURE__*/React.createElement("button", {
+  }, "Omg\xE5ng ", tournament.currentRound, " av ", tournament.rounds), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    className: "text-stone-400 text-[10px] uppercase tracking-widest mb-2 text-center"
+  }, "Totalst\xE4llning"), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-2"
+  }, liveStandings.map(function (p, i) {
+    var _p$colorIndex3, _p$colorIndex4;
+    var pal = PLAYER_COLORS[(_p$colorIndex3 = p.colorIndex) !== null && _p$colorIndex3 !== void 0 ? _p$colorIndex3 : i % 4];
+    var medals = ['🥇', '🥈', '🥉'];
+    return /*#__PURE__*/React.createElement("div", {
+      key: p.name,
+      className: "flex items-center gap-3 rounded-xl px-4 py-2 border-2 ".concat(i === 0 ? pal.finish : 'bg-stone-50 border-stone-200')
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "text-lg w-6 text-center shrink-0"
+    }, medals[i] || "".concat(i + 1, ".")), /*#__PURE__*/React.createElement("span", {
+      className: "text-lg shrink-0"
+    }, p.avatar || AVATAR_OPTIONS[(_p$colorIndex4 = p.colorIndex) !== null && _p$colorIndex4 !== void 0 ? _p$colorIndex4 : i]), /*#__PURE__*/React.createElement("div", {
+      className: "flex-1 min-w-0"
+    }, /*#__PURE__*/React.createElement("p", {
+      className: "font-display font-bold text-stone-900 truncate text-sm"
+    }, p.name), /*#__PURE__*/React.createElement("p", {
+      className: "text-[11px] text-stone-400"
+    }, "Totalt ", p.totalScore, " p")), /*#__PURE__*/React.createElement("div", {
+      className: "text-right shrink-0"
+    }, /*#__PURE__*/React.createElement("p", {
+      className: "font-mono-score text-xl font-extrabold text-stone-900"
+    }, p.wins % 1 === 0 ? p.wins : p.wins.toFixed(1)), /*#__PURE__*/React.createElement("p", {
+      className: "text-[10px] text-stone-400"
+    }, p.wins === 1 ? 'vinst' : 'vinster')));
+  }))), tournament.currentRound < tournament.rounds ? /*#__PURE__*/React.createElement("button", {
     onClick: onNextRound,
     className: "w-full py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition"
   }, "Omg\xE5ng ", tournament.currentRound + 1, " \u2192") : /*#__PURE__*/React.createElement("button", {
@@ -2677,6 +2726,14 @@ function YatzyApp() {
     setTournamentMode(false);
     resetGame();
   }
+
+  // Close the standings and start a fresh tournament (keeps tournament mode on,
+  // unlike abortTournament which returns to a plain single game).
+  function newTournament() {
+    setTournament(null);
+    setTournamentMode(true);
+    resetGame();
+  }
   function resetGame() {
     setPhase('setup');
     setPlayers([]);
@@ -3116,7 +3173,8 @@ function YatzyApp() {
     return /*#__PURE__*/React.createElement(TournamentStandingsScreen, {
       tournament: tournament,
       onNextRound: nextTournamentRound,
-      onAbort: abortTournament
+      onAbort: abortTournament,
+      onNewTournament: newTournament
     });
   }
   var gridCols = "116px repeat(".concat(numPlayers, ", minmax(56px, 1fr))");
