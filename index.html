@@ -214,19 +214,10 @@ function calcScore(catId, dice, houseRules, scores) {
   });
   if (!cat) return 0;
 
-  // Joker: a Yatzy roll counts as satisfying a lower-section pattern once the
-  // yatzy slot is filled. Pair/tretal/fyrtal/chans already score correctly from
-  // five of a kind, but two pairs, the straights and kak come out as 0 because
-  // the dice don't literally match the pattern — so score those as if they did.
-  if (isJokerEligible(catId, dice, scores, hr)) {
-    var face = dice[0];
-    if (catId === 'twopairs') return 4 * face;
-    if (catId === 'smallstraight') return FIXED_DEFAULTS.smallstraight;
-    if (catId === 'largestraight') return FIXED_DEFAULTS.largestraight;
-    if (catId === 'house') return dice.reduce(function (a, b) {
-      return a + b;
-    }, 0);
-  }
+  // Joker: once the yatzy slot is filled, a fresh Yatzy roll is a wildcard that
+  // scores any open row at its maximum, whatever the faces show — so five ones
+  // can be spent as 25 in femmor, or 22 in tva par.
+  if (isJokerEligible(catId, dice, scores, hr)) return MAX_SCORES[catId];
   return cat.calc(dice);
 }
 
@@ -237,11 +228,10 @@ function isJokerEligible(catId, dice, scores, houseRules) {
   if (!counts(dice).includes(5)) return false; // must be a Yatzy roll
   if (scores['yatzy'] === undefined) return false; // yatzy slot must be filled
   if (scores[catId] !== undefined) return false; // a joker fills an empty box, never overwrites
-  // Joker applies to lower section categories (except yatzy itself)
-  var cat = CATEGORIES.find(function (c) {
+  if (catId === 'yatzy') return false; // the yatzy row itself is already spent
+  return CATEGORIES.some(function (c) {
     return c.id === catId;
   });
-  return cat && cat.section === 'lower' && catId !== 'yatzy';
 }
 
 // Forced-order: return the catId that must be filled next, or null if free choice
@@ -641,6 +631,12 @@ var VALID_SCORES = CATEGORIES.reduce(function (acc, cat) {
     return set.add(cat.calc(dice));
   });
   acc[cat.id] = set;
+  return acc;
+}, {});
+// Highest score each row can actually take (ones 5 ... sixes 30, two pairs 22,
+// kak 28, chans 30, ...). Used by the joker house rule.
+var MAX_SCORES = CATEGORIES.reduce(function (acc, cat) {
+  acc[cat.id] = Math.max.apply(Math, _toConsumableArray(VALID_SCORES[cat.id]));
   return acc;
 }, {});
 function isValidScore(catId, score) {
@@ -1607,7 +1603,7 @@ function LoadingScreen() {
 var HOUSE_RULE_DEFS = [{
   id: 'joker',
   label: 'Joker',
-  desc: 'Yatzy som joker — om Yatzy-rutan är fylld kan ett Yatzy-kast räknas som ett par, kåk, etc.',
+  desc: 'Yatzy som joker — när Yatzy-rutan är fylld ger ett nytt Yatzy-kast maxpoäng i vilken öppen ruta som helst (t.ex. 22 för två par, 25 för femmor).',
   emoji: '🃏'
 }, {
   id: 'bonusYatzy',
