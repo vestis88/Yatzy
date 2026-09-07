@@ -130,6 +130,9 @@ function Pencil({ className = '' }) {
 
 // Personal storage keys
 var STORAGE_KEY = 'yatzy-game-state-v3';
+// A tournament parked mid-way, so a normal game can be played in between.
+// Device-local like the in-progress game state, not synced to the cloud.
+var PAUSED_TOURNAMENT_KEY = 'yatzy-paused-tournament';
 var STATS_KEY = 'yatzy-stats';
 
 // ─── Player color palettes ────────────────────────────────────────────────────
@@ -1818,7 +1821,10 @@ function SetupScreen(_ref14) {
     tournamentMode = _ref14.tournamentMode,
     setTournamentMode = _ref14.setTournamentMode,
     tournamentRounds = _ref14.tournamentRounds,
-    setTournamentRounds = _ref14.setTournamentRounds;
+    setTournamentRounds = _ref14.setTournamentRounds,
+    pausedTournament = _ref14.pausedTournament,
+    onResumeTournament = _ref14.onResumeTournament,
+    onDiscardPausedTournament = _ref14.onDiscardPausedTournament;
   var _React$useState = React.useState(false),
     _React$useState2 = _slicedToArray(_React$useState, 2),
     shuffleFlash = _React$useState2[0],
@@ -1998,7 +2004,21 @@ function SetupScreen(_ref14) {
   }, "\u2699\uFE0F Husregler"), /*#__PURE__*/React.createElement("button", {
     onClick: onStart,
     className: "flex-1 py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition text-sm"
-  }, "Starta spelet"))), /*#__PURE__*/React.createElement("div", {
+  }, "Starta spelet"))), pausedTournament && pausedTournament.tournament && /*#__PURE__*/React.createElement("div", {
+    className: "w-full max-w-sm mt-4 rounded-2xl border-4 border-amber-400 bg-amber-50 p-4"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "font-display font-bold text-stone-900 text-sm uppercase tracking-wide"
+  }, "\u23F8 Pausad turnering"), /*#__PURE__*/React.createElement("p", {
+    className: "text-[11px] text-stone-500 mt-0.5 mb-3"
+  }, "Omg\xE5ng ", pausedTournament.tournament.currentRound, " av ", pausedTournament.tournament.rounds, " \xB7 ", pausedTournament.tournament.standings.map(function (st) {
+    return st.name;
+  }).join(', ')), /*#__PURE__*/React.createElement("button", {
+    onClick: onResumeTournament,
+    className: "w-full py-3 rounded-xl bg-amber-400 border-2 border-stone-900 font-display font-bold text-stone-900 uppercase tracking-wide active:scale-95 transition text-sm"
+  }, "\u25B6 \xC5teruppta turnering"), /*#__PURE__*/React.createElement("button", {
+    onClick: onDiscardPausedTournament,
+    className: "w-full mt-2 text-[11px] text-stone-400 underline active:scale-95 transition"
+  }, "Sl\xE4ng den pausade turneringen")), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-4 mt-4"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -2044,7 +2064,8 @@ function FinishedScreen(_ref16) {
     onClearLeaderboard = _ref16.onClearLeaderboard,
     tournament = _ref16.tournament,
     onNextRound = _ref16.onNextRound,
-    onEndTournament = _ref16.onEndTournament;
+    onEndTournament = _ref16.onEndTournament,
+    onPauseTournament = _ref16.onPauseTournament;
   var results = players.map(function (p) {
     return _objectSpread(_objectSpread({}, p), calcTotals(p.scores));
   }).sort(function (a, b) {
@@ -2141,7 +2162,10 @@ function FinishedScreen(_ref16) {
   }, "Omg\xE5ng ", tournament.currentRound + 1, " \u2192") : /*#__PURE__*/React.createElement("button", {
     onClick: onEndTournament,
     className: "w-full py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition"
-  }, "\uD83C\uDFC6 Visa resultat"), /*#__PURE__*/React.createElement("button", {
+  }, "\uD83C\uDFC6 Visa resultat"), tournament.currentRound < tournament.rounds && onPauseTournament && /*#__PURE__*/React.createElement("button", {
+    onClick: onPauseTournament,
+    className: "w-full py-2.5 rounded-xl border-2 border-stone-400 text-stone-600 font-display font-bold uppercase tracking-wide active:scale-95 transition text-sm"
+  }, "\u23F8 Pausa turnering"), /*#__PURE__*/React.createElement("button", {
     onClick: onRestart,
     className: "w-full text-sm text-stone-400 underline active:scale-95 transition text-center"
   }, "Avbryt turnering")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
@@ -2214,6 +2238,11 @@ function YatzyApp() {
     _useState20 = _slicedToArray(_useState19, 2),
     tournament = _useState20[0],
     setTournament = _useState20[1];
+  // Snapshot of a paused tournament (same shape as the autosave), or null
+  var _useStatePT = useState(null),
+    _useStatePT2 = _slicedToArray(_useStatePT, 2),
+    pausedTournament = _useStatePT2[0],
+    setPausedTournament = _useStatePT2[1];
   var _useState21 = useState(false),
     _useState22 = _slicedToArray(_useState21, 2),
     leaderboardLoaded = _useState22[0],
@@ -2462,6 +2491,19 @@ function YatzyApp() {
         }
       }, _callee2, null, [[0, 3, 4, 5]]);
     }))();
+  }, []);
+
+  // Load a paused tournament, if one was parked earlier
+  useEffect(function () {
+    if (typeof window === 'undefined' || !window.storage) return;
+    window.storage.get(PAUSED_TOURNAMENT_KEY).then(function (result) {
+      try {
+        var snap = result && result.value ? JSON.parse(result.value) : null;
+        if (snap && snap.tournament) setPausedTournament(snap);
+      } catch (e) {
+        // Corrupt snapshot — ignore it
+      }
+    }).catch(function () {});
   }, []);
 
   // Load leaderboard
@@ -2750,6 +2792,81 @@ function YatzyApp() {
     setTournament(null);
     setTournamentMode(true);
     resetGame();
+  }
+
+  // Park the running tournament so a normal game can be played in between.
+  // Stores the same snapshot the autosave uses, under its own key so starting
+  // another game doesn't overwrite it.
+  function pauseTournament() {
+    if (!tournament) return;
+    var snapshot = {
+      tournament: tournament,
+      tournamentRounds: tournamentRounds,
+      players: players,
+      currentPlayer: currentPlayer,
+      dice: dice,
+      held: held,
+      rollsLeft: rollsLeft,
+      turnsPlayed: turnsPlayed,
+      history: history,
+      phase: phase === 'setup' ? 'playing' : phase,
+      mode: mode,
+      numPlayers: numPlayers,
+      names: names,
+      aiFlags: aiFlags,
+      aiDifficulties: aiDifficulties,
+      avatars: avatars,
+      houseRules: houseRules,
+      // Carried so resuming a round that already banked its stats doesn't
+      // record that round a second time.
+      statsRecorded: statsRecorded,
+      statsSnapshot: statsSnapshot,
+      savedAt: Date.now()
+    };
+    setPausedTournament(snapshot);
+    if (typeof window !== 'undefined' && window.storage) {
+      window.storage.set(PAUSED_TOURNAMENT_KEY, JSON.stringify(snapshot)).catch(function () {});
+    }
+    setTournament(null);
+    setTournamentMode(false);
+    setConfirmReset(false);
+    resetGame();
+  }
+
+  // Pick a parked tournament back up exactly where it was left
+  function resumeTournament() {
+    var snap = pausedTournament;
+    if (!snap || !snap.tournament) return;
+    setTournament(snap.tournament);
+    setTournamentMode(true);
+    if (typeof snap.tournamentRounds === 'number') setTournamentRounds(snap.tournamentRounds);
+    if (Array.isArray(snap.names)) setNames(snap.names);
+    if (typeof snap.numPlayers === 'number') setNumPlayers(snap.numPlayers);
+    if (Array.isArray(snap.aiFlags)) setAiFlags(snap.aiFlags);
+    if (Array.isArray(snap.aiDifficulties)) setAiDifficulties(snap.aiDifficulties);
+    if (Array.isArray(snap.avatars)) setAvatars(snap.avatars);
+    if (snap.houseRules && _typeof(snap.houseRules) === 'object') setHouseRules(_objectSpread(_objectSpread({}, DEFAULT_HOUSE_RULES), snap.houseRules));
+    if (snap.mode === 'auto' || snap.mode === 'manual') setMode(snap.mode);
+    setPlayers(Array.isArray(snap.players) ? snap.players : []);
+    setCurrentPlayer(snap.currentPlayer || 0);
+    setDice(Array.isArray(snap.dice) ? snap.dice : [1, 2, 3, 4, 5]);
+    setHeld(Array.isArray(snap.held) ? snap.held.map(Boolean) : [false, false, false, false, false]);
+    setRollsLeft(typeof snap.rollsLeft === 'number' ? snap.rollsLeft : 3);
+    setTurnsPlayed(snap.turnsPlayed || 0);
+    setHistory(Array.isArray(snap.history) ? snap.history : []);
+    setStatsRecorded(!!snap.statsRecorded);
+    setStatsSnapshot(snap.statsSnapshot && _typeof(snap.statsSnapshot) === 'object' ? snap.statsSnapshot : null);
+    setSelectedCategory(null);
+    setInputBuffer('');
+    setInputError(null);
+    clearPausedTournament();
+    setPhase(snap.phase === 'finished' ? 'finished' : 'playing');
+  }
+  function clearPausedTournament() {
+    setPausedTournament(null);
+    if (typeof window !== 'undefined' && window.storage) {
+      window.storage["delete"](PAUSED_TOURNAMENT_KEY).catch(function () {});
+    }
   }
   function resetGame() {
     setPhase('setup');
@@ -3166,7 +3283,10 @@ function YatzyApp() {
       tournamentMode: tournamentMode,
       setTournamentMode: setTournamentMode,
       tournamentRounds: tournamentRounds,
-      setTournamentRounds: setTournamentRounds
+      setTournamentRounds: setTournamentRounds,
+      pausedTournament: pausedTournament,
+      onResumeTournament: resumeTournament,
+      onDiscardPausedTournament: clearPausedTournament
     });
   }
   if (phase === 'finished') {
@@ -3187,7 +3307,8 @@ function YatzyApp() {
       },
       tournament: tournament,
       onNextRound: tournament && tournament.currentRound < tournament.rounds ? nextTournamentRound : endTournament,
-      onEndTournament: endTournament
+      onEndTournament: endTournament,
+      onPauseTournament: pauseTournament
     });
   }
   if (phase === 'tournament-standings') {
@@ -3614,7 +3735,10 @@ function YatzyApp() {
     className: "font-display text-lg font-extrabold text-stone-900 mb-2"
   }, "Avsluta spelet?"), /*#__PURE__*/React.createElement("p", {
     className: "text-sm text-stone-500 mb-4"
-  }, "P\xE5g\xE5ende po\xE4ng g\xE5r f\xF6rlorade."), /*#__PURE__*/React.createElement("div", {
+  }, tournament ? "P\xE5g\xE5ende omg\xE5ng g\xE5r f\xF6rlorad. Pausa i st\xE4llet f\xF6r att spara turneringen till senare." : "P\xE5g\xE5ende po\xE4ng g\xE5r f\xF6rlorade."), tournament && /*#__PURE__*/React.createElement("button", {
+    onClick: pauseTournament,
+    className: "w-full mb-2 py-2.5 rounded-xl bg-amber-400 border-2 border-stone-900 font-display font-bold text-stone-900 uppercase tracking-wide text-sm active:scale-95 transition"
+  }, "\u23F8 Pausa turnering"), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-2"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
