@@ -653,6 +653,18 @@ var DEFAULT_SCORES = CATEGORIES.reduce(function (acc, cat) {
   acc[cat.id] = cat.id in FIXED_DEFAULTS ? FIXED_DEFAULTS[cat.id] : Math.max.apply(Math, _toConsumableArray(VALID_SCORES[cat.id]));
   return acc;
 }, {});
+
+// Face value per upper-section category. These are scored by counting how many
+// dice show the face, so manual entry uses a 0-5 counter instead of a keypad.
+var UPPER_FACES = {
+  ones: 1,
+  twos: 2,
+  threes: 3,
+  fours: 4,
+  fives: 5,
+  sixes: 6
+};
+var DEFAULT_DICE_COUNT = 3;
 function getDefaultScore(catId) {
   return catId in DEFAULT_SCORES ? DEFAULT_SCORES[catId] : null;
 }
@@ -2254,6 +2266,11 @@ function YatzyApp() {
     _useState46 = _slicedToArray(_useState45, 2),
     inputBuffer = _useState46[0],
     setInputBuffer = _useState46[1];
+  // Number of dice showing the face, for upper-section manual entry
+  var _useStateDC = useState(DEFAULT_DICE_COUNT),
+    _useStateDC2 = _slicedToArray(_useStateDC, 2),
+    diceCount = _useStateDC2[0],
+    setDiceCount = _useStateDC2[1];
   var _useState47 = useState(null),
     _useState48 = _slicedToArray(_useState47, 2),
     inputError = _useState48[0],
@@ -3037,6 +3054,7 @@ function YatzyApp() {
     });
     setInputBuffer('');
     setInputError(null);
+    setDiceCount(DEFAULT_DICE_COUNT);
   }
   function pressDigit(n) {
     if (!selectedCategory) return;
@@ -3055,7 +3073,8 @@ function YatzyApp() {
   // Manual mode: confirm the typed number, or the suggested default if nothing was typed
   function confirmScore() {
     if (!selectedCategory) return;
-    var score = inputBuffer !== '' ? parseInt(inputBuffer, 10) : getDefaultScore(selectedCategory);
+    // Upper section is entered as a dice count, so the score is count x face
+    var score = selectedCategory in UPPER_FACES ? diceCount * UPPER_FACES[selectedCategory] : inputBuffer !== '' ? parseInt(inputBuffer, 10) : getDefaultScore(selectedCategory);
     if (score === null) return;
     if (!isValidScore(selectedCategory, score)) {
       var _CATEGORIES$find2;
@@ -3078,11 +3097,13 @@ function YatzyApp() {
     setSelectedCategory(null);
     setInputBuffer('');
     setInputError(null);
+    setDiceCount(DEFAULT_DICE_COUNT);
   }
   function closeKeypad() {
     setSelectedCategory(null);
     setInputBuffer('');
     setInputError(null);
+    setDiceCount(DEFAULT_DICE_COUNT);
   }
 
   // In-game name editing. Pre-fills with a trailing space if the "lucky" flag is
@@ -3181,6 +3202,10 @@ function YatzyApp() {
   var round = Math.floor(turnsPlayed / numPlayers) + 1;
   var diceDisabled = rolling || rollsLeft === 3 || rollsLeft === 0;
   var selDefault = selectedCategory ? getDefaultScore(selectedCategory) : null;
+  // Upper section (ettor-sexor) is entered as "how many dice show this face"
+  var selFace = selectedCategory ? UPPER_FACES[selectedCategory] : undefined;
+  var isUpperSel = !!selFace;
+  var countScore = isUpperSel ? diceCount * selFace : null;
   var selLabel = selectedCategory ? (_CATEGORIES$find3 = CATEGORIES.find(function (c) {
     return c.id === selectedCategory;
   })) === null || _CATEGORIES$find3 === void 0 ? void 0 : _CATEGORIES$find3.label : null;
@@ -3473,11 +3498,43 @@ function YatzyApp() {
     className: "font-display font-bold text-stone-50 text-sm uppercase tracking-wide"
   }, selLabel), /*#__PURE__*/React.createElement("p", {
     className: "font-mono-score text-3xl font-extrabold leading-none mt-0.5 ".concat(inputError ? 'text-red-400' : 'text-amber-400')
-  }, inputBuffer !== '' ? inputBuffer : selDefault)), /*#__PURE__*/React.createElement("button", {
+  }, isUpperSel ? countScore : inputBuffer !== '' ? inputBuffer : selDefault)), /*#__PURE__*/React.createElement("button", {
     onClick: closeKeypad,
     "aria-label": "St\xE4ng",
     className: "w-8 h-8 rounded-full border-2 border-emerald-600 text-emerald-100 flex items-center justify-center text-sm shrink-0"
-  }, "\xD7")), /*#__PURE__*/React.createElement("div", {
+  }, "\xD7")), isUpperSel ? /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      setInputError(null);
+      setDiceCount(function (c) {
+        return Math.max(0, c - 1);
+      });
+    },
+    disabled: diceCount <= 0,
+    "aria-label": "F\xE4rre t\xE4rningar",
+    className: "w-14 h-14 rounded-xl bg-stone-50 border-2 border-stone-900 font-display text-2xl font-bold text-stone-900 disabled:opacity-40 active:scale-95 transition shrink-0"
+  }, "\u2212"), /*#__PURE__*/React.createElement("div", {
+    className: "flex-1 text-center"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "font-mono-score text-3xl font-extrabold text-stone-50 leading-none"
+  }, diceCount), /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] uppercase tracking-widest text-emerald-200 mt-0.5"
+  }, diceCount === 1 ? 't\xE4rning' : 't\xE4rningar')), /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      setInputError(null);
+      setDiceCount(function (c) {
+        return Math.min(5, c + 1);
+      });
+    },
+    disabled: diceCount >= 5,
+    "aria-label": "Fler t\xE4rningar",
+    className: "w-14 h-14 rounded-xl bg-stone-50 border-2 border-stone-900 font-display text-2xl font-bold text-stone-900 disabled:opacity-40 active:scale-95 transition shrink-0"
+  }, "+"), /*#__PURE__*/React.createElement("button", {
+    onClick: confirmScore,
+    "aria-label": "Registrera",
+    className: "w-14 h-14 rounded-xl bg-amber-400 border-2 border-stone-900 font-display text-2xl font-bold text-stone-900 active:scale-95 transition shrink-0"
+  }, "\u2713")) : /*#__PURE__*/React.createElement("div", {
     className: "grid grid-cols-3 gap-2"
   }, [1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (n) {
     return /*#__PURE__*/React.createElement("button", {
@@ -3507,7 +3564,7 @@ function YatzyApp() {
     className: "text-red-300 text-[11px] text-center mt-2 leading-relaxed font-semibold"
   }, "\u26A0 ", inputError) : /*#__PURE__*/React.createElement("p", {
     className: "text-emerald-200 text-[11px] text-center mt-2 leading-relaxed"
-  }, inputBuffer !== '' ? "Tryck \u2713 f\xF6r att registrera ".concat(inputBuffer, " p.") : selectedCategory in FIXED_DEFAULTS ? "\u2713 ger ".concat(selDefault, " p direkt \u2013 eller skriv ett eget v\xE4rde.") : "\u2713 ger ".concat(selDefault, " p (h\xF6gsta m\xF6jliga) \u2013 eller skriv ett eget v\xE4rde.")))), showRules && /*#__PURE__*/React.createElement("div", {
+  }, isUpperSel ? "".concat(diceCount, " \xD7 ").concat(selFace, " = ").concat(countScore, " p. Tryck \u2713 f\xF6r att registrera.") : inputBuffer !== '' ? "Tryck \u2713 f\xF6r att registrera ".concat(inputBuffer, " p.") : selectedCategory in FIXED_DEFAULTS ? "\u2713 ger ".concat(selDefault, " p direkt \u2013 eller skriv ett eget v\xE4rde.") : "\u2713 ger ".concat(selDefault, " p (h\xF6gsta m\xF6jliga) \u2013 eller skriv ett eget v\xE4rde.")))), showRules && /*#__PURE__*/React.createElement("div", {
     className: "fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4",
     onClick: function onClick() {
       return setShowRules(false);
