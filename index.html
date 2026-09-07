@@ -1548,13 +1548,13 @@ function TournamentStandingsScreen(_ref8) {
       className: "font-display font-bold text-stone-900 truncate"
     }, p.name), /*#__PURE__*/React.createElement("p", {
       className: "text-[11px] text-stone-400"
-    }, p.wins === Math.floor(p.wins) ? p.wins : p.wins.toFixed(1), " ", p.wins === 1 ? 'vinst' : 'vinster', " \xB7 Totalt ", p.totalScore, " p")), /*#__PURE__*/React.createElement("div", {
+    }, "Totalt ", p.totalScore, " p")), /*#__PURE__*/React.createElement("div", {
       className: "text-right shrink-0"
     }, /*#__PURE__*/React.createElement("p", {
       className: "font-mono-score text-xl font-extrabold text-stone-900"
     }, p.wins % 1 === 0 ? p.wins : p.wins.toFixed(1)), /*#__PURE__*/React.createElement("p", {
       className: "text-[10px] text-stone-400"
-    }, "po\xE4ng")));
+    }, p.wins === 1 ? 'vinst' : 'vinster')));
   })), !isLastRound && /*#__PURE__*/React.createElement("button", {
     onClick: onNextRound,
     className: "w-full max-w-sm py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition mb-3"
