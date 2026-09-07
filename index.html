@@ -209,16 +209,24 @@ function calcScore(catId, dice, houseRules, scores) {
   // We detect this via the scores context — but we can't know rollsLeft here.
   // Instead we pass it separately. For simplicity, naturalBonus is handled in recordScore.
 
-  // Joker: if scoring a lower-section category and the player has a Yatzy,
-  // and the yatzy slot is already filled, allow the joker score.
-  // The joker score for lower cats = the natural score of that dice combo.
-  // This is handled by NOT blocking the score — the calc itself is unchanged.
-  // We just need to unlock the category when joker applies.
-
   var cat = CATEGORIES.find(function (c) {
     return c.id === catId;
   });
   if (!cat) return 0;
+
+  // Joker: a Yatzy roll counts as satisfying a lower-section pattern once the
+  // yatzy slot is filled. Pair/tretal/fyrtal/chans already score correctly from
+  // five of a kind, but two pairs, the straights and kak come out as 0 because
+  // the dice don't literally match the pattern — so score those as if they did.
+  if (isJokerEligible(catId, dice, scores, hr)) {
+    var face = dice[0];
+    if (catId === 'twopairs') return 4 * face;
+    if (catId === 'smallstraight') return FIXED_DEFAULTS.smallstraight;
+    if (catId === 'largestraight') return FIXED_DEFAULTS.largestraight;
+    if (catId === 'house') return dice.reduce(function (a, b) {
+      return a + b;
+    }, 0);
+  }
   return cat.calc(dice);
 }
 
@@ -228,6 +236,7 @@ function isJokerEligible(catId, dice, scores, houseRules) {
   if (!(houseRules !== null && houseRules !== void 0 && houseRules.joker)) return false;
   if (!counts(dice).includes(5)) return false; // must be a Yatzy roll
   if (scores['yatzy'] === undefined) return false; // yatzy slot must be filled
+  if (scores[catId] !== undefined) return false; // a joker fills an empty box, never overwrites
   // Joker applies to lower section categories (except yatzy itself)
   var cat = CATEGORIES.find(function (c) {
     return c.id === catId;
@@ -1264,8 +1273,6 @@ function ScoreRow(_ref6) {
     }
 
     // auto mode (app-rolled dice)
-    // With joker rule: a filled slot can still be scored if joker applies
-    var jokerApplies = isFilled && isJokerEligible(category.id, dice, (_players$idx$scores = (_players$idx2 = players[idx]) === null || _players$idx2 === void 0 ? void 0 : _players$idx2.scores) !== null && _players$idx$scores !== void 0 ? _players$idx$scores : {}, houseRules);
     var hr = houseRules || DEFAULT_HOUSE_RULES;
     // Forced order: only the required cat is pickable
     var forcedBlocked = hr.forcedOrder && isCurrent && forcedCat && category.id !== forcedCat;
@@ -1278,7 +1285,7 @@ function ScoreRow(_ref6) {
         return sc[c.id] !== undefined;
       });
     }();
-    var canPick = isCurrent && (!isFilled || jokerApplies) && rollsLeft < 3 && !forcedBlocked && !strictBlocked;
+    var canPick = isCurrent && !isFilled && rollsLeft < 3 && !forcedBlocked && !strictBlocked;
     var potential = canPick ? calcScore(category.id, dice, houseRules, (_players$idx$scores3 = (_players$idx4 = players[idx]) === null || _players$idx4 === void 0 ? void 0 : _players$idx4.scores) !== null && _players$idx$scores3 !== void 0 ? _players$idx$scores3 : {}) : null;
     var isLastAiCell = lastAiAction && lastAiAction.playerIndex === idx && lastAiAction.categoryId === category.id;
     var bg = 'bg-transparent';
@@ -3103,16 +3110,10 @@ function YatzyApp() {
         if (!upperDone) return;
       }
     }
-    if (current.scores[catId] !== undefined) {
-      // Joker: if slot is filled but joker applies, we can still use it
-      if (!isJokerEligible(catId, dice, current.scores, hr)) return;
-    }
+    if (current.scores[catId] !== undefined) return;
 
-    // Calculate score with house rules
+    // Calculate score with house rules (incl. joker)
     var score = calcScore(catId, dice, hr, current.scores);
-
-    // Joker: if natural score is 0 but joker applies, treat as non-zero pair/whatever
-    // The scored value is just the natural calcScore result (already handled above)
 
     // Natural bonus: Yatzy on first roll scores 100
     if (catId === 'yatzy' && score === 50 && hr.naturalBonus && initialRollRef.current && rollsLeft === 2) {
