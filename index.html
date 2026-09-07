@@ -1691,6 +1691,12 @@ function LeaderboardModal(_ref0) {
   var leaderboard = _ref0.leaderboard,
     onClose = _ref0.onClose,
     onClear = _ref0.onClear;
+  // Which column the list is ranked by: highest single score, or most wins
+  var _useStateLb = React.useState('best'),
+    _useStateLb2 = _slicedToArray(_useStateLb, 2),
+    sortBy = _useStateLb2[0],
+    setSortBy = _useStateLb2[1];
+  var byWins = sortBy === 'wins';
   var entries = Object.entries(leaderboard).map(function (_ref1) {
     var _ref10 = _slicedToArray(_ref1, 2),
       name = _ref10[0],
@@ -1701,7 +1707,7 @@ function LeaderboardModal(_ref0) {
       avgScore: d.games > 0 ? Math.round(d.totalScore / d.games) : 0
     });
   }).sort(function (a, b) {
-    return b.wins - a.wins || b.bestScore - a.bestScore;
+    return byWins ? b.wins - a.wins || b.bestScore - a.bestScore : b.bestScore - a.bestScore || b.wins - a.wins;
   });
   return /*#__PURE__*/React.createElement("div", {
     className: "fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 px-4"
@@ -1714,7 +1720,19 @@ function LeaderboardModal(_ref0) {
   }, "\uD83C\uDFC6 Topplista"), /*#__PURE__*/React.createElement("button", {
     onClick: onClose,
     className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center font-bold text-stone-900"
-  }, "\u2715")), entries.length === 0 ? /*#__PURE__*/React.createElement("p", {
+  }, "\u2715")), /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-center gap-1 mb-3 bg-stone-200 rounded-full p-1"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return setSortBy('best');
+    },
+    className: "flex-1 px-3 py-1.5 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ".concat(byWins ? 'text-stone-500' : 'bg-stone-900 text-stone-50')
+  }, "H\xF6gsta po\xE4ng"), /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return setSortBy('wins');
+    },
+    className: "flex-1 px-3 py-1.5 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ".concat(byWins ? 'bg-stone-900 text-stone-50' : 'text-stone-500')
+  }, "Vinster")), entries.length === 0 ? /*#__PURE__*/React.createElement("p", {
     className: "text-stone-400 text-sm text-center py-4"
   }, "Inga resultat \xE4nnu.") : /*#__PURE__*/React.createElement("div", {
     className: "space-y-2 max-h-72 overflow-y-auto"
@@ -1730,13 +1748,13 @@ function LeaderboardModal(_ref0) {
       className: "font-display font-bold text-stone-900 truncate"
     }, e.name), /*#__PURE__*/React.createElement("p", {
       className: "text-[11px] text-stone-400"
-    }, e.games, " ", e.games === 1 ? 'match' : 'matcher', " \xB7 Snitt ", e.avgScore, " p \xB7 B\xE4st ", e.bestScore, " p")), /*#__PURE__*/React.createElement("div", {
+    }, e.games, " ", e.games === 1 ? 'match' : 'matcher', " \xB7 Snitt ", e.avgScore, " p \xB7 ", byWins ? "B\xE4st ".concat(e.bestScore, " p") : "".concat(e.wins, " ").concat(e.wins === 1 ? 'vinst' : 'vinster'))), /*#__PURE__*/React.createElement("div", {
       className: "text-right shrink-0"
     }, /*#__PURE__*/React.createElement("p", {
       className: "font-mono-score font-extrabold text-stone-900"
-    }, e.wins), /*#__PURE__*/React.createElement("p", {
+    }, byWins ? e.wins : e.bestScore), /*#__PURE__*/React.createElement("p", {
       className: "text-[10px] text-stone-400"
-    }, e.wins === 1 ? 'vinst' : 'vinster')));
+    }, byWins ? e.wins === 1 ? 'vinst' : 'vinster' : 'po\xE4ng')));
   })), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-2 mt-4"
   }, /*#__PURE__*/React.createElement("button", {
