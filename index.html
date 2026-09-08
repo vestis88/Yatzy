@@ -132,7 +132,26 @@ function Pencil({ className = '' }) {
 var STORAGE_KEY = 'yatzy-game-state-v3';
 // A tournament parked mid-way, so a normal game can be played in between.
 // Device-local like the in-progress game state, not synced to the cloud.
-var PAUSED_TOURNAMENT_KEY = 'yatzy-paused-tournament';
+var PAUSED_TOURNAMENT_KEY = 'yatzy-paused-tournament'; // legacy single slot, migrated on load
+var PAUSED_GAMES_KEY = 'yatzy-paused-games';
+// Plenty for normal use; the oldest is dropped past this so the list and
+// localStorage can't grow without bound.
+var MAX_PAUSED_GAMES = 20;
+
+// "12 nov 14:32", or "-" if the timestamp is missing/unreadable
+function formatPausedDate(ts) {
+  if (!ts) return '\u2013';
+  try {
+    return new Date(ts).toLocaleString('sv-SE', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (e) {
+    return '\u2013';
+  }
+}
 var STATS_KEY = 'yatzy-stats';
 
 // ─── Player color palettes ────────────────────────────────────────────────────
@@ -1843,9 +1862,9 @@ function SetupScreen(_ref14) {
     setTournamentMode = _ref14.setTournamentMode,
     tournamentRounds = _ref14.tournamentRounds,
     setTournamentRounds = _ref14.setTournamentRounds,
-    pausedTournament = _ref14.pausedTournament,
-    onResumeTournament = _ref14.onResumeTournament,
-    onDiscardPausedTournament = _ref14.onDiscardPausedTournament;
+    pausedGames = _ref14.pausedGames,
+    onResumeGame = _ref14.onResumeGame,
+    onDiscardGame = _ref14.onDiscardGame;
   var _React$useState = React.useState(false),
     _React$useState2 = _slicedToArray(_React$useState, 2),
     shuffleFlash = _React$useState2[0],
@@ -2025,21 +2044,38 @@ function SetupScreen(_ref14) {
   }, "\u2699\uFE0F Husregler"), /*#__PURE__*/React.createElement("button", {
     onClick: onStart,
     className: "flex-1 py-3 rounded-xl bg-red-600 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition text-sm"
-  }, "Starta spelet"))), pausedTournament && pausedTournament.tournament && /*#__PURE__*/React.createElement("div", {
+  }, "Starta spelet"))), pausedGames && pausedGames.length > 0 && /*#__PURE__*/React.createElement("div", {
     className: "w-full max-w-sm mt-4 rounded-2xl border-4 border-amber-400 bg-amber-50 p-4"
   }, /*#__PURE__*/React.createElement("p", {
-    className: "font-display font-bold text-stone-900 text-sm uppercase tracking-wide"
-  }, "\u23F8 Pausad turnering"), /*#__PURE__*/React.createElement("p", {
-    className: "text-[11px] text-stone-500 mt-0.5 mb-3"
-  }, "Omg\xE5ng ", pausedTournament.tournament.currentRound, " av ", pausedTournament.tournament.rounds, " \xB7 ", pausedTournament.tournament.standings.map(function (st) {
-    return st.name;
-  }).join(', ')), /*#__PURE__*/React.createElement("button", {
-    onClick: onResumeTournament,
-    className: "w-full py-3 rounded-xl bg-amber-400 border-2 border-stone-900 font-display font-bold text-stone-900 uppercase tracking-wide active:scale-95 transition text-sm"
-  }, "\u25B6 \xC5teruppta turnering"), /*#__PURE__*/React.createElement("button", {
-    onClick: onDiscardPausedTournament,
-    className: "w-full mt-2 text-[11px] text-stone-400 underline active:scale-95 transition"
-  }, "Sl\xE4ng den pausade turneringen")), /*#__PURE__*/React.createElement("div", {
+    className: "font-display font-bold text-stone-900 text-sm uppercase tracking-wide mb-2"
+  }, "\u23F8 Pausade spel"), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-2 max-h-56 overflow-y-auto"
+  }, pausedGames.map(function (g) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: g.id,
+      className: "rounded-xl bg-stone-50 border-2 border-stone-200 px-3 py-2 flex items-center gap-2"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex-1 min-w-0"
+    }, /*#__PURE__*/React.createElement("p", {
+      className: "font-display font-bold text-stone-900 text-sm truncate"
+    }, g.isTournament && /*#__PURE__*/React.createElement("span", {
+      className: "mr-1"
+    }, "\uD83C\uDFC6"), (g.participants || []).join(', ') || 'Spel'), /*#__PURE__*/React.createElement("p", {
+      className: "text-[11px] text-stone-400"
+    }, g.isTournament && g.tournament ? "Omg\xE5ng ".concat(g.tournament.currentRound, "/").concat(g.tournament.rounds, " \xB7 ") : '', formatPausedDate(g.savedAt))), /*#__PURE__*/React.createElement("button", {
+      onClick: function onClick() {
+        return onResumeGame(g.id);
+      },
+      "aria-label": "\xC5teruppta",
+      className: "w-9 h-9 shrink-0 rounded-lg bg-amber-400 border-2 border-stone-900 font-display font-bold text-stone-900 active:scale-95 transition"
+    }, "\u25B6"), /*#__PURE__*/React.createElement("button", {
+      onClick: function onClick() {
+        return onDiscardGame(g.id);
+      },
+      "aria-label": "Sl\xE4ng",
+      className: "w-9 h-9 shrink-0 rounded-lg border-2 border-stone-300 text-stone-400 font-bold active:scale-95 transition"
+    }, "\u2715"));
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-4 mt-4"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -2259,11 +2295,11 @@ function YatzyApp() {
     _useState20 = _slicedToArray(_useState19, 2),
     tournament = _useState20[0],
     setTournament = _useState20[1];
-  // Snapshot of a paused tournament (same shape as the autosave), or null
-  var _useStatePT = useState(null),
+  // Parked games (tournament or normal), newest first
+  var _useStatePT = useState([]),
     _useStatePT2 = _slicedToArray(_useStatePT, 2),
-    pausedTournament = _useStatePT2[0],
-    setPausedTournament = _useStatePT2[1];
+    pausedGames = _useStatePT2[0],
+    setPausedGames = _useStatePT2[1];
   var _useState21 = useState(false),
     _useState22 = _slicedToArray(_useState21, 2),
     leaderboardLoaded = _useState22[0],
@@ -2514,17 +2550,51 @@ function YatzyApp() {
     }))();
   }, []);
 
-  // Load a paused tournament, if one was parked earlier
+  // Load parked games, folding in a tournament parked by the older single-slot version
   useEffect(function () {
     if (typeof window === 'undefined' || !window.storage) return;
-    window.storage.get(PAUSED_TOURNAMENT_KEY).then(function (result) {
+    Promise.all([window.storage.get(PAUSED_GAMES_KEY)["catch"](function () {
+      return null;
+    }), window.storage.get(PAUSED_TOURNAMENT_KEY)["catch"](function () {
+      return null;
+    })]).then(function (_ref) {
+      var _ref2 = _slicedToArray(_ref, 2),
+        listRes = _ref2[0],
+        legacyRes = _ref2[1];
+      var list = [];
       try {
-        var snap = result && result.value ? JSON.parse(result.value) : null;
-        if (snap && snap.tournament) setPausedTournament(snap);
+        var parsed = listRes && listRes.value ? JSON.parse(listRes.value) : null;
+        if (Array.isArray(parsed)) list = parsed.filter(function (g) {
+          return g && g.id;
+        });
       } catch (e) {
-        // Corrupt snapshot — ignore it
+        // Corrupt list — start empty rather than losing the app
       }
-    }).catch(function () {});
+      var migrated = false;
+      try {
+        var legacy = legacyRes && legacyRes.value ? JSON.parse(legacyRes.value) : null;
+        if (legacy && legacy.tournament) {
+          list = [_objectSpread(_objectSpread({}, legacy), {}, {
+            id: 'legacy-' + (legacy.savedAt || Date.now()),
+            isTournament: true,
+            participants: legacy.tournament.standings.map(function (st) {
+              return st.name;
+            })
+          })].concat(list);
+          migrated = true;
+        }
+      } catch (e) {
+        // Ignore an unreadable legacy slot
+      }
+      if (list.length) setPausedGames(list);
+      // Write the merged list back before dropping the old slot, so a reload
+      // before the next save can't lose the migrated tournament.
+      if (migrated) {
+        window.storage.set(PAUSED_GAMES_KEY, JSON.stringify(list)).then(function () {
+          return window.storage["delete"](PAUSED_TOURNAMENT_KEY);
+        })["catch"](function () {});
+      }
+    })["catch"](function () {});
   }, []);
 
   // Load leaderboard
@@ -2815,12 +2885,25 @@ function YatzyApp() {
     resetGame();
   }
 
-  // Park the running tournament so a normal game can be played in between.
-  // Stores the same snapshot the autosave uses, under its own key so starting
-  // another game doesn't overwrite it.
-  function pauseTournament() {
-    if (!tournament) return;
+  function persistPausedGames(list) {
+    setPausedGames(list);
+    if (typeof window !== 'undefined' && window.storage) {
+      window.storage.set(PAUSED_GAMES_KEY, JSON.stringify(list))["catch"](function () {});
+    }
+  }
+
+  // Park the running game — tournament or not — so another can be played in
+  // between. Stores the same snapshot the autosave uses, in its own list so
+  // starting another game doesn't overwrite it.
+  function pauseGame() {
+    if (phase !== 'playing' && phase !== 'finished') return;
+    if (!players.length) return;
     var snapshot = {
+      id: "".concat(Date.now(), "-").concat(Math.random().toString(36).slice(2, 8)),
+      isTournament: !!tournament,
+      participants: players.map(function (pl) {
+        return pl.name;
+      }),
       tournament: tournament,
       tournamentRounds: tournamentRounds,
       players: players,
@@ -2830,7 +2913,7 @@ function YatzyApp() {
       rollsLeft: rollsLeft,
       turnsPlayed: turnsPlayed,
       history: history,
-      phase: phase === 'setup' ? 'playing' : phase,
+      phase: phase,
       mode: mode,
       numPlayers: numPlayers,
       names: names,
@@ -2838,28 +2921,25 @@ function YatzyApp() {
       aiDifficulties: aiDifficulties,
       avatars: avatars,
       houseRules: houseRules,
-      // Carried so resuming a round that already banked its stats doesn't
-      // record that round a second time.
+      // Carried so resuming a game that already banked its stats doesn't
+      // record it a second time.
       statsRecorded: statsRecorded,
       statsSnapshot: statsSnapshot,
       savedAt: Date.now()
     };
-    setPausedTournament(snapshot);
-    if (typeof window !== 'undefined' && window.storage) {
-      window.storage.set(PAUSED_TOURNAMENT_KEY, JSON.stringify(snapshot)).catch(function () {});
-    }
-    setTournament(null);
-    setTournamentMode(false);
+    persistPausedGames([snapshot].concat(_toConsumableArray(pausedGames)).slice(0, MAX_PAUSED_GAMES));
     setConfirmReset(false);
     resetGame();
   }
 
-  // Pick a parked tournament back up exactly where it was left
-  function resumeTournament() {
-    var snap = pausedTournament;
-    if (!snap || !snap.tournament) return;
-    setTournament(snap.tournament);
-    setTournamentMode(true);
+  // Pick a parked game back up exactly where it was left
+  function resumeGame(id) {
+    var snap = pausedGames.find(function (g) {
+      return g.id === id;
+    });
+    if (!snap) return;
+    setTournament(snap.tournament || null);
+    setTournamentMode(!!snap.tournament);
     if (typeof snap.tournamentRounds === 'number') setTournamentRounds(snap.tournamentRounds);
     if (Array.isArray(snap.names)) setNames(snap.names);
     if (typeof snap.numPlayers === 'number') setNumPlayers(snap.numPlayers);
@@ -2880,14 +2960,15 @@ function YatzyApp() {
     setSelectedCategory(null);
     setInputBuffer('');
     setInputError(null);
-    clearPausedTournament();
+    persistPausedGames(pausedGames.filter(function (g) {
+      return g.id !== id;
+    }));
     setPhase(snap.phase === 'finished' ? 'finished' : 'playing');
   }
-  function clearPausedTournament() {
-    setPausedTournament(null);
-    if (typeof window !== 'undefined' && window.storage) {
-      window.storage["delete"](PAUSED_TOURNAMENT_KEY).catch(function () {});
-    }
+  function discardPausedGame(id) {
+    persistPausedGames(pausedGames.filter(function (g) {
+      return g.id !== id;
+    }));
   }
   function resetGame() {
     setPhase('setup');
@@ -3299,9 +3380,9 @@ function YatzyApp() {
       setTournamentMode: setTournamentMode,
       tournamentRounds: tournamentRounds,
       setTournamentRounds: setTournamentRounds,
-      pausedTournament: pausedTournament,
-      onResumeTournament: resumeTournament,
-      onDiscardPausedTournament: clearPausedTournament
+      pausedGames: pausedGames,
+      onResumeGame: resumeGame,
+      onDiscardGame: discardPausedGame
     });
   }
   if (phase === 'finished') {
@@ -3323,7 +3404,7 @@ function YatzyApp() {
       tournament: tournament,
       onNextRound: tournament && tournament.currentRound < tournament.rounds ? nextTournamentRound : endTournament,
       onEndTournament: endTournament,
-      onPauseTournament: pauseTournament
+      onPauseTournament: pauseGame
     });
   }
   if (phase === 'tournament-standings') {
@@ -3750,10 +3831,10 @@ function YatzyApp() {
     className: "font-display text-lg font-extrabold text-stone-900 mb-2"
   }, "Avsluta spelet?"), /*#__PURE__*/React.createElement("p", {
     className: "text-sm text-stone-500 mb-4"
-  }, tournament ? "P\xE5g\xE5ende omg\xE5ng g\xE5r f\xF6rlorad. Pausa i st\xE4llet f\xF6r att spara turneringen till senare." : "P\xE5g\xE5ende po\xE4ng g\xE5r f\xF6rlorade."), tournament && /*#__PURE__*/React.createElement("button", {
-    onClick: pauseTournament,
+  }, "P\xE5g\xE5ende po\xE4ng g\xE5r f\xF6rlorade. Pausa i st\xE4llet f\xF6r att spara till senare."), /*#__PURE__*/React.createElement("button", {
+    onClick: pauseGame,
     className: "w-full mb-2 py-2.5 rounded-xl bg-amber-400 border-2 border-stone-900 font-display font-bold text-stone-900 uppercase tracking-wide text-sm active:scale-95 transition"
-  }, "\u23F8 Pausa turnering"), /*#__PURE__*/React.createElement("div", {
+  }, tournament ? "\u23F8 Pausa turnering" : "\u23F8 Pausa spelet"), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-2"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
