@@ -110,6 +110,11 @@ function Undo2({ className = '' }) {
     React.createElement("path", { d: "M9 14 4 9l5-5" }),
     React.createElement("path", { d: "M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11" }));
 }
+function Redo2({ className = '' }) {
+  return React.createElement("svg", { className: className, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" },
+    React.createElement("path", { d: "m15 14 5-5-5-5" }),
+    React.createElement("path", { d: "M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13" }));
+}
 function Volume2({ className = '' }) {
   return React.createElement("svg", { className: className, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" },
     React.createElement("polygon", { points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5" }),
@@ -137,6 +142,15 @@ var PAUSED_GAMES_KEY = 'yatzy-paused-games';
 // Plenty for normal use; the oldest is dropped past this so the list and
 // localStorage can't grow without bound.
 var MAX_PAUSED_GAMES = 20;
+// How many single actions (each roll, each registered score) can be stepped back.
+// Bounded so the snapshots can't bloat the autosave or a parked game.
+var UNDO_LIMIT = 40;
+
+// A snapshot only needs what an action can change; the rest of the game
+// (names, house rules, tournament standings) is untouched by undo/redo.
+function isSnapshot(entry) {
+  return !!entry && Array.isArray(entry.scores);
+}
 
 // "12 nov 14:32", or "-" if the timestamp is missing/unreadable
 function formatPausedDate(ts) {
@@ -2339,7 +2353,12 @@ function YatzyApp() {
   var _useState39 = useState([]),
     _useState40 = _slicedToArray(_useState39, 2),
     history = _useState40[0],
-    setHistory = _useState40[1]; // stack of {playerIndex, categoryId} for undo
+    setHistory = _useState40[1]; // undo stack of game-state snapshots
+  // Snapshots undone but not yet re-applied, newest first
+  var _useStateFu = useState([]),
+    _useStateFu2 = _slicedToArray(_useStateFu, 2),
+    future = _useStateFu2[0],
+    setFuture = _useStateFu2[1];
   var _useState41 = useState('auto'),
     _useState42 = _slicedToArray(_useState41, 2),
     mode = _useState42[0],
@@ -2491,7 +2510,8 @@ function YatzyApp() {
                 setHeld(restoredHeld);
                 setRollsLeft((_saved$rollsLeft = saved.rollsLeft) !== null && _saved$rollsLeft !== void 0 ? _saved$rollsLeft : 3);
                 setTurnsPlayed((_saved$turnsPlayed = saved.turnsPlayed) !== null && _saved$turnsPlayed !== void 0 ? _saved$turnsPlayed : 0);
-                setHistory(Array.isArray(saved.history) ? saved.history : []);
+                setHistory(Array.isArray(saved.history) ? saved.history.filter(isSnapshot) : []);
+                setFuture(Array.isArray(saved.future) ? saved.future.filter(isSnapshot) : []);
                 setPhase(saved.phase);
               }
             }
@@ -2656,6 +2676,7 @@ function YatzyApp() {
         rollsLeft: rollsLeft,
         turnsPlayed: turnsPlayed,
         history: history,
+        future: future,
         mode: mode,
         soundEnabled: soundEnabled,
         statsRecorded: statsRecorded,
@@ -2666,7 +2687,7 @@ function YatzyApp() {
     return function () {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [loading, phase, numPlayers, names, aiFlags, aiDifficulties, avatars, houseRules, tournament, tournamentMode, tournamentRounds, players, currentPlayer, dice, held, rollsLeft, turnsPlayed, history, mode, soundEnabled, statsRecorded, statsSnapshot]);
+  }, [loading, phase, numPlayers, names, aiFlags, aiDifficulties, avatars, houseRules, tournament, tournamentMode, tournamentRounds, players, currentPlayer, dice, held, rollsLeft, turnsPlayed, history, future, mode, soundEnabled, statsRecorded, statsSnapshot]);
   function persistStats(newStats) {
     setStats(newStats);
     if (typeof window !== 'undefined' && window.storage) {
@@ -2798,6 +2819,7 @@ function YatzyApp() {
     setRollsLeft(3);
     setTurnsPlayed(0);
     setHistory([]);
+    setFuture([]);
     setStatsRecorded(false);
     setStatsSnapshot(null);
     if (aiFlags.slice(0, numPlayers).some(Boolean)) setMode('auto');
@@ -2843,6 +2865,7 @@ function YatzyApp() {
     setRollsLeft(3);
     setTurnsPlayed(0);
     setHistory([]);
+    setFuture([]);
     setStatsRecorded(false);
     setStatsSnapshot(null);
     setPhase('playing');
@@ -2913,6 +2936,7 @@ function YatzyApp() {
       rollsLeft: rollsLeft,
       turnsPlayed: turnsPlayed,
       history: history,
+      future: future,
       phase: phase,
       mode: mode,
       numPlayers: numPlayers,
@@ -2954,7 +2978,8 @@ function YatzyApp() {
     setHeld(Array.isArray(snap.held) ? snap.held.map(Boolean) : [false, false, false, false, false]);
     setRollsLeft(typeof snap.rollsLeft === 'number' ? snap.rollsLeft : 3);
     setTurnsPlayed(snap.turnsPlayed || 0);
-    setHistory(Array.isArray(snap.history) ? snap.history : []);
+    setHistory(Array.isArray(snap.history) ? snap.history.filter(isSnapshot) : []);
+    setFuture(Array.isArray(snap.future) ? snap.future.filter(isSnapshot) : []);
     setStatsRecorded(!!snap.statsRecorded);
     setStatsSnapshot(snap.statsSnapshot && _typeof(snap.statsSnapshot) === 'object' ? snap.statsSnapshot : null);
     setSelectedCategory(null);
@@ -2974,6 +2999,7 @@ function YatzyApp() {
     setPhase('setup');
     setPlayers([]);
     setHistory([]);
+    setFuture([]);
     setStatsRecorded(false);
     setStatsSnapshot(null);
     setConfirmReset(false);
@@ -2987,6 +3013,7 @@ function YatzyApp() {
     if (!((_players$currentPlaye = players[currentPlayer]) !== null && _players$currentPlaye !== void 0 && _players$currentPlaye.isAI)) setLastAiAction(null);
     var isFirstRoll = rollsLeft === 3;
     if (isFirstRoll) initialRollRef.current = true;
+    pushUndo();
     var player = players[currentPlayer];
     var lucky = !!(player !== null && player !== void 0 && player.lucky);
     var unlucky = !!(player !== null && player !== void 0 && player.unlucky);
@@ -3039,6 +3066,7 @@ function YatzyApp() {
     });
     var prevUpperSum = calcTotals(players[currentPlayer].scores).upperSum;
     var isAITurn = !!((_players$currentPlaye2 = players[currentPlayer]) !== null && _players$currentPlaye2 !== void 0 && _players$currentPlaye2.isAI);
+    pushUndo();
     var updated = players.map(function (p, idx) {
       return idx === currentPlayer ? _objectSpread(_objectSpread({}, p), {}, {
         scores: _objectSpread(_objectSpread({}, p.scores), {}, _defineProperty({}, catId, score))
@@ -3056,15 +3084,6 @@ function YatzyApp() {
     } else {
       setLastAiAction(null);
     }
-    setHistory(function (h) {
-      return [].concat(_toConsumableArray(h), [{
-        playerIndex: currentPlayer,
-        categoryId: catId,
-        prevDice: _toConsumableArray(dice),
-        prevHeld: _toConsumableArray(held),
-        prevRollsLeft: rollsLeft
-      }]);
-    });
     setSelectedCategory(null);
     setInputBuffer('');
     setInputError(null);
@@ -3113,52 +3132,90 @@ function YatzyApp() {
     initialRollRef.current = false;
   }
 
-  // Undo the most recent score, one entry at a time. Restores the dice/holds/rolls
-  // exactly as they were before that score was picked, so it can be reassigned.
-  function undo() {
-    if (history.length === 0) return;
-    var last = history[history.length - 1];
+  // Undo/redo work on whole-state snapshots, so a single step back is a single
+  // action — one roll, or one registered score — rather than a whole turn.
+  function captureState() {
+    return {
+      scores: players.map(function (p) {
+        return _objectSpread({}, p.scores);
+      }),
+      currentPlayer: currentPlayer,
+      dice: _toConsumableArray(dice),
+      held: held.map(Boolean),
+      rollsLeft: rollsLeft,
+      turnsPlayed: turnsPlayed,
+      phase: phase
+    };
+  }
+
+  // Called before an action the player can take back. AI moves aren't recorded:
+  // stepping into the middle of one would just let it play itself out again.
+  function pushUndo() {
+    var _players$cp;
+    if ((_players$cp = players[currentPlayer]) !== null && _players$cp !== void 0 && _players$cp.isAI) return;
+    var snap = captureState();
     setHistory(function (h) {
-      return h.slice(0, -1);
+      return [].concat(_toConsumableArray(h), [snap]).slice(-UNDO_LIMIT);
     });
+    setFuture([]);
+  }
+  function applySnapshot(snap) {
     setPlayers(function (prev) {
       return prev.map(function (p, idx) {
-        if (idx !== last.playerIndex) return p;
-        var newScores = _objectSpread({}, p.scores);
-        delete newScores[last.categoryId];
         return _objectSpread(_objectSpread({}, p), {}, {
-          scores: newScores
+          scores: _objectSpread({}, snap.scores[idx] || {})
         });
       });
     });
-    setTurnsPlayed(function (t) {
-      return t - 1;
-    });
-    setCurrentPlayer(last.playerIndex);
-    setDice(Array.isArray(last.prevDice) ? last.prevDice : [1, 2, 3, 4, 5]);
-    setHeld(Array.isArray(last.prevHeld) ? last.prevHeld.map(Boolean) : [false, false, false, false, false]);
-    setRollsLeft(last.prevRollsLeft);
+    setCurrentPlayer(snap.currentPlayer);
+    setDice(Array.isArray(snap.dice) ? snap.dice : [1, 2, 3, 4, 5]);
+    setHeld(Array.isArray(snap.held) ? snap.held.map(Boolean) : [false, false, false, false, false]);
+    setRollsLeft(typeof snap.rollsLeft === 'number' ? snap.rollsLeft : 3);
+    setTurnsPlayed(snap.turnsPlayed || 0);
     setSelectedCategory(null);
     setInputBuffer('');
     setInputError(null);
-    if (phase === 'finished') {
-      setPhase('playing');
-      if (statsRecorded && statsSnapshot) {
-        var restored = _objectSpread({}, stats);
-        Object.entries(statsSnapshot).forEach(function (_ref20) {
-          var _ref21 = _slicedToArray(_ref20, 2),
-            name = _ref21[0],
-            prevValue = _ref21[1];
-          if (prevValue === null) delete restored[name];else restored[name] = prevValue;
-        });
-        persistStats(restored);
-        setStatsSnapshot(null);
-        setStatsRecorded(false);
-      }
-    }
     if (celebrationTimeoutRef.current) clearTimeout(celebrationTimeoutRef.current);
     setCelebration(null);
     setLastAiAction(null);
+    // Stepping back out of the end screen puts the banked stats back as they were
+    if (phase === 'finished' && snap.phase !== 'finished' && statsRecorded && statsSnapshot) {
+      var restored = _objectSpread({}, stats);
+      Object.entries(statsSnapshot).forEach(function (_ref20) {
+        var _ref21 = _slicedToArray(_ref20, 2),
+          name = _ref21[0],
+          prevValue = _ref21[1];
+        if (prevValue === null) delete restored[name];else restored[name] = prevValue;
+      });
+      persistStats(restored);
+      setStatsSnapshot(null);
+      setStatsRecorded(false);
+    }
+    setPhase(snap.phase === 'finished' ? 'finished' : 'playing');
+  }
+  function undo() {
+    if (rolling || history.length === 0) return;
+    var prev = history[history.length - 1];
+    var current = captureState();
+    setHistory(function (h) {
+      return h.slice(0, -1);
+    });
+    setFuture(function (f) {
+      return [current].concat(_toConsumableArray(f)).slice(0, UNDO_LIMIT);
+    });
+    applySnapshot(prev);
+  }
+  function redo() {
+    if (rolling || future.length === 0) return;
+    var next = future[0];
+    var current = captureState();
+    setHistory(function (h) {
+      return [].concat(_toConsumableArray(h), [current]).slice(-UNDO_LIMIT);
+    });
+    setFuture(function (f) {
+      return f.slice(1);
+    });
+    applySnapshot(next);
   }
 
   // Auto mode: score is derived from the app-rolled dice
@@ -3498,8 +3555,15 @@ function YatzyApp() {
     onClick: undo,
     disabled: history.length === 0,
     className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center text-stone-900 disabled:opacity-30",
-    "aria-label": "\xC5ngra senaste registrering"
+    "aria-label": "\xC5ngra senaste \xE5tg\xE4rden"
   }, /*#__PURE__*/React.createElement(Undo2, {
+    className: "w-4 h-4"
+  })), /*#__PURE__*/React.createElement("button", {
+    onClick: redo,
+    disabled: future.length === 0,
+    className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center text-stone-900 disabled:opacity-30",
+    "aria-label": "G\xF6r om"
+  }, /*#__PURE__*/React.createElement(Redo2, {
     className: "w-4 h-4"
   })), /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
@@ -3512,8 +3576,8 @@ function YatzyApp() {
       return setConfirmReset(true);
     },
     className: "w-8 h-8 rounded-full border-2 border-stone-900 flex items-center justify-center text-stone-900 text-lg",
-    "aria-label": "Nytt spel"
-  }, "\u21BA"))), celebration === 'yatzy' && /*#__PURE__*/React.createElement(YatzyCelebration, null), celebration === 'naturalyatzy' && /*#__PURE__*/React.createElement(NaturalYatzyCelebration, null), celebration === 'bonus' && /*#__PURE__*/React.createElement(BonusCelebration, null), celebration === 'bonusyatzy' && /*#__PURE__*/React.createElement(BonusYatzyCelebration, null), /*#__PURE__*/React.createElement("div", {
+    "aria-label": "Avsluta eller pausa spelet"
+  }, "\u2715"))), celebration === 'yatzy' && /*#__PURE__*/React.createElement(YatzyCelebration, null), celebration === 'naturalyatzy' && /*#__PURE__*/React.createElement(NaturalYatzyCelebration, null), celebration === 'bonus' && /*#__PURE__*/React.createElement(BonusCelebration, null), celebration === 'bonusyatzy' && /*#__PURE__*/React.createElement(BonusYatzyCelebration, null), /*#__PURE__*/React.createElement("div", {
     className: "bg-red-600 shrink-0"
   }, /*#__PURE__*/React.createElement("div", {
     className: "px-4 py-2 flex items-center justify-between"
