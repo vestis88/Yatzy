@@ -216,6 +216,8 @@ var PLAYER_COLORS = [{
 // Emoji avatar options per player (shown on setup and scorecard header)
 var AVATAR_OPTIONS = ['😀', '😎', '🤩', '🥳', '🧠', '👻', '🦊', '🐻', '🐼', '🦄', '🎩'];
 var LEADERBOARD_KEY = 'yatzy-leaderboard';
+// Games needed before an average is a fair ranking rather than one lucky night
+var MIN_GAMES_FOR_AVG = 5;
 var TOURNAMENT_KEY = 'yatzy-tournament';
 // ─── House rules ──────────────────────────────────────────────────────────────
 var DEFAULT_HOUSE_RULES = {
@@ -1727,13 +1729,14 @@ function LeaderboardModal(_ref0) {
   var leaderboard = _ref0.leaderboard,
     onClose = _ref0.onClose,
     onClear = _ref0.onClear;
-  // Which column the list is ranked by: highest single score, or most wins
+  // Which column the list is ranked by: best single score, average, or most wins
   var _useStateLb = React.useState('best'),
     _useStateLb2 = _slicedToArray(_useStateLb, 2),
     sortBy = _useStateLb2[0],
     setSortBy = _useStateLb2[1];
   var byWins = sortBy === 'wins';
-  var entries = Object.entries(leaderboard).map(function (_ref1) {
+  var byAvg = sortBy === 'avg';
+  var allEntries = Object.entries(leaderboard).map(function (_ref1) {
     var _ref10 = _slicedToArray(_ref1, 2),
       name = _ref10[0],
       d = _ref10[1];
@@ -1742,9 +1745,18 @@ function LeaderboardModal(_ref0) {
     }, d), {}, {
       avgScore: d.games > 0 ? Math.round(d.totalScore / d.games) : 0
     });
-  }).sort(function (a, b) {
-    return byWins ? b.wins - a.wins || b.bestScore - a.bestScore : b.bestScore - a.bestScore || b.wins - a.wins;
   });
+  // A handful of games keeps one lucky result off the top of the average list
+  var entries = (byAvg ? allEntries.filter(function (e) {
+    return e.games >= MIN_GAMES_FOR_AVG;
+  }) : allEntries.slice()).sort(function (a, b) {
+    if (byAvg) return b.avgScore - a.avgScore || b.bestScore - a.bestScore;
+    if (byWins) return b.wins - a.wins || b.bestScore - a.bestScore;
+    return b.bestScore - a.bestScore || b.wins - a.wins;
+  });
+  var tabCls = function tabCls(id) {
+    return "flex-1 px-2 py-1.5 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ".concat(sortBy === id ? 'bg-stone-900 text-stone-50' : 'text-stone-500');
+  };
   return /*#__PURE__*/React.createElement("div", {
     className: "fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 px-4"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1762,15 +1774,20 @@ function LeaderboardModal(_ref0) {
     onClick: function onClick() {
       return setSortBy('best');
     },
-    className: "flex-1 px-3 py-1.5 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ".concat(byWins ? 'text-stone-500' : 'bg-stone-900 text-stone-50')
-  }, "H\xF6gsta po\xE4ng"), /*#__PURE__*/React.createElement("button", {
+    className: tabCls('best')
+  }, "B\xE4sta"), /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return setSortBy('avg');
+    },
+    className: tabCls('avg')
+  }, "Snitt"), /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
       return setSortBy('wins');
     },
-    className: "flex-1 px-3 py-1.5 rounded-full text-[11px] font-display font-bold uppercase tracking-wide transition ".concat(byWins ? 'bg-stone-900 text-stone-50' : 'text-stone-500')
+    className: tabCls('wins')
   }, "Vinster")), entries.length === 0 ? /*#__PURE__*/React.createElement("p", {
     className: "text-stone-400 text-sm text-center py-4"
-  }, "Inga resultat \xE4nnu.") : /*#__PURE__*/React.createElement("div", {
+  }, byAvg && allEntries.length > 0 ? "Ingen har spelat ".concat(MIN_GAMES_FOR_AVG, " matcher \xE4n.") : "Inga resultat \xE4nnu.") : /*#__PURE__*/React.createElement("div", {
     className: "space-y-2 max-h-72 overflow-y-auto"
   }, entries.map(function (e, i) {
     return /*#__PURE__*/React.createElement("div", {
@@ -1784,19 +1801,19 @@ function LeaderboardModal(_ref0) {
       className: "font-display font-bold text-stone-900 truncate"
     }, e.name), /*#__PURE__*/React.createElement("p", {
       className: "text-[11px] text-stone-400"
-    }, e.games, " ", e.games === 1 ? 'match' : 'matcher', " \xB7 Snitt ", e.avgScore, " p \xB7 ", byWins ? "B\xE4st ".concat(e.bestScore, " p") : "".concat(e.wins, " ").concat(e.wins === 1 ? 'vinst' : 'vinster'))), /*#__PURE__*/React.createElement("div", {
+    }, e.games, " ", e.games === 1 ? 'match' : 'matcher', " \xB7 ", byAvg ? "B\xE4st ".concat(e.bestScore, " p") : "Snitt ".concat(e.avgScore, " p"), " \xB7 ", byWins ? "B\xE4st ".concat(e.bestScore, " p") : "".concat(e.wins, " ").concat(e.wins === 1 ? 'vinst' : 'vinster'))), /*#__PURE__*/React.createElement("div", {
       className: "text-right shrink-0"
     }, /*#__PURE__*/React.createElement("p", {
       className: "font-mono-score font-extrabold text-stone-900"
-    }, byWins ? e.wins : e.bestScore), /*#__PURE__*/React.createElement("p", {
+    }, byWins ? e.wins : byAvg ? e.avgScore : e.bestScore), /*#__PURE__*/React.createElement("p", {
       className: "text-[10px] text-stone-400"
-    }, byWins ? e.wins === 1 ? 'vinst' : 'vinster' : 'po\xE4ng')));
+    }, byWins ? e.wins === 1 ? 'vinst' : 'vinster' : byAvg ? 'snitt' : 'po\xE4ng')));
   })), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-2 mt-4"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: onClose,
     className: "flex-1 py-2.5 rounded-xl bg-stone-900 text-stone-50 font-display font-bold uppercase tracking-wide active:scale-95 transition text-sm"
-  }, "St\xE4ng"), entries.length > 0 && /*#__PURE__*/React.createElement("button", {
+  }, "St\xE4ng"), allEntries.length > 0 && /*#__PURE__*/React.createElement("button", {
     onClick: onClear,
     className: "px-4 py-2.5 rounded-xl border-2 border-stone-300 text-stone-500 font-display font-bold uppercase tracking-wide active:scale-95 transition text-sm"
   }, "Rensa"))));
