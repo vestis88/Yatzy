@@ -2286,6 +2286,11 @@ function YatzyApp() {
     _useState10 = _slicedToArray(_useState1, 2),
     avatars = _useState10[0],
     setAvatars = _useState10[1];
+  // Index of the player the pause menu is asking to confirm removal of, or null
+  var _useStateRm = useState(null),
+    _useStateRm2 = _slicedToArray(_useStateRm, 2),
+    pendingRemoval = _useStateRm2[0],
+    setPendingRemoval = _useStateRm2[1];
   var _useState11 = useState({}),
     _useState12 = _slicedToArray(_useState11, 2),
     leaderboard = _useState12[0],
@@ -2994,6 +2999,63 @@ function YatzyApp() {
     persistPausedGames(pausedGames.filter(function (g) {
       return g.id !== id;
     }));
+  }
+  // Drop a player mid-game. Their column disappears and nothing they scored is
+  // kept, so the finished-game effects never see them and their averages are
+  // left alone — the roster simply shrinks and play continues.
+  function removePlayer(idx) {
+    if (!players[idx] || players.length <= 1) return;
+    var without = function without(arr, fill) {
+      var next = arr.filter(function (_, i) {
+        return i !== idx;
+      });
+      while (next.length < 4) next.push(fill);
+      return next;
+    };
+    var newPlayers = players.filter(function (_, i) {
+      return i !== idx;
+    });
+    var newCount = newPlayers.length;
+    // turnsPlayed counts filled cells, so recomputing keeps the "15 rounds each"
+    // end condition correct now that there's one player fewer.
+    var newTurns = newPlayers.reduce(function (sum, pl) {
+      return sum + Object.keys(pl.scores).length;
+    }, 0);
+    var removedWasCurrent = idx === currentPlayer;
+    var newCurrent = idx < currentPlayer ? currentPlayer - 1 : currentPlayer;
+    if (newCurrent >= newCount) newCurrent = 0;
+    setPlayers(newPlayers);
+    setNumPlayers(newCount);
+    setCurrentPlayer(newCurrent);
+    setTurnsPlayed(newTurns);
+    setNames(without(names, ''));
+    setAvatars(without(avatars, null));
+    setAiFlags(without(aiFlags, false));
+    setAiDifficulties(without(aiDifficulties, 'mellan'));
+    if (tournament && Array.isArray(tournament.standings)) {
+      setTournament(_objectSpread(_objectSpread({}, tournament), {}, {
+        standings: tournament.standings.filter(function (_, i) {
+          return i !== idx;
+        })
+      }));
+    }
+    // Undo snapshots address players by position, so they no longer line up
+    setHistory([]);
+    setFuture([]);
+    setSelectedCategory(null);
+    setInputBuffer('');
+    setInputError(null);
+    setLastAiAction(null);
+    // Whoever's turn it was is gone, so the next player starts fresh
+    if (removedWasCurrent) {
+      setDice([1, 2, 3, 4, 5]);
+      setHeld([false, false, false, false, false]);
+      setRollsLeft(3);
+    }
+    setPendingRemoval(null);
+    setConfirmReset(false);
+    // Removing the straggler can be what completes the game
+    if (newTurns >= newCount * 15) setPhase('finished');
   }
   function resetGame() {
     setPhase('setup');
@@ -3884,7 +3946,8 @@ function YatzyApp() {
   }, "St\xE4ng"))), confirmReset && /*#__PURE__*/React.createElement("div", {
     className: "fixed inset-0 bg-stone-900/60 flex items-center justify-center z-50 p-4",
     onClick: function onClick() {
-      return setConfirmReset(false);
+      setPendingRemoval(null);
+      setConfirmReset(false);
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "bg-stone-50 rounded-2xl max-w-xs w-full p-5 border-4 border-stone-900 text-center",
@@ -3898,11 +3961,51 @@ function YatzyApp() {
   }, "P\xE5g\xE5ende po\xE4ng g\xE5r f\xF6rlorade. Pausa i st\xE4llet f\xF6r att spara till senare."), /*#__PURE__*/React.createElement("button", {
     onClick: pauseGame,
     className: "w-full mb-2 py-2.5 rounded-xl bg-amber-400 border-2 border-stone-900 font-display font-bold text-stone-900 uppercase tracking-wide text-sm active:scale-95 transition"
-  }, tournament ? "\u23F8 Pausa turnering" : "\u23F8 Pausa spelet"), /*#__PURE__*/React.createElement("div", {
+  }, tournament ? "\u23F8 Pausa turnering" : "\u23F8 Pausa spelet"), players.length > 1 && (pendingRemoval === null ? /*#__PURE__*/React.createElement("div", {
+    className: "mb-3 rounded-xl border-2 border-stone-200 p-2"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-[10px] uppercase tracking-widest text-stone-400 font-display font-bold mb-1.5 text-center"
+  }, "Ta bort spelare"), /*#__PURE__*/React.createElement("div", {
+    className: "space-y-1"
+  }, players.map(function (pl, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "flex items-center gap-2 px-2 py-1 rounded-lg bg-stone-100"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "text-base shrink-0"
+    }, pl.avatar || AVATAR_OPTIONS[i]), /*#__PURE__*/React.createElement("span", {
+      className: "flex-1 min-w-0 truncate text-sm font-display font-bold text-stone-800 text-left"
+    }, pl.name), /*#__PURE__*/React.createElement("button", {
+      onClick: function onClick() {
+        return setPendingRemoval(i);
+      },
+      "aria-label": "Ta bort ".concat(pl.name),
+      className: "w-7 h-7 shrink-0 rounded-lg border-2 border-stone-300 text-stone-400 font-bold active:scale-95 transition"
+    }, "\u2715"));
+  }))) : /*#__PURE__*/React.createElement("div", {
+    className: "mb-3 rounded-xl border-2 border-red-300 bg-red-50 p-3"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-sm text-stone-700 mb-2 text-center"
+  }, "Ta bort ", /*#__PURE__*/React.createElement("span", {
+    className: "font-display font-bold"
+  }, players[pendingRemoval] ? players[pendingRemoval].name : ''), "? Po\xE4ngen r\xE4knas inte och spelet forts\xE4tter utan dem."), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-2"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
-      return setConfirmReset(false);
+      return setPendingRemoval(null);
+    },
+    className: "flex-1 py-2 rounded-lg border-2 border-stone-900 font-display font-bold text-stone-900 text-sm"
+  }, "Avbryt"), /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return removePlayer(pendingRemoval);
+    },
+    className: "flex-1 py-2 rounded-lg bg-red-600 text-stone-50 font-display font-bold text-sm"
+  }, "Ta bort")))), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      setPendingRemoval(null);
+      setConfirmReset(false);
     },
     className: "flex-1 py-2.5 rounded-xl border-2 border-stone-900 font-display font-bold text-stone-900"
   }, "Avbryt"), /*#__PURE__*/React.createElement("button", {
